@@ -6,7 +6,7 @@ services:
     ports:
       - 3000:5432
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - ~/mindfulu:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=admin
