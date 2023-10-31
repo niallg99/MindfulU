@@ -21,3 +21,9 @@ docker exec -it <container-id> psql -U admin -d mindfulu
 mindfulu=# DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 ```
+
+## Run scraping tool
+
+```sh
+docker exec -it <container-id> python manage.py shell -c "exec(open('base/scraping/scraping_logic.py').read())"
+```

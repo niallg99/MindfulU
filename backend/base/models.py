@@ -57,3 +57,29 @@ class Friendship(models.Model):
 
     def __str__(self):
         return f'{self.user.username} and {self.friend.username} - Status: {self.friendship_status}'
+
+class ScrapedData(models.Model):
+    url = models.URLField()
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    scraped_content = models.TextField(default="")  # Specify the default value
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Scraped Data"
+        verbose_name_plural = "Scraped Data"
+
+
+class Event(models.Model):
+    name = models.CharField(max_length=255, default="Event Name")
+    date = models.CharField(max_length=100, default="Event Date")
+    duration = models.CharField(max_length=100, default="Event Duration")
+    day = models.CharField(max_length=30, default="Event Day")
+    time = models.CharField(max_length=50, default="Event Time")
+    venue = models.CharField(max_length=255, default="Event Venue")
+    registration = models.TextField(default="Registration Information")
+
+    def __str__(self):
+        return self.name
