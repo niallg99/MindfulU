@@ -6,7 +6,6 @@ class User(models.Model):
     password = models.CharField(max_length=255)
     first_name = models.CharField(max_length=255)  # New field for first name
     last_name = models.CharField(max_length=255)   # New field for last name
-    date_of_birth = models.DateField()             # New field for date of birth
     # Add other user-related fields if needed
 
     def __str__(self):
