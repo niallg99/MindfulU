@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib import admin
-from .models import User, ProfilePicture, MoodCause, Mood, Friendship
+from .models import User, ProfilePicture, MoodCause, Mood, Friendship, Event
 
 # Register the User model
 admin.site.register(User)
@@ -18,3 +18,6 @@ admin.site.register(Mood)
 
 # Register the Friendship model
 admin.site.register(Friendship)
+
+# Register the Event model
+admin.site.register(Event)
