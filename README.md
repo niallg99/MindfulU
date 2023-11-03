@@ -27,3 +27,6 @@ CREATE SCHEMA public;
 ```sh
 docker exec -it <container-id> python manage.py shell -c "exec(open('base/scraping/scraping_logic.py').read())"
 ```
+
+export EMAIL_USER='your-gmail-username@gmail.com'
+export EMAIL_PASSWORD='your-gmail-app-password'

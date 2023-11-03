@@ -17,3 +17,26 @@ export function loginUser(userData) {
         return response.json();
     });
 }
+
+export async function resetUserPassword(email) {
+  try {
+    const response = await fetch(`${baseUrl}/api/password-reset/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error('Password reset failed: ' + (errorData.error || 'Unknown error'));
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error in resetUserPassword:', error);
+    throw error;
+  }
+}

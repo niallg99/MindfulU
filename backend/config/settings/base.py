@@ -37,7 +37,12 @@ PROJECT_APPS = [
     "base.apps.BaseConfig",
 ]
 
-THIRD_PARTY_APPS = ["corsheaders", "rest_framework", "rest_framework_simplejwt"]
+THIRD_PARTY_APPS = [
+    "corsheaders",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "captcha",
+]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
@@ -87,6 +92,19 @@ DATABASES = {
     }
 }
 
+RECAPTCHA_PUBLIC_KEY = "6LckjvIoAAAAACiQJaX2xfy1RcDPdZckdcr2GOFl"
+RECAPTCHA_PRIVATE_KEY = "6LckjvIoAAAAAJJ3tOOfZl8dUyw-DLKZCVupACD4"
+RECAPTCHA_USE_SSL = True
+
+# Email configuration
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get("EMAIL_USER")  # Set this in your environment
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")  # Set this in your environment
+
+
 # API
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -107,7 +125,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},

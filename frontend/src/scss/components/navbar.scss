@@ -1,0 +1,15 @@
+.navbar-custom {
+  background-color: $color-dusty-rose;
+  max-height: 100px;
+
+    .nav-link, .navbar-brand {
+      color: $default--text-color;
+    }
+
+  .nav-link, .nav-link.btn {
+    background: none;
+    border: none;
+    padding: 0;
+    outline: none;
+  }
+}
