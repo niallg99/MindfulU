@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "bootstrap-vue": "^2.23.1"
+  },
+  "devDependencies": {
+    "sass": "^1.69.5"
+  }
+}
