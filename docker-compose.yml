@@ -4,30 +4,47 @@ services:
   postgres:
     image: postgres:latest
     ports:
-      - 3000:5432
+      - "5432:5432"
     volumes:
       - ~/apps/postgres:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_USER=admin
-      - POSTGRES_DB=mindfulu
+      POSTGRES_PASSWORD: 123
+      POSTGRES_USER: admin
+      POSTGRES_DB: mindfulu
+
   backend:
     build: backend/
-    ports:
-      - "8000:8000"
     volumes:
       - ./backend:/backend
     env_file: .env
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn base.wsgi:application --bind 0.0.0.0:8000
     depends_on:
       - postgres
     restart: on-failure
+    ports:
+      - "8000:8000"  # If you want the backend to be accessible outside Docker
+
   frontend:
     build: frontend/
-    ports:
-      - "8080:8080"
-    volumes: 
-      - ./frontend/src:/frontend/src
-    command: npm run dev
+    command: npm run serve
     depends_on:
       - backend
+    restart: on-failure
+    ports:
+      - "8080:8080"
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/html:/usr/share/nginx/html:ro
+      - static_volume:/var/www/mindful-u.co.uk/static
+    depends_on:
+      - backend
+      - frontend
+    restart: on-failure
+
+volumes:
+  static_volume:

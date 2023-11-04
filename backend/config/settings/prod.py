@@ -1,7 +1,7 @@
 from .base import *
 
 DEBUG = False
-ALLOWED_HOSTS = ['']
+ALLOWED_HOSTS = ["mindful-u.co.uk", "www.mindful-u.co.uk"]
 
 # SECURITY
 # ------------------------------------------------------------------------------
