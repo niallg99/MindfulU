@@ -35,6 +35,10 @@
   width: 200px;
 }
 
+.card-header {
+  background-color: $color-mint-green;
+}
+
 @media (max-width: 767.98px) {
   /* Styles for smaller screens if needed */
 }

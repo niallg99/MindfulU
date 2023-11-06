@@ -1,5 +1,6 @@
 .full-page {
   height: calc(100vh - var(--navbar-height) - var(--footer-height));
+  background-color: dee2e6;
 }
 
 .login-card {
@@ -9,10 +10,15 @@
   border-radius: 0.5rem;
   overflow: hidden;
   border: 1px solid #dee2e6;
+  background-color: $color-mint-green;
 }
 
 .card-header, .card-body, .card-footer {
   padding: 1rem; 
+}
+
+.staff-header {
+  background-color: $color-pale-blue;
 }
 
 .card-header {
@@ -21,7 +27,7 @@
 
 .card-footer {
   border-top: 1px solid #dee2e6;
-  background-color: #f8f9fa;
+  background-color: $color-sand;
 }
 
 .shadow {

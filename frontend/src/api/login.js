@@ -29,8 +29,14 @@ export async function resetUserPassword(email) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error('Password reset failed: ' + (errorData.error || 'Unknown error'));
+      if (response.headers.get("content-type")?.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error('Password reset failed: ' + (errorData.error || 'Unknown error'));
+      } else {
+        // Here you can handle non-JSON responses, maybe the response is plain text
+        const errorText = await response.text();
+        throw new Error('Password reset failed: ' + errorText);
+      }
     }
 
     const data = await response.json();
@@ -40,3 +46,5 @@ export async function resetUserPassword(email) {
     throw error;
   }
 }
+
+

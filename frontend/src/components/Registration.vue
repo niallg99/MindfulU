@@ -86,8 +86,4 @@ export default {
 	<Footer />
 </template>
 
-<style scoped lang="scss">
-	@import "/src/scss/components/registration.scss";
-</style>
-
 

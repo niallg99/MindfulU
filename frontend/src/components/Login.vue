@@ -14,7 +14,8 @@ export default {
 			login_password: '',
 			reset_email: '',
 			errorMessage: '',
-			isStaffLogin: false
+			isStaffLogin: false,
+			isLoggedIn: false
 		};
 	},
 	methods: {
@@ -29,7 +30,9 @@ export default {
 				};
 				const response = await loginUser(userData);
 				if (response.message) {
-					this.$router.push('/events');
+					this.isLoggedIn = true;
+					this.$emit('login-success', this.isLoggedIn);
+					this.$router.push('/dashboard');
 				}
 			} catch (error) {
 				this.errorMessage = error.message;
@@ -64,10 +67,10 @@ export default {
 </script>
 
 <template>
-  <Navbar :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
+  <Navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
   <div class="full-page d-flex justify-content-center align-items-center">
     <div class="card login-card shadow">
-      <div v-if="isStaffLogin" class="card-header text-center bg-primary text-white">
+      <div v-if="isStaffLogin" class="card-header staff-header text-center text-white">
         Staff Login
       </div>
       <div class="card-header text-center bg-transparent">
@@ -121,9 +124,3 @@ export default {
 	</div>
 	<Footer />
 </template>
-
-
-<style scoped lang="scss">
-	@import "/src/scss/components/login.scss";
-	@import "/src/scss/utilities/modal.scss";
-</style>

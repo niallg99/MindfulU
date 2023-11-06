@@ -26,6 +26,7 @@ class MoodCause(models.Model):
         ("Academic", "Academic"),
         ("Financial", "Financial"),
         ("Relationship/Social", "Relationship/Social"),
+        ("Other", "Other"),
     ]
 
     cause_type = models.CharField(max_length=50, choices=CAUSE_CHOICES)
@@ -44,7 +45,7 @@ class Mood(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mood_type = models.CharField(max_length=50, choices=MOOD_CHOICES)
-    mood_date = models.DateTimeField()
+    mood_date = models.DateTimeField(auto_now_add=True)
     mood_cause = models.ForeignKey(
         MoodCause, on_delete=models.CASCADE, null=True, blank=True
     )
@@ -90,3 +91,16 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class SupportLink(models.Model):
+    url = models.URLField(max_length=200)
+    link_text = models.CharField(max_length=200)
+    link_url = models.URLField(max_length=200, default="")
+
+    def __str__(self):
+        return self.link_text
+
+    class Meta:
+        verbose_name = "Support Link"
+        verbose_name_plural = "Support Links"

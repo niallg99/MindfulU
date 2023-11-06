@@ -2,7 +2,15 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib import admin
-from .models import User, ProfilePicture, MoodCause, Mood, Friendship, Event
+from .models import (
+    User,
+    ProfilePicture,
+    MoodCause,
+    Mood,
+    Friendship,
+    Event,
+    SupportLink,
+)
 
 # Register the User model
 admin.site.register(User)
@@ -21,3 +29,6 @@ admin.site.register(Friendship)
 
 # Register the Event model
 admin.site.register(Event)
+
+# Register the SupportLink model
+admin.site.register(SupportLink)

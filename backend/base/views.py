@@ -4,8 +4,12 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from base.models import Event, ScrapedData
-from base.serializers import EventSerializer, ScrapedDataSerializer
+from base.models import Event, ScrapedData, Mood, SupportLink
+from base.serializers import (
+    EventSerializer,
+    ScrapedDataSerializer,
+    SupportLinkSerializer,
+)
 
 
 @api_view(["POST"])
@@ -80,3 +84,19 @@ def get_scraped_data(request):
     scraped_data = ScrapedData.objects.all()
     serializer = ScrapedDataSerializer(scraped_data, many=True)
     return Response(serializer.data)
+
+
+@api_view(["GET"])
+def get_mood_choices(request):
+    return Response(Mood.MOOD_CHOICES)
+
+
+@api_view(["GET"])
+def get_support_links(request):
+    support_links = SupportLink.objects.all()
+    serializer = SupportLinkSerializer(support_links, many=True)
+
+    # Explicitly create a Response object and set the data attribute
+    response = Response(serializer.data)
+
+    return response

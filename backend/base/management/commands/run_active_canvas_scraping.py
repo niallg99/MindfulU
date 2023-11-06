@@ -4,8 +4,9 @@ import requests
 from bs4 import BeautifulSoup
 from base.models import ScrapedData, Event
 
+
 class Command(BaseCommand):
-    help = 'Run the scraping logic'
+    help = "Run the active canvas scraping logic"
 
     def handle(self, *args, **kwargs):
         activeCanvasURL = "https://www.queenssport.com/StudentSport/ActiveCampus/"
@@ -33,7 +34,9 @@ class Command(BaseCommand):
 
                 for row in rows:
                     columns = row.find_all("td")
-                    row_data = {}  # Initialize a dictionary to store data for the current row
+                    row_data = (
+                        {}
+                    )  # Initialize a dictionary to store data for the current row
 
                     if len(columns) == 7:
                         row_data["Event/Programme"] = columns[0].get_text()
@@ -61,7 +64,9 @@ class Command(BaseCommand):
 
                 # Create a new ScrapedData instance for the entire table and save it
                 scraped_item = ScrapedData(
-                    url=activeCanvasURL, title="Scraped Data", description=str(scraped_data)
+                    url=activeCanvasURL,
+                    title="Scraped Data",
+                    description=str(scraped_data),
                 )
                 scraped_item.save()
             else:
