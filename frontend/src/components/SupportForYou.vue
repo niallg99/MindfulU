@@ -1,74 +1,41 @@
 <template>
   <div>
     <h2>Support For You</h2>
-    <ul>
-      <li v-for="section in supportSections" :key="section.id">
-        <a
-          v-if="section.link_url === ''"
-          :href="section.url"
-          target="_blank"
-          class="accordion-title"
-          aria-controls="i5wdcr-accordion"
-          :id="`${section.id}-accordion-label`"
-          aria-expanded="false"
-        >
-          {{ section.link_text }}
-        </a>
+    <div class="accordion" id="supportAccordion">
+      <div
+        class="accordion-item"
+        v-for="section in supportSections"
+        :key="section.id"
+      >
+        <h3 class="accordion-header" :id="`${section.id}-accordion-label`">
+          <button
+            class="accordion-button"
+            type="button"
+            data-bs-toggle="collapse"
+            :data-bs-target="`#${section.id}-accordion-content`"
+            aria-expanded="false"
+          >
+            {{ section.title }}
+          </button>
+        </h3>
         <div
-          v-else
-          class="accordion-content"
-          :data-tab-content="section.id"
-          role="region"
+          :id="`${section.id}-accordion-content`"
+          class="accordion-collapse collapse"
           :aria-labelledby="`${section.id}-accordion-label`"
-          aria-hidden="true"
-          :id="section.id"
         >
-          <ul class="links-ul arrows-primary">
-            <li v-for="link in section.links" :key="link.id">
-              <a :href="link.link_url" target="_blank">{{ link.link_text }}</a>
-            </li>
-          </ul>
+          <div class="accordion-body">
+            <ul class="list-unstyled"> <!-- Use Bootstrap's list-unstyled class to remove bullet points -->
+              <li v-for="link in section.links" :key="link.url">
+                <a :href="link.link_url" target="_blank">{{ link.link_text }}</a>
+              </li>
+            </ul>
+          </div>
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
   </div>
 </template>
 
-<template>
-  <div>
-    <h2>Support For You</h2>
-    <ul>
-      <li v-for="section in supportSections" :key="section.id">
-        <a
-          v-if="!section.links.length"
-          :href="section.url"
-          target="_blank"
-          class="accordion-title"
-          aria-controls="i5wdcr-accordion"
-          :id="`${section.id}-accordion-label`"
-          aria-expanded="false"
-        >
-          {{ section.title }}
-        </a>
-        <div
-          v-else
-          class="accordion-content"
-          :data-tab-content="section.id"
-          role="region"
-          :aria-labelledby="`${section.id}-accordion-label`"
-          aria-hidden="true"
-          :id="section.id"
-        >
-          <ul class="links-ul arrows-primary">
-            <li v-for="link in section.links" :key="link.url">
-              <a :href="link.url" target="_blank">{{ link.text }}</a>
-            </li>
-          </ul>
-        </div>
-      </li>
-    </ul>
-  </div>
-</template>
 <script>
 // Import the fetchSupport function from your API
 import { fetchSupport } from '@/api/supportforyou.js';
@@ -78,9 +45,6 @@ export default {
     return {
       supportSections: [],
     };
-  },
-  mounted() {
-    this.loadSupportData();
   },
   methods: {
     async loadSupportData() {
@@ -93,9 +57,16 @@ export default {
       }
     },
   },
+  mounted() {
+    this.loadSupportData();
+  },
 };
 </script>
 
-<style>
-/* Add your component's styles here */
+<style scoped>
+/* Add scoped styles for the component */
+.accordion-item {
+  max-width: 800px; /* Adjust the max-width to your preferred width */
+  margin-bottom: 10px; /* Add margin to separate items */
+}
 </style>

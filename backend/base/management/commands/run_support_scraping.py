@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from base.models import SupportLink
+from base.models import SupportLink, SupportSection
 import requests
 from bs4 import BeautifulSoup
 from django.db import transaction
@@ -12,23 +12,27 @@ class Command(BaseCommand):
         supportForYouURL = "https://www.qub.ac.uk/students/"
 
         try:
-            support_links = self.scrape_support_for_you(supportForYouURL)
+            support_links_data = self.scrape_support_for_you(supportForYouURL)
 
-            if support_links:
+            if support_links_data:
                 with transaction.atomic():
-                    # Save the extracted support links to the database
-                    for link_info in support_links:
-                        for link_data in link_info.get("Links", []):
-                            link_text = link_data.get(
-                                "Link Text", ""
-                            )  # Check for existence
-                            link_url = link_data.get("Link URL", "")
-                            support_link = SupportLink(
-                                url=supportForYouURL,
-                                link_text=link_text,
-                                link_url=link_url,
+                    for section_data in support_links_data:
+                        section_title = section_data["Section Title"]
+                        links_data = section_data["Links"]
+
+                        # Create a SupportSection instance for the section title
+                        section, created = SupportSection.objects.get_or_create(
+                            title=section_title
+                        )
+
+                        # Create SupportLink instances for each link and associate them with the section
+                        for link_data in links_data:
+                            link_text = link_data["Link Text"]
+                            link_url = link_data["Link URL"]
+
+                            SupportLink.objects.create(
+                                section=section, link_text=link_text, link_url=link_url
                             )
-                            support_link.save()
             else:
                 self.stdout.write(
                     self.style.ERROR("Failed to scrape Support for You links.")
@@ -39,50 +43,35 @@ class Command(BaseCommand):
     def scrape_support_for_you(self, url):
         try:
             response = requests.get(url)
-            response.raise_for_status()  # Raise an exception for 4xx and 5xx status codes
+            response.raise_for_status()
 
             page_content = response.text
             soup = BeautifulSoup(page_content, "html.parser")
 
-            # Find the main accordion section
-            accordion = soup.find(
-                "ul", class_="accordion accordion-boxed accordion-large bg-white"
-            )
+            support_links = []
 
-            if accordion:
-                support_links = []
+            # Find all accordion items
+            accordion_items = soup.find_all("li", class_="accordion-item")
+            for item in accordion_items:
+                section_title = item.find("a", class_="accordion-title").text.strip()
+                content_links = []
 
-                # Iterate through each accordion item
-                accordion_items = accordion.find_all("li", class_="accordion-item")
-                for item in accordion_items:
-                    # Extract the title of the accordion section
-                    title = item.find("a", class_="accordion-title")
-                    if title:
-                        section_title = title.text.strip()
-
-                        # Extract links within the accordion content
-                        content_links = []
-                        content = item.find("div", class_="accordion-content")
-                        if content:
-                            link_items = content.find_all("li")
-                            for link_item in link_items:
-                                link = link_item.find("a")
-                                if link:
-                                    link_text = link.text.strip()
-                                    link_url = link.get("href")
-                                    content_links.append(
-                                        {"Link Text": link_text, "Link URL": link_url}
-                                    )
-                                else:
-                                    print("No link found in the accordion content.")
-
-                        support_links.append(
-                            {"Section Title": section_title, "Links": content_links}
+                # Find links within the accordion content
+                link_items = item.find("div", class_="accordion-content").find_all("li")
+                for link_item in link_items:
+                    link = link_item.find("a")
+                    if link:
+                        link_text = link.text.strip()
+                        link_url = link.get("href")
+                        content_links.append(
+                            {"Link Text": link_text, "Link URL": link_url}
                         )
-                    else:
-                        print("No title found for accordion item.")
 
-                return support_links
+                support_links.append(
+                    {"Section Title": section_title, "Links": content_links}
+                )
+
+            return support_links
 
         except requests.exceptions.RequestException as re:
             raise Exception(f"Request error: {str(re)}")

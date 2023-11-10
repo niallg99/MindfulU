@@ -1,68 +1,63 @@
 <script>
-import { loginUser, resetUserPassword } from '@/api/login';
-import Navbar from './Navbar.vue';
-import Footer from './Footer.vue';
+import loginApi from '@/api/login';
 
 export default {
-	components: {
-		Navbar,
-		Footer
-	},
-	data() {
-		return {
-			login_username: '',
-			login_password: '',
-			reset_email: '',
-			errorMessage: '',
-			isStaffLogin: false,
-			isLoggedIn: false
-		};
-	},
-	methods: {
-		handleStaffLoginToggle(newValue) {
-			this.isStaffLogin = newValue;
-		},
-		async login() {
-			try {
-				const userData = {
-					username: this.login_username,
-					password: this.login_password
-				};
-				const response = await loginUser(userData);
-				if (response.message) {
-					this.isLoggedIn = true;
-					this.$emit('login-success', this.isLoggedIn);
-					this.$router.push('/dashboard');
-				}
-			} catch (error) {
-				this.errorMessage = error.message;
-			}
-		},
-			async resetPassword() {
-				if (!this.reset_email) {
-					this.errorMessage = 'Please enter your email address.';
-					return;
-				}
+  data() {
+    return {
+      login_username: '',
+      login_password: '',
+      reset_email: '',
+      errorMessage: '',
+      isStaffLogin: false,
+      isLoggedIn: false
+    };
+  },
+  methods: {
+    handleStaffLoginToggle(newValue) {
+      this.isStaffLogin = newValue;
+    },
+    async login() {
+      try {
+        const csrfToken = await loginApi.checkCSRFToken();
+        const userData = {
+          username: this.login_username,
+          password: this.login_password
+        };
+        const response = await loginApi.loginUser(userData, csrfToken);
+        if (response.message) {
+          this.isLoggedIn = true;
+          this.$emit('login-success', this.isLoggedIn);
+          this.$router.push('/dashboard');
+        }
+      } catch (error) {
+        this.errorMessage = error.message;
+      }
+    },
+    async resetPassword() {
+      if (!this.reset_email) {
+        this.errorMessage = 'Please enter your email address.';
+        return;
+      }
 
-				// Simple email format validation
-				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-				if (!emailRegex.test(this.reset_email)) {
-					this.errorMessage = 'Please enter a valid email address.';
-					return;
-				}
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.reset_email)) {
+        this.errorMessage = 'Please enter a valid email address.';
+        return;
+      }
 
-				try {
-					this.errorMessage = ''; 
-					const response = await resetUserPassword(this.reset_email);
-					console.log(response.message);
-				} catch (error) {
-					this.errorMessage = error.message || 'Failed to reset password.';
-				}
-			},
-		preventDefault(event) {
-			event.preventDefault();
-		},
-	}
+      try {
+        this.errorMessage = '';
+        const csrfToken = await loginApi.checkCSRFToken();
+        const response = await loginApi.resetUserPassword(this.reset_email, csrfToken);
+        console.log(response.message);
+      } catch (error) {
+        this.errorMessage = error.message || 'Failed to reset password.';
+      }
+    },
+    preventDefault(event) {
+      event.preventDefault();
+    },
+  }
 }
 </script>
 
@@ -122,5 +117,5 @@ export default {
 			</div>
 		</div>
 	</div>
-	<Footer />
+	<CustomFooter />
 </template>

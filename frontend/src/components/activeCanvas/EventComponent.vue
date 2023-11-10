@@ -1,13 +1,14 @@
 <script>
 import { fetchEvents } from '@/api/events';
 import Navbar from '../Navbar.vue';
-import Footer from '../Footer.vue';
+import CustomFooter from '../CustomFooter.vue';
 
 export default {
 	components: {
-		Navbar,
-		Footer
-	},
+    Navbar,
+    CustomFooter,
+    Navbar
+},
 	data() {
 		return {
 			events: [],
@@ -63,6 +64,7 @@ export default {
 }
 </script>
 <template>
+	<Navbar :is-logged-in="true" :is-staff-login="false" />
 	<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 		<div class="card shadow" style="width: 80%;">
 			<div class="card-body">
@@ -110,6 +112,7 @@ export default {
 			</div>
 		</div>
 	</div>
+	<CustomFooter />
 </template>
 
 

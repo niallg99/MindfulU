@@ -13,8 +13,17 @@
           <p>You have selected: {{ mood }}</p>
           <div class="form-group">
             <label for="feedback">Your feedback:</label>
-            <textarea id="feedback" class="form-control"></textarea>
+            <textarea id="feedback" class="form-control" v-model="feedback"></textarea>
           </div>
+          <div class="form-group" v-if="isCauseInputVisible">
+            <label for="cause">Select a cause:</label>
+            <select id="cause" class="form-control" v-model="selectedCause">
+              <option v-for="(choice, index) in causeChoices" :key="index" :value="choice[0]">
+                {{ choice[1] }}
+              </option>
+            </select>
+          </div>
+
           <button type="submit" class="btn btn-success">Submit</button>
         </form>
       </div>
@@ -23,6 +32,8 @@
 </template>
 
 <script>
+import { postMood } from '@/api/moods';
+
 export default {
   name: 'Mood',
   props: {
@@ -38,6 +49,15 @@ export default {
   data() {
     return {
       isModalVisible: false,
+      isCauseInputVisible: false,
+      selectedCause: '', // To store the selected cause choice
+      feedback: '', // To store the feedback
+      causeChoices: [
+        ["Academic", "Academic"],
+        ["Financial", "Financial"],
+        ["Relationship/Social", "Relationship/Social"],
+        ["Other", "Other"],
+      ],
     };
   },
   computed: {
@@ -54,15 +74,36 @@ export default {
   methods: {
     toggleModal() {
       this.isModalVisible = !this.isModalVisible;
+      // Check if the mood is NOT "meh" to show/hide the cause input
+      this.isCauseInputVisible = this.mood !== "meh";
     },
     submitForm() {
-      // Handle the form submission
-      console.log("Form submitted!");
+      // Prepare the mood data to send to the API
+      const moodData = {
+        mood_type: this.mood,
+        description: this.feedback,
+        mood_cause: this.selectedCause,
+      };
+
+      // Call the postMood function to submit the data
+      postMood(moodData)
+        .then((response) => {
+          // Handle the success response
+          console.log('Mood posted successfully:', response);
+          // Optionally, you can reset the form or close the modal here
+          this.resetForm();
+        })
+        .catch((error) => {
+          // Handle the error
+          console.error('Error posting mood:', error);
+        });
+    },
+    resetForm() {
+      // Reset the form fields and modal state
+      this.feedback = '';
+      this.selectedCause = '';
+      this.isModalVisible = false;
     }
   }
 };
 </script>
-
-<style scoped lang="scss">
-  @import "/src/scss/components/mood.scss";
-</style>

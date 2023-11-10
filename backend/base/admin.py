@@ -10,6 +10,7 @@ from .models import (
     Friendship,
     Event,
     SupportLink,
+    SupportSection,
 )
 
 # Register the User model
@@ -32,3 +33,6 @@ admin.site.register(Event)
 
 # Register the SupportLink model
 admin.site.register(SupportLink)
+
+# Register the SupportLink model
+admin.site.register(SupportSection)

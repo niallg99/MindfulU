@@ -1,7 +1,7 @@
 // Dashboard.vue script section
 <script>
 import Navbar from './Navbar.vue';
-import Footer from './Footer.vue';
+import CustomFooter from './CustomFooter.vue';
 import Mood from './Mood.vue';
 import Card from './Card.vue';
 import EventPanel from './EventPanel.vue'
@@ -12,11 +12,12 @@ export default {
   name: 'Dashboard',
   components: {
     Navbar,
-    Footer,
+    CustomFooter,
     Mood,
     Card,
     EventPanel,
-    SupportForYou
+    SupportForYou,
+    CustomFooter
 },
   data() {
     return {
@@ -65,8 +66,14 @@ export default {
       </div>
     </div>
   </div>
-  <SupportForYou />
-  <Footer />
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8 col-sm-12 mb-4">
+        <SupportForYou />
+      </div>
+    </div>
+  </div>
+  <CustomFooter />
 </template>
 
 
@@ -84,6 +91,18 @@ export default {
   min-width: 250px;
 }
 
+/* Style for the SupportForYou container */
+.container-fluid:last-child {
+  margin-top: 2rem; /* Adjust the top margin as needed */
+  margin-bottom: 2rem; /* Adjust the bottom margin as needed */
+}
+
+/* Adjust the width of the SupportForYou component on smaller screens if needed */
+@media (max-width: 576px) {
+  .col-md-8 {
+    min-width: 100%; /* Full width on extra small screens */
+  }
+}
 @media (max-width: 992px) {
   .mood-component,
   .col-lg-6 {

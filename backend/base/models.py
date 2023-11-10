@@ -93,14 +93,16 @@ class Event(models.Model):
         return self.name
 
 
+class SupportSection(models.Model):
+    title = models.CharField(max_length=255)
+
+
 class SupportLink(models.Model):
-    url = models.URLField(max_length=200)
-    link_text = models.CharField(max_length=200)
-    link_url = models.URLField(max_length=200, default="")
-
-    def __str__(self):
-        return self.link_text
-
-    class Meta:
-        verbose_name = "Support Link"
-        verbose_name_plural = "Support Links"
+    section = models.ForeignKey(
+        SupportSection,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+    )
+    link_text = models.CharField(max_length=255)
+    link_url = models.URLField()

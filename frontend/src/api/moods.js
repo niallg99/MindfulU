@@ -14,4 +14,29 @@ const fetchMoodChoices = async () => {
   }
 };
 
-export { fetchMoodChoices };
+const postMood = async (moodData) => {
+  try {
+    const response = await fetch(`${baseUrl}/api/moods/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.accessToken}`, // Access the accessToken from the component's data
+      },
+      body: JSON.stringify(moodData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const newMood = await response.json();
+    return newMood;
+  } catch (error) {
+    console.error("Could not post mood:", error);
+    throw error;
+  }
+};
+
+export { fetchMoodChoices, postMood };
+
+

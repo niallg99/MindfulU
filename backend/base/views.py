@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -9,6 +11,8 @@ from base.serializers import (
     EventSerializer,
     ScrapedDataSerializer,
     SupportLinkSerializer,
+    CustomSupportLinkSerializer,
+    MoodSerializer,
 )
 
 
@@ -100,3 +104,47 @@ def get_support_links(request):
     response = Response(serializer.data)
 
     return response
+
+
+@api_view(["GET"])
+def get_support_links_view(request):
+    # Fetch all SupportLink objects and serialize them
+    support_links = SupportLink.objects.all()
+    serializer = CustomSupportLinkSerializer(support_links, many=True)
+
+    # Group the serialized data by section title
+    support_data = {}
+    for item in serializer.data:
+        section_title = item.pop("section_title")
+        if section_title not in support_data:
+            support_data[section_title] = []
+        support_data[section_title].append(item)
+
+    # Transform the grouped data into the desired format
+    support_links_data = []
+    for section_title, links in support_data.items():
+        support_links_data.append(
+            {
+                "title": section_title,
+                "links": links,
+            }
+        )
+
+    return Response(support_links_data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def post_mood(request):
+    serializer = MoodSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save(user=request.user)  # Associate the mood with the current user
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({"csrf_token": csrf_token})

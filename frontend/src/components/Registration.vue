@@ -1,12 +1,12 @@
 <script>
 import { registerUser } from '@/api/registration';
 import Navbar from './Navbar.vue';
-import Footer from './Footer.vue';
+import CustomFooter from './CustomFooter.vue';
 
 export default {
 	components: {
 		Navbar,
-		Footer
+		CustomFooter
 	},
 	data() {
 			return {
