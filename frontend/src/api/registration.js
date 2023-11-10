@@ -10,7 +10,7 @@ export function registerUser(userData) {
     })
     .then(response => {
         if (!response.ok) {
-            return response.json().then(data => {
+            return response.json().then(() => {
                 throw new Error('Registration failed');
             });
         }

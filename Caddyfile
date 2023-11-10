@@ -1,0 +1,3 @@
+mindful-u.co.uk/ {
+    reverse_proxy localhost:8000
+}

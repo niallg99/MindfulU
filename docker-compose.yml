@@ -11,6 +11,7 @@ services:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=admin
       - POSTGRES_DB=mindfulu
+
   backend:
     build: backend/
     ports:
@@ -22,6 +23,7 @@ services:
     depends_on:
       - postgres
     restart: on-failure
+
   frontend:
     build: frontend/
     ports:
@@ -31,3 +33,20 @@ services:
     command: npm run dev
     depends_on:
       - backend
+
+  caddy:
+    image: caddy:latest
+    ports:
+      - "90:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  caddy_data:
+  caddy_config:
