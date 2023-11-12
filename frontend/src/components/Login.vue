@@ -2,6 +2,7 @@
 import loginApi from '@/api/login';
 
 export default {
+  name: 'Login',
   data() {
     return {
       login_username: '',
@@ -9,58 +10,40 @@ export default {
       reset_email: '',
       errorMessage: '',
       isStaffLogin: false,
-      isLoggedIn: false
+      isLoggedIn: false,
     };
   },
   methods: {
-    handleStaffLoginToggle(newValue) {
-      this.isStaffLogin = newValue;
-    },
-    async login() {
-      try {
-        const csrfToken = await loginApi.checkCSRFToken();
-        const userData = {
-          username: this.login_username,
-          password: this.login_password
-        };
-        const response = await loginApi.loginUser(userData, csrfToken);
-        if (response.message) {
-          this.isLoggedIn = true;
-          this.$emit('login-success', this.isLoggedIn);
-          this.$router.push('/dashboard');
-        }
-      } catch (error) {
-        this.errorMessage = error.message;
-      }
-    },
-    async resetPassword() {
-      if (!this.reset_email) {
-        this.errorMessage = 'Please enter your email address.';
-        return;
-      }
+   async login() {
+    try {
+      const csrfToken = await loginApi.getCSRFToken();
+      const userData = {
+        username: this.login_username,
+        password: this.login_password,
+      };
+      const response = await loginApi.loginUser(userData, csrfToken);
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.reset_email)) {
-        this.errorMessage = 'Please enter a valid email address.';
-        return;
-      }
+      console.log('API Response:', response);
 
-      try {
-        this.errorMessage = '';
-        const csrfToken = await loginApi.checkCSRFToken();
-        const response = await loginApi.resetUserPassword(this.reset_email, csrfToken);
-        console.log(response.message);
-      } catch (error) {
-        this.errorMessage = error.message || 'Failed to reset password.';
+      if (response.access_token) {
+        // Store the access token in localStorage upon successful login
+        localStorage.setItem('accessToken', response.access_token);
+        console.log('Access Token:', response.access_token);
+        this.isLoggedIn = true;
+        this.$emit('login-success', this.isLoggedIn);
+        this.$router.push('/dashboard');
+      } else {
+        // Handle the case where the access token is not found in the response
+        console.error('Access token not found in response');
+        // You may want to display an error message or handle this case as needed.
       }
+    } catch (error) {
+      this.errorMessage = error.message;
+    }
     },
-    preventDefault(event) {
-      event.preventDefault();
-    },
-  }
-}
+  },
+};
 </script>
-
 <template>
   <Navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
   <div class="full-page d-flex justify-content-center align-items-center">
@@ -117,5 +100,5 @@ export default {
 			</div>
 		</div>
 	</div>
-	<CustomFooter />
+	<custom-footer />
 </template>

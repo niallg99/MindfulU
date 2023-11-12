@@ -1,5 +1,12 @@
 from rest_framework import serializers
-from base.models import Event, ScrapedData, SupportLink, SupportSection, Mood
+from base.models import (
+    Event,
+    ScrapedData,
+    SupportLink,
+    SupportSection,
+    Mood,
+    MoodCause,
+)
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -40,4 +47,11 @@ class CustomSupportLinkSerializer(serializers.ModelSerializer):
 class MoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mood
-        fields = "__all__"  # You can specify specific fields if needed
+        fields = "__all__"
+
+
+class MoodCauseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MoodCause
+        fields = "__all__"
+

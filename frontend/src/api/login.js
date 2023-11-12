@@ -27,14 +27,18 @@ const checkCSRFToken = async () => {
 };
 
 // Function to log in a user
+// Function to log in a user
 export function loginUser(userData) {
   return checkCSRFToken()
     .then(csrfToken => {
+      // Debug: Check if CSRF token is correctly retrieved
+      console.log('CSRF Token:', csrfToken);
+
       return fetch(`${baseUrl}/api/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken, // Include the CSRF token in the headers
+          'X-CSRFToken': csrfToken, // Ensure this matches the expected header name
         },
         body: JSON.stringify(userData),
       })
@@ -52,6 +56,7 @@ export function loginUser(userData) {
       throw error;
     });
 }
+
 
 // Function to reset a user's password
 export async function resetUserPassword(email) {
