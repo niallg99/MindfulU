@@ -113,9 +113,19 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_REFRESH_LIFETIME_GRACE_PERIOD": timedelta(minutes=60),
+    "SLIDING_TOKEN_REFRESH_SCOPE_CLAIM": "refresh_token",
+    "SLIDING_TOKEN_ROTATE_REFRESH_TOKENS": False,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:8080", "http://localhost:8000"]
 CORS_ALLOW_ALL_ORIGINS = True

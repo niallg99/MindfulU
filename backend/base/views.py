@@ -6,13 +6,16 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from base.models import Event, ScrapedData, Mood, SupportLink
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from base.models import Event, ScrapedData, Mood, SupportLink, MoodCause
 from base.serializers import (
     EventSerializer,
     ScrapedDataSerializer,
     SupportLinkSerializer,
     CustomSupportLinkSerializer,
     MoodSerializer,
+    MoodCauseSerializer,
 )
 
 
@@ -63,7 +66,13 @@ def login(request):
     user = authenticate(username=username, password=password)
 
     if user:
-        return Response({"message": "Login successful!"}, status=status.HTTP_200_OK)
+        # Generate the access token and include it in the response
+        refresh = RefreshToken.for_user(user)
+        response_data = {
+            "message": "Login successful!",
+            "access_token": str(refresh.access_token),
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     else:
         return Response(
             {"error": "Invalid credentials!"}, status=status.HTTP_401_UNAUTHORIZED
@@ -139,7 +148,7 @@ def post_mood(request):
     serializer = MoodSerializer(data=request.data)
 
     if serializer.is_valid():
-        serializer.save(user=request.user)  # Associate the mood with the current user
+        serializer.save(user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -148,3 +157,9 @@ def post_mood(request):
 def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({"csrf_token": csrf_token})
+
+
+@api_view(["GET"])
+def get_mood_causes(request):
+    causes = [cause[0] for cause in MoodCause.CAUSE_CHOICES]
+    return JsonResponse(causes, safe=False)

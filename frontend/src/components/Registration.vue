@@ -1,52 +1,54 @@
 <script>
 import { registerUser } from '@/api/registration';
+import { getAccessToken } from '@/api/auth';
 import Navbar from './Navbar.vue';
 import CustomFooter from './CustomFooter.vue';
 
 export default {
+	name: 'Registration',
 	components: {
-		Navbar,
-		CustomFooter
-	},
+	Navbar,
+	CustomFooter,
+},
 	data() {
-			return {
-					username: "",
-					email: "",
-					password: "",
-					first_name: "",
-					last_name: "",
-			};
+		return {
+				username: "",
+				email: "",
+				password: "",
+				first_name: "",
+				last_name: "",
+		};
 	},
 	methods: {
-			register() {
-					const userData = {
-							username: this.username,
-							email: this.email,
-							password: this.password,
-							first_name: this.first_name,
-							last_name: this.last_name,
-					};
-					registerUser(userData)
-							.then(result => {
-							if (result.success) {
-									this.$router.push("/login");
-							}
-							else {
-									console.error("Error registering user:", result.error);
-							}
-					})
-							.catch(error => {
-							console.error("Error during registration:", error);
-					});
-			}
+		register() {
+			const userData = {
+				username: this.username,
+				email: this.email,
+				password: this.password,
+				first_name: this.first_name,
+				last_name: this.last_name,
+			};
+
+			registerUser(userData)
+				.then(result => {
+					if (result.success) {
+						this.$router.push("/login");
+					} else {
+						console.error("Error registering user:", result.error);
+					}
+				})
+				.catch(error => {
+					console.error("Error during registration:", error);
+				});
+		}
 	},
 };
 </script>
 <template>
 	<Navbar />
 	<div class="container content h-100">
-    <div class="row justify-content-center align-items-center">
-      <div class="col-md-8">
+		<div class="row justify-content-center align-items-center">
+			<div class="col-md-8">
 				<div class=" card registration-card">
 					<div class="card-header text-center">
 						<img src="/src/images/mental.svg" alt="Logo" class="mb-4" style="width: 200px; height: auto;">
@@ -83,7 +85,7 @@ export default {
 			</div>
 		</div>
 	</div>
-	<Footer />
+	<custom-footer />
 </template>
 
 

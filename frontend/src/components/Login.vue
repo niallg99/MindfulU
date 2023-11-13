@@ -1,7 +1,10 @@
 <script>
 import loginApi from '@/api/login';
+import { jwtDecode } from 'jwt-decode';
+
 
 export default {
+  name: 'Login',
   data() {
     return {
       login_username: '',
@@ -9,58 +12,43 @@ export default {
       reset_email: '',
       errorMessage: '',
       isStaffLogin: false,
-      isLoggedIn: false
+      // isLoggedIn: false, // Removed, as we will use a computed property now
     };
   },
+  computed: {
+    isLoggedIn() {
+      return !!localStorage.getItem('accessToken');
+    }
+  },
   methods: {
-    handleStaffLoginToggle(newValue) {
-      this.isStaffLogin = newValue;
-    },
     async login() {
-      try {
-        const csrfToken = await loginApi.checkCSRFToken();
-        const userData = {
-          username: this.login_username,
-          password: this.login_password
-        };
-        const response = await loginApi.loginUser(userData, csrfToken);
-        if (response.message) {
-          this.isLoggedIn = true;
-          this.$emit('login-success', this.isLoggedIn);
-          this.$router.push('/dashboard');
-        }
-      } catch (error) {
-        this.errorMessage = error.message;
-      }
-    },
-    async resetPassword() {
-      if (!this.reset_email) {
-        this.errorMessage = 'Please enter your email address.';
-        return;
-      }
+  try {
+    const csrfToken = await loginApi.getCSRFToken();
+    const userData = {
+      username: this.login_username,
+      password: this.login_password,
+    };
+    const response = await loginApi.loginUser(userData, csrfToken);
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.reset_email)) {
-        this.errorMessage = 'Please enter a valid email address.';
-        return;
-      }
+    console.log('API Response:', response);
 
-      try {
-        this.errorMessage = '';
-        const csrfToken = await loginApi.checkCSRFToken();
-        const response = await loginApi.resetUserPassword(this.reset_email, csrfToken);
-        console.log(response.message);
-      } catch (error) {
-        this.errorMessage = error.message || 'Failed to reset password.';
-      }
-    },
-    preventDefault(event) {
-      event.preventDefault();
-    },
+    if (response.access_token) {
+      localStorage.setItem('accessToken', response.access_token);
+      const userId = jwtDecode(response.access_token).user_id;
+      localStorage.setItem('userId', userId);
+      this.$router.push('/dashboard');
+    } else {
+      console.error('Access token not found in response');
+    }
+  } catch (error) {
+    this.errorMessage = error.message;
   }
-}
-</script>
+},
 
+    // ... other methods
+  },
+};
+</script>
 <template>
   <Navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
   <div class="full-page d-flex justify-content-center align-items-center">
@@ -117,5 +105,5 @@ export default {
 			</div>
 		</div>
 	</div>
-	<CustomFooter />
+	<custom-footer />
 </template>

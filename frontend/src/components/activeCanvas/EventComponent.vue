@@ -7,7 +7,6 @@ export default {
 	components: {
     Navbar,
     CustomFooter,
-    Navbar
 },
 	data() {
 		return {
@@ -112,7 +111,7 @@ export default {
 			</div>
 		</div>
 	</div>
-	<CustomFooter />
+	<custom-footer />
 </template>
 
 

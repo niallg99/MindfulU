@@ -1,9 +1,9 @@
-from django.contrib import admin
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # Register your models here.
 from django.contrib import admin
 from .models import (
-    User,
     ProfilePicture,
     MoodCause,
     Mood,
@@ -13,8 +13,6 @@ from .models import (
     SupportSection,
 )
 
-# Register the User model
-admin.site.register(User)
 
 # Register the ProfilePicture model
 admin.site.register(ProfilePicture)
@@ -36,3 +34,11 @@ admin.site.register(SupportLink)
 
 # Register the SupportLink model
 admin.site.register(SupportSection)
+
+class UserAdmin(BaseUserAdmin):
+    list_display = ("id", "username", "email", "first_name", "last_name", "is_staff")
+
+
+# Re-register UserAdmin
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
