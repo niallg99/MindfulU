@@ -1,0 +1,104 @@
+.mood-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Smaller gap between cards */
+  justify-content: center;
+  align-items: stretch;
+  padding: 0 20px; /* Padding from the page sides */
+}
+
+.mood-card {
+  flex: 0 0 auto; /* Changed to prevent cards from growing or shrinking */
+  width: 220px; /* Increase the width as desired */
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  min-height: 250px;
+}
+
+.mood-card img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.mood-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  background-color: transparent;
+}
+
+.mood-modal .modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.close {
+  float: right;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mood-name {
+  color: white;
+  margin-bottom: 10px;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  transition: visibility 0.3s, opacity 0.3s ease;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.mood-card:hover .btn-primary {
+  visibility: visible;
+  opacity: 1;
+}
+
+.mood-card:hover .mood-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 600px) {
+  .mood-container {
+    justify-content: space-around;
+  }
+
+  .mood-card {
+    min-width: 48%;
+    min-height: 200px;
+  }
+}
+
+@media (hover: none) {
+  .mood-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .btn-primary {
+    visibility: visible;
+    opacity: 1;
+  }
+}

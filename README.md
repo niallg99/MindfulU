@@ -25,5 +25,7 @@ CREATE SCHEMA public;
 ## Run scraping tool
 
 ```sh
-docker exec -it <container-id> python manage.py shell -c "exec(open('base/scraping/scraping_logic.py').read())"
-```
+docker-compose exec backend python manage.py run_active_canvas_scraping```
+
+export EMAIL_USER='your-gmail-username@gmail.com'
+export EMAIL_PASSWORD='your-gmail-app-password'
