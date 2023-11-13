@@ -7,24 +7,26 @@ import { fetchMoodChoices } from '../api/moods.js';
 import SupportForYou from './SupportForYou.vue';
 
 export default {
-	name: 'Dashboard',
-	components: {
-		Navbar,
-		Mood,
-		Card,
-		SupportForYou,
-		CustomFooter,
-},
-	data() {
+  name: 'Dashboard',
+  components: {
+    Navbar,
+    Mood,
+    Card,
+    SupportForYou,
+    CustomFooter,
+  },
+  data() {
 		return {
-			moods: [],
-			isLoading: true,
-			isError: false,
-			errorMessage: '',
-			cardHeaders: ['Activities', 'Mood History', 'Support', 'Friends']
-		};
+			userId: null, 
+      moods: [],
+      isLoading: true,
+      isError: false,
+      errorMessage: '',
+      cardHeaders: ['Activities', 'Mood History', 'Support', 'Friends']
+    };
 	},
 	async mounted() {
+		this.userId = localStorage.getItem('userId');
 		try {
 			this.moods = await fetchMoodChoices();
 		} catch (error) {
@@ -37,8 +39,7 @@ export default {
 };
 </script>
 <template>
-	<navbar :isLoggedIn="true" :isStaff="isStaff" @update:isStaffLogin="isLoggedIn" />
-	
+	<navbar :isLoggedIn="true" :isStaff="isStaff" @update:isStaffLogin="isLoggedIn" @login-success="handleLoginSuccess" />
 	<div class="container-fluid pt-4 pb-4">
 		<div class="row mb-4">
 			<div class="col-12 mood-container">
@@ -47,6 +48,7 @@ export default {
 					:key="index"
 					:mood="mood[0]"
 					:selectionCount="mood.count"
+					:user-id="userId || ''"
 				/>
 			</div>
 		</div>

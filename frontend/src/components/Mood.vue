@@ -11,7 +11,11 @@ export default {
     selectionCount: {
       type: Number,
       default: 0
-    }
+    },
+    userId: { // Add this prop for the user ID
+      type: [String, Number],
+      required: true
+    },
   },
   data() {
     return {
@@ -22,7 +26,7 @@ export default {
       causeChoices: [],
     };
   },
-  computed: {
+ computed: {
     backgroundStyle() {
       const imageUrl = `/src/images/${this.mood.toLowerCase()}.png`;
       return {
@@ -31,34 +35,37 @@ export default {
         backgroundPosition: 'center'
       };
     }
-  },
+	},
   methods: {
     toggleModal() {
       this.isModalVisible = !this.isModalVisible;
-      // Check if the mood is NOT "meh" to show/hide the cause input
-      this.isCauseInputVisible = this.mood !== "meh";
+      this.isCauseInputVisible = this.mood !== "meh"; //not working check why
     },
     async submitForm() {
       try {
         const moodData = {
           mood_type: this.mood,
           description: this.feedback,
-					mood_cause: this.selectedCause,
-					user: this.user,
+          mood_cause: this.selectedCause,
+          user: this.userId,
         };
-        const response = await postMood(moodData);
-        console.log('Mood posted successfully:', response);
+        await postMood(moodData);
         this.resetForm();
+        this.isModalVisible = false;
       } catch (error) {
         console.error('Error posting mood:', error);
       }
+  },
+  resetForm() {
+    this.selectedCause = '';
+    this.feedback = '';
     },
-    async mounted() {
-      try {
-        this.causeChoices = await fetchMoodCauses();
-      } catch (error) {
-        console.error('Error fetching mood causes:', error);
-      }
+  },
+  async mounted() {
+    try {
+      this.causeChoices = await fetchMoodCauses();
+    } catch (error) {
+      console.error('Error fetching mood causes:', error);
     }
   }
 };
@@ -83,9 +90,9 @@ export default {
 					<div class="form-group" v-if="isCauseInputVisible">
 						<label for="cause">Select a cause:</label>
 						<select id="cause" class="form-control" v-model="selectedCause">
-							<option v-for="(choice, index) in causeChoices" :key="index" :value="choice[0]">
-								{{ choice[1] }}
-							</option>
+              <option v-for="cause in causeChoices" :key="cause" :value="cause">
+                {{ cause }}
+              </option>
 						</select>
 					</div>
 

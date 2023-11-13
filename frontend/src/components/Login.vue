@@ -1,5 +1,7 @@
 <script>
 import loginApi from '@/api/login';
+import { jwtDecode } from 'jwt-decode';
+
 
 export default {
   name: 'Login',
@@ -10,37 +12,40 @@ export default {
       reset_email: '',
       errorMessage: '',
       isStaffLogin: false,
-      isLoggedIn: false,
+      // isLoggedIn: false, // Removed, as we will use a computed property now
     };
   },
-  methods: {
-   async login() {
-    try {
-      const csrfToken = await loginApi.getCSRFToken();
-      const userData = {
-        username: this.login_username,
-        password: this.login_password,
-      };
-      const response = await loginApi.loginUser(userData, csrfToken);
-
-      console.log('API Response:', response);
-
-      if (response.access_token) {
-        // Store the access token in localStorage upon successful login
-        localStorage.setItem('accessToken', response.access_token);
-        console.log('Access Token:', response.access_token);
-        this.isLoggedIn = true;
-        this.$emit('login-success', this.isLoggedIn);
-        this.$router.push('/dashboard');
-      } else {
-        // Handle the case where the access token is not found in the response
-        console.error('Access token not found in response');
-        // You may want to display an error message or handle this case as needed.
-      }
-    } catch (error) {
-      this.errorMessage = error.message;
+  computed: {
+    isLoggedIn() {
+      return !!localStorage.getItem('accessToken');
     }
-    },
+  },
+  methods: {
+    async login() {
+  try {
+    const csrfToken = await loginApi.getCSRFToken();
+    const userData = {
+      username: this.login_username,
+      password: this.login_password,
+    };
+    const response = await loginApi.loginUser(userData, csrfToken);
+
+    console.log('API Response:', response);
+
+    if (response.access_token) {
+      localStorage.setItem('accessToken', response.access_token);
+      const userId = jwtDecode(response.access_token).user_id;
+      localStorage.setItem('userId', userId);
+      this.$router.push('/dashboard');
+    } else {
+      console.error('Access token not found in response');
+    }
+  } catch (error) {
+    this.errorMessage = error.message;
+  }
+},
+
+    // ... other methods
   },
 };
 </script>

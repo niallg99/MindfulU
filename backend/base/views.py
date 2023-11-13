@@ -51,6 +51,7 @@ def register(request):
         {"message": "User registered successfully!"}, status=status.HTTP_201_CREATED
     )
 
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login(request):
@@ -160,5 +161,5 @@ def get_csrf_token(request):
 
 @api_view(["GET"])
 def get_mood_causes(request):
-    cause_choices = MoodCause.CAUSE_CHOICES
-    return Response(cause_choices)
+    causes = [cause[0] for cause in MoodCause.CAUSE_CHOICES]
+    return JsonResponse(causes, safe=False)
