@@ -163,3 +163,18 @@ def get_csrf_token(request):
 def get_mood_causes(request):
     causes = [cause[0] for cause in MoodCause.CAUSE_CHOICES]
     return JsonResponse(causes, safe=False)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_user_moods(request, user_id):
+    user = request.user
+    # Check if the requested user ID matches the logged-in user's ID
+    if str(user.id) == user_id:
+        moods = Mood.objects.filter(user=user).order_by("-mood_date")
+        serializer = MoodSerializer(moods, many=True)
+        return Response(serializer.data)
+    else:
+        return Response(
+            {"error": "You do not have permission to view these moods."}, status=403
+        )

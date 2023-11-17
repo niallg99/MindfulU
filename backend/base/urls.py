@@ -16,5 +16,6 @@ urlpatterns = [
     path("api/mood-choices/", views.get_mood_choices, name="mood-choices"),
     path("api/get-mood-causes/", views.get_mood_causes, name="get-mood-causes"),
     path("api/moods/", views.post_mood, name="post-mood"),
+    path("api/user-moods/<str:user_id>/", views.get_user_moods, name="get_user_moods"),
     path("api/get-csrf-token/", views.get_csrf_token, name="get-csrf-token"),
 ]

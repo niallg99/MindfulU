@@ -56,4 +56,26 @@ const postMood = async (moodData) => {
   }
 };
 
-export { fetchMoodChoices, fetchMoodCauses, postMood };
+const fetchUserMoods = async (userId) => {
+  try {
+    const accessToken = getAccessToken();
+    const response = await fetch(`${baseUrl}/api/user-moods/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const userMoods = await response.json();
+    return userMoods;
+  } catch (error) {
+    console.error("Could not fetch user moods:", error);
+    throw error;
+  }
+};
+
+export { fetchMoodChoices, fetchMoodCauses, postMood, fetchUserMoods };
+
