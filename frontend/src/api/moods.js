@@ -56,6 +56,33 @@ const postMood = async (moodData) => {
   }
 };
 
+const updateMood = async (moodId, moodData) => {
+  try {
+    const accessToken = getAccessToken(); // Retrieve the access token
+    const url = `${baseUrl}/api/moods/${moodId}/`;
+
+    const response = await fetch(url, {
+      method: 'PATCH', // or 'PUT', depending on your API
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(moodData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const updatedMood = await response.json();
+    return updatedMood;
+  } catch (error) {
+    console.error("Could not update mood:", error);
+    throw error;
+  }
+};
+
+
 const fetchUserMoods = async (userId) => {
   try {
     const accessToken = getAccessToken();
@@ -77,5 +104,25 @@ const fetchUserMoods = async (userId) => {
   }
 };
 
-export { fetchMoodChoices, fetchMoodCauses, postMood, fetchUserMoods };
+const deleteMood = async (moodId) => {
+  try {
+    const response = await fetch(`[Your API Endpoint]/moods/${moodId}`, {
+      method: 'DELETE',
+      headers: {
+        // Add necessary headers, e.g., for authorization
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return true; // Return true on successful deletion
+  } catch (error) {
+    console.error("Could not delete mood:", error);
+    throw error;
+  }
+};
+
+export { fetchMoodChoices, fetchMoodCauses, postMood, fetchUserMoods, updateMood, deleteMood};
 
