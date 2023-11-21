@@ -6,6 +6,7 @@ from base.models import (
     SupportSection,
     Mood,
     MoodCause,
+    Friends,
 )
 
 
@@ -55,3 +56,7 @@ class MoodCauseSerializer(serializers.ModelSerializer):
         model = MoodCause
         fields = "__all__"
 
+class FriendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friends
+        fields = "__all__"

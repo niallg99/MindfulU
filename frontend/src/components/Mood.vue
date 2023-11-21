@@ -71,7 +71,7 @@ export default {
 	<div class="card mood-card">
 		<div class="card-body p-0" :style="backgroundStyle">
 			<div class="mood-overlay" @click="toggleModal">
-				<button class="btn btn-primary">{{ mood }}</button>
+				<button class="btn mood-btn-primary">{{ mood }}</button>
 			</div>
 		</div>
 		<div v-if="isModalVisible" class="mood-modal">

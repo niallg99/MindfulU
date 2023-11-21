@@ -3,12 +3,13 @@ from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from base.models import Event, ScrapedData, Mood, SupportLink, MoodCause
+from base.models import Event, ScrapedData, Mood, SupportLink, MoodCause, Friends
 from base.serializers import (
     EventSerializer,
     ScrapedDataSerializer,
@@ -16,6 +17,7 @@ from base.serializers import (
     CustomSupportLinkSerializer,
     MoodSerializer,
     MoodCauseSerializer,
+    FriendSerializer,
 )
 
 
@@ -169,7 +171,6 @@ def get_mood_causes(request):
 @permission_classes([IsAuthenticated])
 def get_user_moods(request, user_id):
     user = request.user
-    # Check if the requested user ID matches the logged-in user's ID
     if str(user.id) == user_id:
         moods = Mood.objects.filter(user=user).order_by("-mood_date")
         serializer = MoodSerializer(moods, many=True)
@@ -178,3 +179,60 @@ def get_user_moods(request, user_id):
         return Response(
             {"error": "You do not have permission to view these moods."}, status=403
         )
+    
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_friends_list_view(request):
+    friends = Friends.objects.filter(user=request.user)
+    serializer = FriendSerializer(friends, many=True)
+    return Response(serializer.data)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_user_friends(request, user_id):
+    if str(request.user.id) == user_id:
+        friends = Friends.objects.filter(user=request.user)
+        serializer = FriendSerializer(friends, many=True)
+        return Response(serializer.data)
+    else:
+        return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+    
+from django.shortcuts import get_object_or_404
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def send_friend_request(request, username):
+    # Get the user object for the given username
+    friend_user = get_object_or_404(User, username=username)
+    # Check if the friend request already exists or if it's a request to oneself
+    if request.user == friend_user or Friends.objects.filter(user=request.user, friend=friend_user).exists():
+        return Response({"error": "Invalid friend request."}, status=status.HTTP_400_BAD_REQUEST)
+    # Create a new friend request
+    Friends.objects.create(user=request.user, friend=friend_user, friendship_status="Requested")
+    return Response({"message": "Friend request sent."}, status=status.HTTP_200_OK)
+
+
+# Accept Friend Request
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def accept_friend_request(request, friend_id):
+    friend_request = get_object_or_404(Friends, user_id=friend_id, friend=request.user)
+    friend_request.friendship_status = "Accepted"
+    friend_request.save()
+    return Response({"message": "Friend request accepted."}, status=status.HTTP_200_OK)
+
+# Reject Friend Request
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def reject_friend_request(request, friend_id):
+    Friends.objects.filter(user_id=friend_id, friend=request.user).delete()
+    return Response({"message": "Friend request rejected."}, status=status.HTTP_200_OK)
+
+# Remove Friend
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def remove_friend(request, friend_id):
+    Friends.objects.filter(user=request.user, friend_id=friend_id).delete()
+    return Response({"message": "Friend removed."}, status=status.HTTP_200_OK)
+
+

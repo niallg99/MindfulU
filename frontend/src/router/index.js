@@ -17,6 +17,10 @@ const routes = [
         path: '/support', 
         component: () => import('@/components/SupportForYou.vue') 
     },
+    {
+        path: '/friends',
+        component: () => import('@/components/Friends.vue')
+    },
     { 
         path: '/dashboard', 
         component: () => import('@/components/Dashboard.vue') 

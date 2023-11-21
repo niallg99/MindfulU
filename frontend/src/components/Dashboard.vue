@@ -20,8 +20,8 @@
         <mood-history-panel :user-moods="userMoods" />
       </div>
       <div class="panel">
-        <!-- Placeholder for Friends Panel -->
-        <div class="friends-panel-placeholder">Friends Panel</div>
+				<friends-panel />
+				<div class="friends-panel-placeholder">Friends Panel</div>
       </div>
     </div>
   </div>
@@ -40,6 +40,7 @@ import MoodHistoryPanel from './MoodHistoryPanel.vue';
 import EventPanel from './EventPanel.vue';
 import SupportPanel from './SupportPanel.vue';
 import MoodHistory from './MoodHistory.vue';
+import FriendsPanel from './FriendsPanel.vue';
 
 export default {
   name: 'Dashboard',
@@ -49,9 +50,10 @@ export default {
     SupportForYou,
     CustomFooter,
     MoodHistoryPanel,
-		EventPanel,
-		SupportPanel,
-		MoodHistory,
+    EventPanel,
+    SupportPanel,
+    MoodHistory,
+    FriendsPanel
 },
   data() {
     return {

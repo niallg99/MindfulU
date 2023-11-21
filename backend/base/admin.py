@@ -7,7 +7,7 @@ from .models import (
     ProfilePicture,
     MoodCause,
     Mood,
-    Friendship,
+    Friends,
     Event,
     SupportLink,
     SupportSection,
@@ -24,7 +24,7 @@ admin.site.register(MoodCause)
 admin.site.register(Mood)
 
 # Register the Friendship model
-admin.site.register(Friendship)
+admin.site.register(Friends)
 
 # Register the Event model
 admin.site.register(Event)

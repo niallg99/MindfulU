@@ -44,18 +44,29 @@ class Mood(models.Model):
     )
     description = models.TextField(blank=True)
 
-    # Add other mood-related fields if needed
     def __str__(self):
         return f"{self.user.username} - {self.mood_type} on {self.mood_date}"
 
 
-class Friendship(models.Model):
+class Friends(models.Model):
+    FRIENDSHIP_STATUS_CHOICES = [
+        ("Requested", "Requested"),
+        ("Accepted", "Accepted"),
+        ("Blocked", "Blocked"),
+        # Add more statuses as needed
+    ]
+
     user = models.ForeignKey(
         DjangoUser, on_delete=models.CASCADE, related_name="friendships"
     )
     friend = models.ForeignKey(DjangoUser, on_delete=models.CASCADE)
-    friendship_status = models.CharField(max_length=50)
-    # Add other friendship-related fields
+    friendship_status = models.CharField(
+        max_length=50, choices=FRIENDSHIP_STATUS_CHOICES, default="Requested"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'friend')
 
     def __str__(self):
         return f"{self.user.username} and {self.friend.username} - Status: {self.friendship_status}"
