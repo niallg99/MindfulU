@@ -3,112 +3,147 @@ import { getAccessToken } from '@/api/auth';
 const baseUrl = 'http://0.0.0.0:8000';
 
 const fetchFriends = async (userId) => {
-  try {
-    console.log('Fetching friends for user ID:', userId);
-    const accessToken = getAccessToken();
-    const url = `${baseUrl}/api/friends/${userId}`;
-
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+        const accessToken = getAccessToken();
+        if (!accessToken) {
+            throw new Error('Access token is missing or invalid');
+        }
+        const url = `${baseUrl}/api/friends/`;
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const friendsData = await response.json();
+        return friendsData;
+    } catch (error) {
+        console.error("Could not fetch friends:", error);
+        throw error;
     }
-
-    const friendsData = await response.json();
-    console.log('Friends data received:', friendsData);
-    return friendsData;
-  } catch (error) {
-    console.error("Could not fetch friends:", error);
-    throw error;
-  }
 };
+
 
 const sendFriendRequest = async (username) => {
-  try {
-    const accessToken = getAccessToken();
-    const response = await fetch(`${baseUrl}/api/send-friend-request/${username}/`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+        const accessToken = getAccessToken();
+        const response = await fetch(`${baseUrl}/api/send-friend-request/${username}/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('Error response:', errorBody);
+            throw new Error(`HTTP error ${response.status}: ${errorBody.error || 'Unknown error'}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Could not send friend request:", error);
+        throw error;
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Could not send friend request:", error);
-    throw error;
-  }
 };
 
-const acceptFriendRequest = async (friendId) => {
-  try {
-    const accessToken = getAccessToken();
-    const response = await fetch(`${baseUrl}/api/accept-friend-request/${friendId}/`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+const acceptFriendRequest = async (username) => {
+    try {
+        const accessToken = getAccessToken();
+        const response = await fetch(`${baseUrl}/api/accept-friend-request/${username}/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('Error response:', errorBody);
+            throw new Error(`HTTP error ${response.status}: ${errorBody.detail || 'Unknown error'}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Could not accept friend request:", error);
+        throw error;
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Could not accept friend request:", error);
-    throw error;
-  }
 };
 
-const rejectFriendRequest = async (friendId) => {
-  try {
-    const accessToken = getAccessToken();
-    const response = await fetch(`${baseUrl}/api/reject-friend-request/${friendId}/`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+
+const rejectFriendRequest = async (username) => {
+    try {
+        const accessToken = getAccessToken();
+        const response = await fetch(`${baseUrl}/api/reject-friend-request/${username}/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('Error response:', errorBody);
+            throw new Error(`HTTP error ${response.status}: ${errorBody.detail || 'Unknown error'}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Could not reject friend request:", error);
+        throw error;
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Could not reject friend request:", error);
-    throw error;
-  }
 };
 
-const removeFriend = async (friendId) => {
-  try {
-    const accessToken = getAccessToken();
-    const response = await fetch(`${baseUrl}/api/remove-friend/${friendId}/`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+const removeFriend = async (username) => {
+    try {
+        const accessToken = getAccessToken();
+        const response = await fetch(`${baseUrl}/api/remove-friend/${username}/`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('Error response:', errorBody);
+            throw new Error(`HTTP error ${response.status}: ${errorBody.detail || 'Unknown error'}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Could not remove friend:", error);
+        throw error;
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Could not remove friend:", error);
-    throw error;
-  }
 };
 
-export { fetchFriends, sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend };
+
+const fetchFriendRequests = async () => {
+	try {
+		const accessToken = getAccessToken();
+		if (!accessToken) {
+			throw new Error('Access token not found');
+		}
+		const url = `${baseUrl}/api/friend-requests/`;
+		const response = await fetch(url, {
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			},
+		});
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+		const requestsData = await response.json();
+		console.log('Friend requests data received:', requestsData);
+		return requestsData;
+	} catch (error) {
+		console.error("Could not fetch friend requests:", error);
+		throw error;
+	}
+};
+
+export {
+	fetchFriends,
+	sendFriendRequest,
+	acceptFriendRequest,
+	rejectFriendRequest,
+	removeFriend,
+	fetchFriendRequests
+};

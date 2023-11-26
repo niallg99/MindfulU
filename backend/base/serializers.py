@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from base.models import (
     Event,
     ScrapedData,
@@ -56,7 +57,32 @@ class MoodCauseSerializer(serializers.ModelSerializer):
         model = MoodCause
         fields = "__all__"
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name']
 class FriendSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    friend = UserSerializer()
+    most_recent_mood = serializers.SerializerMethodField()
+
     class Meta:
         model = Friends
-        fields = "__all__"
+        fields = ('id', 'user', 'friend', 'friendship_status', 'created_at', 'updated_at', 'most_recent_mood')
+
+    def get_most_recent_mood(self, obj):
+        last_mood = Mood.objects.filter(user=obj.friend).order_by('-mood_date').first()
+        if last_mood:
+            # Format the mood as a string. You can customize this format as needed.
+            return f"{last_mood.mood_type} on {last_mood.mood_date.strftime('%Y-%m-%d')}"
+        return None
+
+
+class FriendRequestSerializer(serializers.ModelSerializer):
+    sender = serializers.CharField(source='user.username')
+    username = serializers.CharField(source='user.username')
+    status = serializers.CharField(source='friendship_status')
+
+    class Meta:
+        model = Friends
+        fields = ('id', 'sender', 'username', 'status')

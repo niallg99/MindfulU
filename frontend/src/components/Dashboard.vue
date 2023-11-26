@@ -25,8 +25,6 @@
       </div>
     </div>
   </div>
-  <support-for-you />
-  <mood-history />  
   <custom-footer />
 </template>
 
@@ -35,11 +33,9 @@ import Navbar from './Navbar.vue';
 import CustomFooter from './CustomFooter.vue';
 import Mood from './Mood.vue';
 import { fetchMoodChoices, fetchUserMoods } from '../api/moods.js'; 
-import SupportForYou from './SupportForYou.vue';
 import MoodHistoryPanel from './MoodHistoryPanel.vue';
 import EventPanel from './EventPanel.vue';
 import SupportPanel from './SupportPanel.vue';
-import MoodHistory from './MoodHistory.vue';
 import FriendsPanel from './FriendsPanel.vue';
 
 export default {
@@ -47,12 +43,10 @@ export default {
   components: {
     Navbar,
     Mood,
-    SupportForYou,
     CustomFooter,
     MoodHistoryPanel,
     EventPanel,
     SupportPanel,
-    MoodHistory,
     FriendsPanel
 },
   data() {
@@ -84,9 +78,11 @@ export default {
 .main-container {
   max-width: 80%;
   margin: auto;
+	padding: 0;
 }
 
 .mood-container {
+	padding: 2rem 0 0 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around; /* Changed to space-around for even spacing */
@@ -96,7 +92,7 @@ export default {
 .panel {
   flex: 1 1 50%; /* Each panel takes up half of the container's width */
   max-width: 50%;
-  padding: 1rem; /* Add some padding around each panel */
+  padding: 0; /* Add some padding around each panel */
 }
 
 .panels-container {

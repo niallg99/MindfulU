@@ -2,7 +2,7 @@
 	<div class="container mt-4">
 		<div class="row justify-content-center">
 			<div class="col-lg-12">
-				<div class="card">
+				<div class="card panel-card">
 					<div class="card-header">
 						Support For You
 					</div>
@@ -39,7 +39,9 @@
 								</div>
 							</div>
 						</div>
-						<button class="btn btn-primary mt-3" @click="navigateToSupportForYou">See More Support Options</button>
+					</div>
+					<div class="card-footer text-center">
+						<button class="btn btn-primary" @click="navigateToSupportForYou">See More Support Options</button>
 					</div>
 				</div>
 			</div>
@@ -89,10 +91,3 @@ export default {
 	},
 };
 </script>
-
-<style scoped>
-.support-panel .accordion-item {
-	max-width: 800px;
-	margin-bottom: 10px;
-}
-</style>

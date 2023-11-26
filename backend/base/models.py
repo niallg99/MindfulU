@@ -25,7 +25,6 @@ class MoodCause(models.Model):
 
 
 class Mood(models.Model):
-    # ... other fields ...
 
     MOOD_CHOICES = [
         ("Meh", "Meh"),
@@ -53,7 +52,6 @@ class Friends(models.Model):
         ("Requested", "Requested"),
         ("Accepted", "Accepted"),
         ("Blocked", "Blocked"),
-        # Add more statuses as needed
     ]
 
     user = models.ForeignKey(
@@ -63,11 +61,15 @@ class Friends(models.Model):
     friendship_status = models.CharField(
         max_length=50, choices=FRIENDSHIP_STATUS_CHOICES, default="Requested"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     class Meta:
         unique_together = ('user', 'friend')
 
+    def get_most_recent_mood(self):
+        return Mood.objects.filter(user=self.friend).order_by('-mood_date').first()
+    
     def __str__(self):
         return f"{self.user.username} and {self.friend.username} - Status: {self.friendship_status}"
 
@@ -76,7 +78,7 @@ class ScrapedData(models.Model):
     url = models.URLField()
     title = models.CharField(max_length=255)
     description = models.TextField()
-    scraped_content = models.TextField(default="")  # Specify the default value
+    scraped_content = models.TextField(default="")
 
     def __str__(self):
         return self.title

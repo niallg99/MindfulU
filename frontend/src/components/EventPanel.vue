@@ -44,7 +44,7 @@ export default {
 		<div class="container mt-4">
 			<div class="row justify-content-center">
 				<div class="col-lg-12">
-					<div class="card">
+					<div class="card panel-card">
 						<div class="card-header">
 							Upcoming Events
 						</div>
@@ -63,9 +63,11 @@ export default {
 										Venue: {{ event.venue }}
 									</li>
 								</ul>
-								<button class="btn btn-primary mt-3" @click="navigateToEvents">See More Events</button>
 							</div>
 						</div>
+            <div class="card-footer text-center">
+              <button class="btn btn-primary" @click="navigateToEvents">See More Events</button>
+            </div>
 					</div>
 				</div>
 			</div>

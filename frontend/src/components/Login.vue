@@ -12,7 +12,6 @@ export default {
       reset_email: '',
       errorMessage: '',
       isStaffLogin: false,
-      // isLoggedIn: false, // Removed, as we will use a computed property now
     };
   },
   computed: {
@@ -22,35 +21,33 @@ export default {
   },
   methods: {
     async login() {
-  try {
-    const csrfToken = await loginApi.getCSRFToken();
-    const userData = {
-      username: this.login_username,
-      password: this.login_password,
-    };
-    const response = await loginApi.loginUser(userData, csrfToken);
+      try {
+        const csrfToken = await loginApi.getCSRFToken();
+        const userData = {
+          username: this.login_username,
+          password: this.login_password,
+        };
+        const response = await loginApi.loginUser(userData, csrfToken);
 
-    console.log('API Response:', response);
+        console.log('API Response:', response);
 
-    if (response.access_token) {
-      localStorage.setItem('accessToken', response.access_token);
-      const userId = jwtDecode(response.access_token).user_id;
-      localStorage.setItem('userId', userId);
-      this.$router.push('/dashboard');
-    } else {
-      console.error('Access token not found in response');
-    }
-  } catch (error) {
-    this.errorMessage = error.message;
-  }
-},
-
-    // ... other methods
+        if (response.access_token) {
+          localStorage.setItem('accessToken', response.access_token);
+          const userId = jwtDecode(response.access_token).user_id;
+          localStorage.setItem('userId', userId);
+          this.$router.push('/dashboard');
+        } else {
+          console.error('Access token not found in response');
+        }
+      } catch (error) {
+        this.errorMessage = error.message;
+      }
+    },
   },
 };
 </script>
 <template>
-  <Navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
+  <navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
   <div class="full-page d-flex justify-content-center align-items-center">
     <div class="card login-card shadow">
       <div v-if="isStaffLogin" class="card-header staff-header text-center text-white">

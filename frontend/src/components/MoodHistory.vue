@@ -22,8 +22,6 @@
         </ul>
       </nav>
     </div>
-
-   <!-- Mood Edit Modal -->
     <MoodHistoryModal
       :show="showModal"
       :mood="selectedMood"
@@ -32,16 +30,19 @@
       @save="handleSave"
     />
   </div>
+  <custom-footer />
 </template>
 
 <script>
 import { fetchUserMoods, fetchMoodChoices } from '@/api/moods';
 import MoodHistoryModal from './MoodHistoryModal.vue';
+import CustomFooter from './CustomFooter.vue';
 
 export default {
   name: 'MoodHistory',
   components: {
-    MoodHistoryModal
+    MoodHistoryModal,
+    CustomFooter,
   },
   data() {
     return {

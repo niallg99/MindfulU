@@ -1,4 +1,5 @@
 <template>
+  <navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
   <div>
     <h2>Support For You</h2>
     <div class="accordion" id="supportAccordion">
@@ -34,12 +35,19 @@
       </div>
     </div>
   </div>
+  <custom-footer />
 </template>
 
 <script>
 import { fetchSupport } from '@/api/supportforyou.js';
+import Navbar from './Navbar.vue';
+import CustomFooter from './CustomFooter.vue';
 
 export default {
+  components: {
+    Navbar,
+    CustomFooter,
+  },
   data() {
     return {
       supportSections: [],

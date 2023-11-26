@@ -25,6 +25,10 @@ const routes = [
         path: '/dashboard', 
         component: () => import('@/components/Dashboard.vue') 
     },
+        { 
+        path: '/mood-history', 
+        component: () => import('@/components/MoodHistory.vue') 
+    },
     { 
         path: '/', 
         redirect: '/login' 
