@@ -1,17 +1,38 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Registration from '@/components/Registration.vue';
-import Login from '@/components/Login.vue';
-import EventComponent from '@/components/activeCanvas/EventComponent.vue';
-import Dashboard from '@/components/Dashboard.vue';
-import SupportForYou from '../components/SupportForYou.vue';
 
 const routes = [
-    { path: '/register', component: Registration },
-    { path: '/login', component: Login },
-    { path: '/events', component: EventComponent },
-     { path: '/support', component: SupportForYou },
-    { path: '/dashboard', component: Dashboard },
-    { path: '/', redirect: '/login' }
+    { 
+        path: '/register', 
+        component: () => import('@/components/Registration.vue') 
+    },
+    { 
+        path: '/login', 
+        component: () => import('@/components/Login.vue') 
+    },
+    { 
+        path: '/events', 
+        component: () => import('@/components/activeCanvas/EventComponent.vue') 
+    },
+    { 
+        path: '/support', 
+        component: () => import('@/components/SupportForYou.vue') 
+    },
+    {
+        path: '/friends',
+        component: () => import('@/components/Friends.vue')
+    },
+    { 
+        path: '/dashboard', 
+        component: () => import('@/components/Dashboard.vue') 
+    },
+        { 
+        path: '/mood-history', 
+        component: () => import('@/components/MoodHistory.vue') 
+    },
+    { 
+        path: '/', 
+        redirect: '/login' 
+    }
 ];
 
 const router = createRouter({

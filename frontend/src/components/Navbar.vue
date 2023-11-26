@@ -1,25 +1,5 @@
-<script>
-export default {
-	name: 'Navbar',
-	props: {
-		isLoggedIn: {
-			type: Boolean,
-			default: false
-		},
-		isStaffLogin: {
-			type: Boolean,
-			default: false
-		}
-	},
-	methods: {
-		toggleLogin() {
-		this.$emit('update:isStaffLogin', !this.isStaffLogin);
-		}
-  }
-}
-</script>
 <template>
-  <nav :class="['navbar', { 'navbar-staff-login': isStaffLogin }]" class="navbar navbar-expand-lg navbar-custom">
+  <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">
         <img src="/src/images/mental-health-during-covid-19.png" alt="MindfulU Logo" width="45" height="30">
@@ -31,15 +11,35 @@ export default {
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li v-if="!isLoggedIn" class="nav-item">
-            <button type="button" class="nav-link btn btn-link" @click="toggleLogin">{{ isStaffLogin ? 'User Login' : 'Staff Login' }}</button>
+            <router-link to="/login" class="nav-link">Login</router-link>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" v-if="isLoggedIn">
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Notifications <span v-if="friendRequests.length">({{ friendRequests.length }})</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+              <li v-for="request in friendRequests" :key="request.id" class="dropdown-item d-flex justify-content-between">
+                {{ request.sender }} wants to be friends.
+                <span>
+                  <button @click="acceptRequest(request.id)">✓</button>
+                  <button @click="declineRequest(request.id)">✗</button>
+                </span>
+              </li>
+              <li v-if="notifications.length === 0">
+                <a class="dropdown-item" href="#">No new notifications</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item" v-if="!isLoggedIn">
+            <a class="nav-link" href="#" id="loginPrompt">Need to log in</a>
+          </li>
+          <li class="nav-item dropdown" v-if="isLoggedIn">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Profile
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <li><router-link class="dropdown-item" to="/action">Action</router-link></li>
-              <li><router-link class="dropdown-item" to="/another-action">Another action</router-link></li>
+              <li><router-link class="dropdown-item" to="/profile">Profile</router-link></li>
+              <li><router-link class="dropdown-item" to="/settings">Settings</router-link></li>
               <li><hr class="dropdown-divider"></li>
               <li><router-link class="dropdown-item" to="/logout">Logout</router-link></li>
             </ul>
@@ -50,4 +50,49 @@ export default {
   </nav>
 </template>
 
+<script>
+import { fetchFriendRequests } from '@/api/friends';
 
+export default {
+  name: 'Navbar',
+  data() {
+    return {
+      notifications: [],
+      friendRequests: [],
+    };
+  },
+  computed: {
+    isLoggedIn() {
+      return !!localStorage.getItem('accessToken');
+    },
+  },
+  methods: {
+    toggleLogin() {
+      this.$emit('update:isStaffLogin', !this.isStaffLogin);
+    },
+    async fetchFriendRequests() {
+      try {
+        const requests = await fetchFriendRequests();
+        this.friendRequests = requests;
+      } catch (error) {
+        console.error('Error fetching friend requests:', error);
+      }
+  },
+    async acceptRequest(requestId) {
+      // Logic to accept friend request
+    },
+    async declineRequest(requestId) {
+      // Logic to decline friend request
+    },
+  },
+    mounted() {
+    if (this.isLoggedIn) {
+      this.fetchFriendRequests();
+    }
+    const dropdownElements = document.querySelectorAll('.dropdown-toggle');
+    dropdownElements.forEach(dropdown => {
+      new bootstrap.Dropdown(dropdown);
+    });
+  }
+};
+</script>

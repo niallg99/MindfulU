@@ -18,7 +18,3 @@ export default {
   },
 };
 </script>
-
-<!-- Add any specific styles for CardComponent here -->
-<style scoped>
-</style>

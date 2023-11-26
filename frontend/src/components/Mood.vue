@@ -1,5 +1,5 @@
 <script>
-import { postMood, fetchMoodCauses } from '@/api/moods';
+import { postMood, fetchMoodCauses, fetchMoodChoices } from '@/api/moods';
 
 export default {
   name: 'Mood',
@@ -8,11 +8,7 @@ export default {
       type: String,
       required: true
     },
-    selectionCount: {
-      type: Number,
-      default: 0
-    },
-    userId: { // Add this prop for the user ID
+    userId: {
       type: [String, Number],
       required: true
     },
@@ -27,15 +23,15 @@ export default {
     };
   },
  computed: {
-    backgroundStyle() {
-      const imageUrl = `/src/images/${this.mood.toLowerCase()}.png`;
-      return {
-        backgroundImage: `url(${imageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      };
-    }
-	},
+  backgroundStyle() {
+    const imageUrl = `/src/images/${this.mood.toLowerCase()}.png`;
+    return {
+      backgroundImage: `url(${imageUrl})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
+    };
+  }
+},
   methods: {
     toggleModal() {
       this.isModalVisible = !this.isModalVisible;
@@ -63,6 +59,7 @@ export default {
   },
   async mounted() {
     try {
+      this.moods = await fetchMoodChoices();
       this.causeChoices = await fetchMoodCauses();
     } catch (error) {
       console.error('Error fetching mood causes:', error);
@@ -95,7 +92,6 @@ export default {
               </option>
 						</select>
 					</div>
-
 					<button type="submit" class="btn btn-success">Submit</button>
 				</form>
 			</div>

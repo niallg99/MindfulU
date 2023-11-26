@@ -16,5 +16,12 @@ urlpatterns = [
     path("api/mood-choices/", views.get_mood_choices, name="mood-choices"),
     path("api/get-mood-causes/", views.get_mood_causes, name="get-mood-causes"),
     path("api/moods/", views.post_mood, name="post-mood"),
+    path("api/user-moods/<str:user_id>/", views.get_user_moods, name="get_user_moods"),
     path("api/get-csrf-token/", views.get_csrf_token, name="get-csrf-token"),
+    path('api/friends/', views.get_friends_list_view, name='friends_list'),
+    path('api/send-friend-request/<str:username>/', views.send_friend_request, name='send_friend_request'),
+    path('api/accept-friend-request/<str:username>/', views.accept_friend_request, name='accept_friend_request'),
+    path('api/reject-friend-request/<str:username>/', views.reject_friend_request, name='reject_friend_request'),
+    path('api/remove-friend/<str:username>/', views.remove_friend, name='remove_friend'),
+    path('api/friend-requests/', views.get_friend_requests, name='get_friend_requests'),
 ]
