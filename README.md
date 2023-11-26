@@ -29,3 +29,10 @@ docker-compose exec backend python manage.py run_active_canvas_scraping```
 
 export EMAIL_USER='your-gmail-username@gmail.com'
 export EMAIL_PASSWORD='your-gmail-app-password'
+```
+
+## Accessing External Website
+
+```sh
+http://mindful-u.co.uk/login
+```
