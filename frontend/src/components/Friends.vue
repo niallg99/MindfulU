@@ -1,8 +1,7 @@
 <template>
-  <navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
+  <navbar :is-logged-in="isLoggedIn"/>
   <div class="container mt-4">
     <div class="row">
-      <!-- Friend Cards -->
       <template v-if="friendsList.length">
         <div class="col-md-4" v-for="friend in paginatedFriendsList" :key="friend.id">
           <div class="card friend-card mb-3">
@@ -26,9 +25,7 @@
           </div>
         </div>
       </template>
-      <!-- Add Friend Modal -->
       <div v-if="showAddFriendModal" class="modal fade show d-block" tabindex="-1" aria-hidden="true">
-        <!-- Modal Content -->
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -45,7 +42,6 @@
           </div>
         </div>
       </div>
-      <!-- Empty State Card -->
       <template v-else>
         <div class="col-12">
           <div class="card text-center">
@@ -57,7 +53,6 @@
         </div>
       </template>
     </div>
-    <!-- Pagination -->
     <nav aria-label="Page navigation" v-if="totalPages > 1">
       <ul class="pagination justify-content-center">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -139,7 +134,6 @@ export default {
     async acceptRequest(requestId) {
       try {
         await acceptFriendRequest(requestId);
-        // Refresh the list after accepting
         await this.fetchFriendRequests();
         await this.loadFriendsData();
       } catch (error) {
@@ -149,7 +143,6 @@ export default {
     async declineRequest(requestId) {
       try {
         await rejectFriendRequest(requestId);
-        // Refresh the list after declining
         await this.fetchFriendRequests();
       } catch (error) {
         console.error('Error declining friend request:', error);
@@ -159,8 +152,8 @@ export default {
       try {
         await sendFriendRequest(this.friendUsername);
         alert('Friend request sent successfully to ' + this.friendUsername);
-        this.modalToggle(); // Close the modal after sending the request
-        await this.loadFriendsData(); // Reload friend data
+        this.modalToggle();
+        await this.loadFriendsData();
       } catch (error) {
         console.error('Error sending friend request:', error);
         alert('Failed to send friend request. Please try again.');

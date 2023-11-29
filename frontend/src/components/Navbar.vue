@@ -13,9 +13,10 @@
           <li v-if="!isLoggedIn" class="nav-item">
             <router-link to="/login" class="nav-link">Login</router-link>
           </li>
-          <li class="nav-item dropdown" v-if="isLoggedIn">
+          <li v-else class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Notifications <span v-if="friendRequests.length">({{ friendRequests.length }})</span>
+              <img src="/src/images/bell.svg" alt="Notifications" style="width: 20px; height: 20px;"> 
+              <span v-if="friendRequests.length">({{ friendRequests.length }})</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
               <li v-for="request in friendRequests" :key="request.id" class="dropdown-item d-flex justify-content-between">
@@ -25,21 +26,17 @@
                   <button @click="declineRequest(request.id)">✗</button>
                 </span>
               </li>
-              <li v-if="notifications.length === 0">
+              <li v-if="!friendRequests.length">
                 <a class="dropdown-item" href="#">No new notifications</a>
               </li>
             </ul>
           </li>
-          <li class="nav-item" v-if="!isLoggedIn">
-            <a class="nav-link" href="#" id="loginPrompt">Need to log in</a>
-          </li>
-          <li class="nav-item dropdown" v-if="isLoggedIn">
+          <li v-if="isLoggedIn" class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Profile
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <li><router-link class="dropdown-item" to="/profile">Profile</router-link></li>
-              <li><router-link class="dropdown-item" to="/settings">Settings</router-link></li>
+              <li><a class="dropdown-item" href="#" @click="openProfileModal">Profile</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><router-link class="dropdown-item" to="/logout">Logout</router-link></li>
             </ul>
@@ -48,13 +45,19 @@
       </div>
     </div>
   </nav>
+  <profile-modal ref="profileModalRef" />
 </template>
 
+
 <script>
-import { fetchFriendRequests } from '@/api/friends';
+import { fetchFriendRequests, acceptFriendRequest, rejectFriendRequest } from '@/api/friends';
+import ProfileModal from './ProfileModal.vue';
 
 export default {
   name: 'Navbar',
+  components: {
+    ProfileModal,
+  },
   data() {
     return {
       notifications: [],
@@ -67,9 +70,6 @@ export default {
     },
   },
   methods: {
-    toggleLogin() {
-      this.$emit('update:isStaffLogin', !this.isStaffLogin);
-    },
     async fetchFriendRequests() {
       try {
         const requests = await fetchFriendRequests();
@@ -78,11 +78,26 @@ export default {
         console.error('Error fetching friend requests:', error);
       }
   },
-    async acceptRequest(requestId) {
-      // Logic to accept friend request
+    async acceptRequest(username) {
+      try {
+        const response = await acceptFriendRequest(username);
+        console.log('Accept friend request response:', response);
+        await this.fetchFriendRequests();
+        await this.loadFriendsData();
+      } catch (error) {
+        console.error('Error accepting friend request:', error);
+      }
     },
-    async declineRequest(requestId) {
-      // Logic to decline friend request
+    async declineRequest(username) {
+      try {
+        await rejectFriendRequest(username);
+        await this.fetchFriendRequests();
+      } catch (error) {
+        console.error('Error declining friend request:', error);
+      }
+    },
+    openProfileModal() {
+      this.$refs.profileModalRef.show();
     },
   },
     mounted() {

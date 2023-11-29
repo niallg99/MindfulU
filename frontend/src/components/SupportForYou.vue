@@ -1,5 +1,5 @@
 <template>
-  <navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
+  <navbar :is-logged-in="isLoggedIn"/>
   <div>
     <h2>Support For You</h2>
     <div class="accordion" id="supportAccordion">

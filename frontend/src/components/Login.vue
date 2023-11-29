@@ -11,7 +11,6 @@ export default {
       login_password: '',
       reset_email: '',
       errorMessage: '',
-      isStaffLogin: false,
     };
   },
   computed: {
@@ -47,12 +46,9 @@ export default {
 };
 </script>
 <template>
-  <navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
+  <navbar :is-logged-in="isLoggedIn"/>
   <div class="full-page d-flex justify-content-center align-items-center">
     <div class="card login-card shadow">
-      <div v-if="isStaffLogin" class="card-header staff-header text-center text-white">
-        Staff Login
-      </div>
       <div class="card-header text-center bg-transparent">
         <img src="/src/images/mental.svg" alt="Logo" style="width: 200px; height: auto;">
       </div>
