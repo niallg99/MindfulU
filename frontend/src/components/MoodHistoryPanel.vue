@@ -1,21 +1,21 @@
 <template>
-  <div class="container mt-4">
-    <div class="row justify-content-center">
-      <div class="col-lg-12">
-        <div class="card panel-card">
-          <div class="card-header">
-            Recent Mood
-          </div>
+	<div class="container mt-4">
+		<div class="row justify-content-center">
+			<div class="col-lg-12">
+				<div class="card panel-card">
+					<div class="card-header">
+						Recent Mood
+					</div>
           <div class="card-body">
             <div v-if="isLoading">
-              <Spinner /> Loading mood history...
+              <Spinner />
             </div>
-            <div v-else-if="isError">
-              {{ errorMessage }}
-            </div>
-            <div v-else>
-              <div v-if="userMoods.length > 0" class="mood-carousel-container">
-                <div id="moodCarousel" class="carousel slide" data-bs-ride="carousel">
+						<div v-else-if="isError">
+							{{ errorMessage }}
+						</div>
+						<div v-else>
+							<div v-if="userMoods.length > 0" class="mood-carousel-container">
+								<div id="moodCarousel" class="carousel slide" data-bs-ride="carousel">
 									<div class="carousel-inner">
 										<div class="carousel-item" :class="{ active: index === 0 }" v-for="(mood, index) in recentUserMoods" :key="mood.id">
 											<img :src="moodImageUrl(mood.mood_type)" class="d-block w-100" :alt="mood.mood_type">
@@ -35,17 +35,17 @@
 										<span class="visually-hidden">Next</span>
 									</button>
 								</div>
-              </div>
-              <div v-if="userMoods.length === 0" class="no-data-state">No mood data available.</div>
-            </div>
-          </div>
-          <div class="card-footer text-center">
-            <button class="btn btn-primary" @click="navigateToMoodHistory">See All Moods</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+							</div>
+							<div v-if="userMoods.length === 0" class="no-data-state">No mood data available.</div>
+						</div>
+					</div>
+					<div class="card-footer text-center">
+						<button class="btn btn-primary" @click="navigateToMoodHistory">See All Moods</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -55,13 +55,13 @@ import Spinner from './Spinner.vue';
 export default {
 	name: 'MoodHistoryPanel',
 	setup() {
-    const router = useRouter();
-    return {
-      navigateToMoodHistory() {
-        router.push('/mood-history');
-      },
-    };
-  },
+		const router = useRouter();
+		return {
+			navigateToMoodHistory() {
+				router.push('/mood-history');
+			},
+		};
+	},
 	components: { Spinner },
 	props: { userMoods: { type: Array, required: true } },
 	data() {

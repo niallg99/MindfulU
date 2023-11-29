@@ -63,7 +63,7 @@ export default {
 }
 </script>
 <template>
-	<Navbar :is-logged-in="true" :is-staff-login="false" />
+	<navbar :is-logged-in="true"/>
 	<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 		<div class="card shadow" style="width: 80%;">
 			<div class="card-body">

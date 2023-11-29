@@ -11,10 +11,19 @@ export function registerUser(userData, csrfToken) {
     })
     .then(response => {
         if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error('Registration failed');
-            });
+            throw new Error('Network response was not ok');
         }
         return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            return { success: true, data };
+        } else {
+            return { success: false, message: data.message || 'Registration failed.' };
+        }
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+        return { success: false, message: error.message };
     });
 }

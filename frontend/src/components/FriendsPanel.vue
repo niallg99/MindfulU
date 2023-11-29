@@ -3,7 +3,9 @@
     <div class="row justify-content-center">
       <div class="col-lg-12">
         <div class="card panel-card">
-          <div class="card-header">Friends</div>
+          <div class="card-header">
+            Friends
+          </div>
           <div class="card-body">
             <div v-if="friendRequests.length" class="incoming-requests mb-4">
               <h3>Incoming Friend Requests</h3>
@@ -44,9 +46,9 @@
                     </div>
                     <div class="card-body">
                       <h5 class="card-title">Username: @{{ friend.friend.username }}</h5>
-                      <p class="card-text">Name: {{ friend.friend.first_name }}</p>
-                      <p class="card-text">Mood: {{ friend.most_recent_mood }}</p>
-                      <img :src="moodImageUrl(friend.most_recent_mood)" alt="Mood Image" class="mood-image"/>
+                      <template v-if="friend.most_recent_mood">
+                        <img :src="moodImageUrl(friend.most_recent_mood)" alt="Mood Image" class="mood-image"/>
+                      </template>
                     </div>
                   </div>
                 </div>
@@ -78,6 +80,7 @@
 <script>
 import { fetchFriends, sendFriendRequest, acceptFriendRequest, rejectFriendRequest, fetchFriendRequests } from '@/api/friends';
 import { useRouter } from 'vue-router';
+import Spinner from './Spinner.vue';
 
 export default {
   name: 'FriendsPanel',
@@ -88,6 +91,9 @@ export default {
         router.push('/friends');
       },
     };
+  },
+  components: {
+    Spinner,
   },
   data() {
     return {
@@ -196,7 +202,6 @@ export default {
 }
 
 .card-header {
-  height: 80px;
   display: flex;
   align-items: center;
 }
