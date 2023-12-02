@@ -1,36 +1,27 @@
 <template>
-  <navbar :isLoggedIn="true"/>
-  <div class="page-container">
-    <div class="main-container">
-      <div class="card">
-          <div class="card-header">
-            Moods
-          </div>
-        <div class="card-body">
-          <div class="mood-container">
-            <Mood 
-              v-for="(mood, index) in moodChoices"
-              :key="index"
-              :mood="mood[0]"
-              :user-id="userId || ''"
-            />
-          </div>
-        </div>
+  <navbar :isLoggedIn="true" :isStaff="isStaff" @update:isStaffLogin="isLoggedIn" @login-success="handleLoginSuccess" />
+  <div class="main-container">
+    <div class="mood-container">
+      <Mood 
+        v-for="(mood, index) in moodChoices"
+        :key="index"
+        :mood="mood[0]"
+        :user-id="userId || ''"
+      />
+    </div>
+    <div class="panels-container">
+      <div class="panel">
+        <event-panel />
       </div>
-      <div class="panels-container">
-        <div class="panel">
-          <event-panel />
-        </div>
-        <div class="panel">
-          <support-panel />
-        </div>
-        <div class="panel">
-          <mood-history-panel :user-moods="userMoods" />
-        </div>
-        <div class="panel">
-          <friends-panel />
-          <div class="friends-panel-placeholder">Friends Panel</div>
-        </div>
+      <div class="panel">
+        <support-panel />
+      </div>
+      <div class="panel">
+        <mood-history-panel :user-moods="userMoods" />
+      </div>
+      <div class="panel">
+				<friends-panel />
+				<div class="friends-panel-placeholder">Friends Panel</div>
       </div>
     </div>
   </div>
@@ -84,49 +75,36 @@ export default {
 </script>
 
 <style scoped>
-  .page-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+.main-container {
+  max-width: 80%;
+  margin: auto;
+  padding-bottom: 3rem; /* Add padding at the bottom */
+}
 
-  .main-container {
-    max-width: 100%;
-    margin: auto;
-    padding: 0;
-    padding-bottom: 60px;
-    flex-grow: 1;
-  }
+.mood-container {
+  padding: 2rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 1rem;
+}
 
-  .mood-container {
-    width: 80%; /* Set the width to 80% */
-    margin: 0 auto; /* Center the container */
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; /* Center the mood items */
-    gap: 1rem;
-    padding: 2rem 0;
-  }
+.panel {
+  flex: 1 1 50%;
+  max-width: 50%;
+}
 
+.panels-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+@media (max-width: 992px) {
   .panel {
-    flex: 1 1 50%;
-    max-width: 50%;
-    padding: 0;
+    max-width: 100%;
   }
+}
 
-  .panels-container {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 2rem;
-  }
 
-  @media (max-width: 992px) {
-    .panel {
-      max-width: 100%;
-    }
-
-    .mood-container {
-      width: 100%; /* Adjust width for smaller screens */
-    }
-  }
 </style>

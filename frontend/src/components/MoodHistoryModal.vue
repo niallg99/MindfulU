@@ -52,7 +52,20 @@ export default {
     }
   },
   methods: {
+    initializeModal() {
+      const modalElement = document.getElementById('moodModal');
+      this.modalInstance = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      if (this.showModal) {
+        this.modalInstance.show();
+      }
+    },
     closeModal() {
+      if (this.modalInstance) {
+        this.modalInstance.hide();
+      }
       this.$emit('close');
     },
     async saveChanges() {
@@ -75,6 +88,9 @@ export default {
         this.saveError = 'Failed to delete mood. Please try again.';
       }
     }
+  },
+  mounted() {
+    this.initializeModal();
   }
 };
 </script>

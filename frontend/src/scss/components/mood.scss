@@ -1,15 +1,15 @@
 .mood-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px; /* Smaller gap between cards */
+  gap: 10px;
   justify-content: center;
   align-items: stretch;
-  padding: 0 20px; /* Padding from the page sides */
+  padding: 0 20px;
 }
 
 .mood-card {
-  flex: 0 0 auto; /* Changed to prevent cards from growing or shrinking */
-  width: 220px; /* Increase the width as desired */
+  flex: 0 0 auto;
+  width: 220px;
   position: relative;
   overflow: hidden;
   margin-bottom: 20px;
