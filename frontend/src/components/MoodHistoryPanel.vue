@@ -6,10 +6,10 @@
 					<div class="card-header">
 						Recent Mood
 					</div>
-          <div class="card-body">
-            <div v-if="isLoading">
-              <Spinner />
-            </div>
+					<div class="card-body mt-5">
+						<div v-if="isLoading">
+							<Spinner />
+						</div>
 						<div v-else-if="isError">
 							{{ errorMessage }}
 						</div>

@@ -2,31 +2,38 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     { 
-        path: '/register', 
+        path: '/register',
+        name: 'Register', 
         component: () => import('@/components/Registration.vue') 
     },
     { 
         path: '/login', 
+        name: 'Login',
         component: () => import('@/components/Login.vue') 
     },
     { 
-        path: '/events', 
+        path: '/events',
+        name: 'Events',
         component: () => import('@/components/activeCanvas/EventComponent.vue') 
     },
     { 
-        path: '/support', 
+        path: '/support',
+        name: 'Support', 
         component: () => import('@/components/SupportForYou.vue') 
     },
     {
         path: '/friends',
+        name: 'Friends',
         component: () => import('@/components/Friends.vue')
     },
     { 
-        path: '/dashboard', 
+        path: '/dashboard',
+        name: 'Dashboard',
         component: () => import('@/components/Dashboard.vue') 
     },
-        { 
+    { 
         path: '/mood-history', 
+        name: 'MoodHistory',
         component: () => import('@/components/MoodHistory.vue') 
     },
     { 

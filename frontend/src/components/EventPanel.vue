@@ -3,40 +3,40 @@ import { fetchEvents } from '@/api/events';
 import { useRouter } from 'vue-router';
 
 export default {
-  name: 'EventPanel',
-  setup() {
-    const router = useRouter();
-    const navigateToEvents = () => {
-      router.push('/events');
-    };
+	name: 'EventPanel',
+	setup() {
+		const router = useRouter();
+		const navigateToEvents = () => {
+			router.push('/events');
+		};
 
-    return { navigateToEvents };
-  },
-  data() {
-    return {
-      events: [],
-      isLoading: true,
-      isError: false,
-      errorMessage: '',
-    };
-  },
-  computed: {
-    upcomingEvents() {
-      return this.events.slice(1, 4);
-    },
-  },
-  created() {
-    fetchEvents()
-      .then(data => {
-        this.events = data.sort((a, b) => new Date(a.date) - new Date(b.date));
-        this.isLoading = false;
-      })
-      .catch(error => {
-        console.error('There was a problem fetching the events:', error);
-        this.isError = true;
-        this.errorMessage = 'Failed to load events.';
-      });
-  }
+		return { navigateToEvents };
+	},
+	data() {
+		return {
+			events: [],
+			isLoading: true,
+			isError: false,
+			errorMessage: '',
+		};
+	},
+	computed: {
+		upcomingEvents() {
+			return this.events.slice(1, 4);
+		},
+	},
+	created() {
+		fetchEvents()
+			.then(data => {
+				this.events = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+				this.isLoading = false;
+			})
+			.catch(error => {
+				console.error('There was a problem fetching the events:', error);
+				this.isError = true;
+				this.errorMessage = 'Failed to load events.';
+			});
+	}
 }
 </script>
 
@@ -65,9 +65,9 @@ export default {
 								</ul>
 							</div>
 						</div>
-            <div class="card-footer text-center">
-              <button class="btn btn-primary" @click="navigateToEvents">See More Events</button>
-            </div>
+						<div class="card-footer text-center">
+							<button class="btn btn-primary" @click="navigateToEvents">See More Events</button>
+						</div>
 					</div>
 				</div>
 			</div>

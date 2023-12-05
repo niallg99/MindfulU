@@ -1,41 +1,44 @@
 <template>
-  <navbar :is-logged-in="isLoggedIn"/>
-  <div>
-    <h2>Support For You</h2>
-    <div class="accordion" id="supportAccordion">
-      <div
-        class="accordion-item"
-        v-for="(section, index) in supportSections"
-        :key="section.id"
-      >
-        <h3 class="accordion-header" :id="`heading${index}`">
-          <button
-            class="accordion-button"
-            type="button"
-            :class="{ 'collapsed': collapsed !== index }"
-            @click="toggleCollapse(index)"
+  <div class="page-container">
+    <navbar :is-logged-in="isLoggedIn"/>
+    <div class="main-container">
+      <div>
+        <div class="accordion" id="supportAccordion">
+          <div
+            class="accordion-item"
+            v-for="(section, index) in supportSections"
+            :key="section.id"
           >
-            {{ section.title }}
-          </button>
-        </h3>
-        <div
-          :id="`collapse${index}`"
-          class="accordion-collapse collapse"
-          :class="{ 'show': collapsed === index }"
-          :aria-labelledby="`heading${index}`"
-        >
-          <div class="accordion-body">
-            <ul class="list-unstyled">
-              <li v-for="link in section.links" :key="link.url">
-                <a :href="link.link_url" target="_blank">{{ link.link_text }}</a>
-              </li>
-            </ul>
+            <h3 class="accordion-header" :id="`heading${index}`">
+              <button
+                class="accordion-button"
+                type="button"
+                :class="{ 'collapsed': collapsed !== index }"
+                @click="toggleCollapse(index)"
+              >
+                {{ section.title }}
+              </button>
+            </h3>
+            <div
+              :id="`collapse${index}`"
+              class="accordion-collapse collapse"
+              :class="{ 'show': collapsed === index }"
+              :aria-labelledby="`heading${index}`"
+            >
+              <div class="accordion-body">
+                <ul class="list-unstyled">
+                  <li v-for="link in section.links" :key="link.url">
+                    <a :href="link.link_url" target="_blank">{{ link.link_text }}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <custom-footer />
   </div>
-  <custom-footer />
 </template>
 
 <script>
@@ -74,8 +77,39 @@ export default {
 </script>
 
 <style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.accordion {
+  width: 100%;
+  max-width: 80%; 
+  margin: 0 auto;
+}
+
 .accordion-item {
-  max-width: 800px;
-  margin-bottom: 10px;
+  width: 100%;
+}
+
+.accordion-item:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+.footer {
+  width: 100%;
+  margin-top: auto;
 }
 </style>
+
+

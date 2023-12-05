@@ -41,7 +41,17 @@
               <li><router-link class="dropdown-item" to="/logout">Logout</router-link></li>
             </ul>
           </li>
-        </ul>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Pages
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="pagesDropdown">
+                <li v-for="route in router.getRoutes()" :key="route.path">
+                  <router-link :to="route.path" class="dropdown-item">{{ route.name }}</router-link>
+                </li>
+              </ul>
+            </li>
+        </ul> 
       </div>
     </div>
   </nav>
@@ -52,6 +62,7 @@
 <script>
 import { fetchFriendRequests, acceptFriendRequest, rejectFriendRequest } from '@/api/friends';
 import ProfileModal from './ProfileModal.vue';
+import router from '../router';
 
 export default {
   name: 'Navbar',
@@ -62,6 +73,7 @@ export default {
     return {
       notifications: [],
       friendRequests: [],
+      router: router,
     };
   },
   computed: {

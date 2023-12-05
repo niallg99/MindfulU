@@ -1,77 +1,79 @@
 <template>
-  <navbar :is-logged-in="isLoggedIn"/>
-  <div class="container mt-4">
-    <div class="row">
-      <template v-if="friendsList.length">
-        <div class="col-md-4" v-for="friend in paginatedFriendsList" :key="friend.id">
-          <div class="card friend-card mb-3">
-            <div class="row g-0">
-              <div class="col-md-4">
-                <img 
-                  :src="friend.profilePicture || '/src/images/person.svg'" 
-                  class="img-fluid rounded-start" 
-                  :alt="friend.name"
-                >
-              </div>
-              <div class="col-md-8">
-                <div class="card-body">
-                  <h5 class="card-title">{{ friend.name }}</h5>
-                  <p class="card-text"><small class="text-muted">@{{ friend.username }}</small></p>
-                  <p class="card-text">{{ friend.mostRecentMood }}</p>
-                  <p class="card-text" v-if="friend.mostRecentCause">Cause: {{ friend.mostRecentCause }}</p>
+  <div class="page-container">
+      <navbar :is-logged-in="isLoggedIn" />
+      <div class="container mt-4">
+        <div class="row">
+          <template v-if="friendsList.length">
+            <div class="col-md-4" v-for="friend in paginatedFriendsList" :key="friend.id">
+              <div class="card friend-card mb-3">
+                <div class="row g-0">
+                  <div class="col-md-4">
+                    <img 
+                      :src="friend.profilePicture || '/src/images/person.svg'" 
+                      class="img-fluid rounded-start" 
+                      :alt="`${friend.name}'s profile picture`"
+                    >
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body">
+                      <h5 class="card-title">{{ friend.name }}</h5>
+                      <p class="card-text"><small>@{{ friend.username }}</small></p>
+                      <p class="card-text" v-if="friend.allowMoodDisplay">{{ friend.mostRecentMood }}</p>
+                    <p class="card-text" v-if="friend.mostRecentCause">Cause: {{ friend.mostRecentCause }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </template>
-      <div v-if="showAddFriendModal" class="modal fade show d-block" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Add a Friend</h5>
-              <button type="button" class="btn-close" @click="modalToggle"></button>
-            </div>
-            <div class="modal-body">
-              <input type="text" class="form-control" placeholder="Enter friend's username" v-model="friendUsername">
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="modalToggle">Close</button>
-              <button type="button" class="btn btn-primary" @click="addFriend">Add Friend</button>
+        </template>
+        <div v-if="showAddFriendModal" class="modal fade show d-block" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Add a Friend</h5>
+                <button type="button" class="btn-close" @click="modalToggle"></button>
+              </div>
+              <div class="modal-body">
+                <input type="text" class="form-control" placeholder="Enter friend's username" v-model="friendUsername">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @click="modalToggle">Close</button>
+                <button type="button" class="btn btn-primary" @click="addFriend">Add Friend</button>
+              </div>
             </div>
           </div>
         </div>
+        <template v-else>
+          <div class="col-12">
+            <div class="card text-center">
+              <div class="card-body">
+                <p>No friends added yet. Start connecting!</p>
+                <button class="btn btn-primary" @click="modalToggle">Add Friend</button>
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
-      <template v-else>
-        <div class="col-12">
-          <div class="card text-center">
-            <div class="card-body">
-              <p>No friends added yet. Start connecting!</p>
-              <button class="btn btn-primary" @click="modalToggle">Add Friend</button>
-            </div>
-          </div>
-        </div>
-      </template>
+      <nav aria-label="Page navigation" v-if="totalPages > 1">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" :class="{ disabled: currentPage === 1 }">
+            <a class="page-link" href="#" aria-label="Previous" @click.prevent="changePage(currentPage - 1)">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+            <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+            <a class="page-link" href="#" aria-label="Next" @click.prevent="changePage(currentPage + 1)">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
-    <nav aria-label="Page navigation" v-if="totalPages > 1">
-      <ul class="pagination justify-content-center">
-        <li class="page-item" :class="{ disabled: currentPage === 1 }">
-          <a class="page-link" href="#" aria-label="Previous" @click.prevent="changePage(currentPage - 1)">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
-          <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
-        </li>
-        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-          <a class="page-link" href="#" aria-label="Next" @click.prevent="changePage(currentPage + 1)">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
+    <custom-footer />
   </div>
-  <custom-footer />
 </template>
 
 
@@ -180,6 +182,17 @@ export default {
 
 
 <style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1;
+  padding-top: 1rem;
+}
+
 .friend-card .card-body {
   padding: 1rem;
 }
@@ -196,7 +209,10 @@ export default {
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 
+  margin-top: 1rem;
 }
 
+.custom-footer {
+  margin-top: auto;
+}
 </style>
