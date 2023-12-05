@@ -25,11 +25,12 @@
 				</nav>
 			</div>
 			<MoodHistoryModal
-				:show="showModal"
-				:mood="selectedMood"
-				:moodChoices="moodChoices"
-				@close-modal="showModal = false"
-				@save="handleSave"
+					ref="moodModalRef"
+					:mood="selectedMood"
+					:moodChoices="moodChoices"
+					@close-modal="showModal = false"
+					@save="handleSave"
+					@delete="handleDelete"
 			/>
 		</div>
 		<custom-footer />
@@ -91,8 +92,6 @@ export default {
 			try {
 				const response = await fetchMoodChoices();
 				console.log("Mood choices response:", response);
-
-				// Transform the response to a simple array of strings
 				this.moodChoices = response.map(choiceArray => choiceArray[0]);
 			} catch (error) {
 				console.error('Error fetching mood choices:', error);
@@ -106,19 +105,16 @@ export default {
 		},
 		openModal(mood) {
 			this.selectedMood = mood;
-			this.$nextTick(() => {
-				const modalElement = document.getElementById('moodModal');
-				if (!this.modalInstance) {
-					this.modalInstance = new bootstrap.Modal(modalElement);
-				}
-				this.modalInstance.show();
-			});
+			this.$refs.moodModalRef.show();
 		},
 		formatDate(dateStr) {
 			const date = new Date(dateStr);
 			const options = { day: 'numeric', month: 'short', year: 'numeric' };
 			return date.toLocaleDateString('en-GB', options);
-		}
+		},
+		 handleDelete(deletedMoodId) {
+				this.moods = this.moods.filter(mood => mood.id !== deletedMoodId);
+		},
 	},
 	mounted() {
 		this.loadMoods();

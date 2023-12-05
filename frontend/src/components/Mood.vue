@@ -30,13 +30,14 @@ computed: {
 			backgroundSize: 'cover',
 			backgroundPosition: 'center'
 		};
-	}
+	},
+	shouldShowCauseInput() {
+		return !['Happy'].includes(this.mood);
+	},
 },
 	methods: {
 		toggleModal() {
 			this.isModalVisible = !this.isModalVisible;
-			this.isCauseInputVisible = ['sad', 'angry', 'meh'].includes(this.mood);
-			
 		},
 		async submitForm() {
       try {
@@ -72,30 +73,32 @@ computed: {
 	<div class="card mood-card">
 		<div class="card-body p-0" :style="backgroundStyle">
 			<div class="mood-overlay" @click="toggleModal">
-				<button class="btn btn-primary">{{ mood }}</button>
+				<button class="btn mood-btn-primary btn-primary">{{ mood }}</button>
 			</div>
 		</div>
 		<div v-if="isModalVisible" class="mood-modal">
 			<div class="modal-overlay" @click="toggleModal"></div>
-			<div class="modal-content">
-				<span class="close" @click="toggleModal">&times;</span>
-				<form @submit.prevent="submitForm">
-					<p>You have selected: {{ mood }}</p>
-					<div class="form-group">
-						<label for="feedback">Your feedback:</label>
-						<textarea id="feedback" class="form-control" v-model="feedback"></textarea>
+				<div class="modal-content">
+					<span class="close" @click="toggleModal">&times;</span>
+					<form @submit.prevent="submitForm">
+						<p>You have selected: {{ mood }}</p>
+						<div class="form-group">
+							<label for="feedback">Your feedback:</label>
+							<textarea id="feedback" class="form-control" v-model="feedback"></textarea>
+						</div>
+						<div class="form-group padding-top-1" v-if="shouldShowCauseInput">
+							<label for="cause">Select a cause:</label>
+							<select id="cause" class="form-control" v-model="selectedCause">
+								<option v-for="cause in causeChoices" :key="cause" :value="cause">
+									{{ cause }}
+								</option>
+							</select>
 					</div>
-					<div class="form-group">
-						<label for="cause">Select a cause:</label>
-						<select id="cause" class="form-control" v-model="selectedCause">
-							<option v-for="cause in causeChoices" :key="cause" :value="cause">
-								{{ cause }}
-							</option>
-						</select>
+					<div class="padding-top-1">
+						<button type="submit" class="btn btn-success">Submit</button>
 					</div>
-					<button type="submit" class="btn btn-success">Submit</button>
 				</form>
-			</div>
+  		</div>
 		</div>
 	</div>
 </template>

@@ -159,6 +159,23 @@ def get_user_moods(request, user_id):
         return Response(
             {"error": "You do not have permission to view these moods."}, status=403
         )
+    
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_mood(request, mood_id):
+    mood = get_object_or_404(Mood, id=mood_id)
+    serializer = MoodSerializer(mood, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_mood(request, mood_id):
+    mood = get_object_or_404(Mood, id=mood_id)
+    mood.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])

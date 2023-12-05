@@ -8,22 +8,23 @@
 				</div>
 				<div class="modal-body">
 					<div class="text-center mb-3">
-						<img :src="userProfilePicture || '/src/images/default-avatar.png'" class="rounded-circle" alt="Profile Picture" style="width: 100px; height: 100px;">
+						<img :src="userProfilePicture || '/src/images/person.svg'" class="rounded-circle" alt="Profile Picture" style="width: 100px; height: 100px;">
 					</div>
 					<div class="mb-3">
 						<label for="profilePicture" class="form-label">Update Profile Picture</label>
 						<input type="file" class="form-control" id="profilePicture" @change="handleFileUpload">
 					</div>
+					<label for="profilePicture" class="form-label">Update Privacy Settings</label>
 				<div class="form-check">
 						<input 
-						class="form-check-input" 
-						type="checkbox" 
-						id="showMood" 
-						:checked="showMood" 
-						@change="$emit('update:showMood', $event.target.checked)"
+							class="form-check-input" 
+							type="checkbox" 
+							id="showMood" 
+							:checked="showMood" 
+							@change="$emit('update:showMood', $event.target.checked)"
 						>
 						<label class="form-check-label" for="showMood">
-						Show most recent mood to friends
+							Show most recent mood to friends
 						</label>
 				</div>
 				</div>
@@ -62,10 +63,10 @@ export default {
 						body: formData,
 						});
 						if (response.ok) {
-						this.$emit('profile-updated');
+							this.$emit('profile-updated');
 						} else {
-						const error = await response.json();
-						throw new Error(error.message);
+							const error = await response.json();
+							throw new Error(error.message);
 						}
 				} catch (error) {
 						console.error(error);

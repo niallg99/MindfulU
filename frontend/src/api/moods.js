@@ -1,4 +1,4 @@
-import { getAccessToken } from '@/api/auth'; // Import the getAccessToken function
+import { getAccessToken } from '@/api/auth';
 const baseUrl = 'http://0.0.0.0:8000';
 
 const fetchMoodChoices = async () => {
@@ -31,8 +31,8 @@ const fetchMoodCauses = async () => {
 
 const postMood = async (moodData) => {
   try {
-    const accessToken = getAccessToken(); // Call getAccessToken to retrieve the access token
-    console.log('Access Token:', accessToken); // Add this line to print the access token
+    const accessToken = getAccessToken();
+    console.log('Access Token:', accessToken)
     const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
     console.log('Token Payload:', tokenPayload);
     const response = await fetch(`${baseUrl}/api/moods/`, {
@@ -58,11 +58,11 @@ const postMood = async (moodData) => {
 
 const updateMood = async (moodId, moodData) => {
   try {
-    const accessToken = getAccessToken(); // Retrieve the access token
-    const url = `${baseUrl}/api/moods/${moodId}/`;
+    const accessToken = getAccessToken();
+    const url = `${baseUrl}/api/moods/${moodId}/update/`;
 
     const response = await fetch(url, {
-      method: 'PATCH', // or 'PUT', depending on your API
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
@@ -106,10 +106,12 @@ const fetchUserMoods = async (userId) => {
 
 const deleteMood = async (moodId) => {
   try {
-    const response = await fetch(`[Your API Endpoint]/moods/${moodId}`, {
+    const accessToken = getAccessToken();
+    const url = `${baseUrl}/api/moods/${moodId}/delete/`;
+    const response = await fetch(url, {
       method: 'DELETE',
       headers: {
-        // Add necessary headers, e.g., for authorization
+        'Authorization': `Bearer ${accessToken}`,
       },
     });
 
@@ -117,7 +119,7 @@ const deleteMood = async (moodId) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return true; // Return true on successful deletion
+    return true;
   } catch (error) {
     console.error("Could not delete mood:", error);
     throw error;
