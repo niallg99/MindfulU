@@ -4,61 +4,54 @@ import { jwtDecode } from 'jwt-decode';
 
 
 export default {
-  name: 'Login',
-  data() {
-    return {
-      login_username: '',
-      login_password: '',
-      reset_email: '',
-      errorMessage: '',
-      isStaffLogin: false,
-      // isLoggedIn: false, // Removed, as we will use a computed property now
-    };
-  },
-  computed: {
-    isLoggedIn() {
-      return !!localStorage.getItem('accessToken');
-    }
-  },
-  methods: {
-    async login() {
-  try {
-    const csrfToken = await loginApi.getCSRFToken();
-    const userData = {
-      username: this.login_username,
-      password: this.login_password,
-    };
-    const response = await loginApi.loginUser(userData, csrfToken);
+	name: 'Login',
+	data() {
+		return {
+			login_username: '',
+			login_password: '',
+			reset_email: '',
+			errorMessage: '',
+		};
+	},
+	computed: {
+		isLoggedIn() {
+			return !!localStorage.getItem('accessToken');
+		}
+	},
+	methods: {
+		async login() {
+			try {
+				const csrfToken = await loginApi.getCSRFToken();
+				const userData = {
+					username: this.login_username,
+					password: this.login_password,
+				};
+				const response = await loginApi.loginUser(userData, csrfToken);
 
-    console.log('API Response:', response);
+				console.log('API Response:', response);
 
-    if (response.access_token) {
-      localStorage.setItem('accessToken', response.access_token);
-      const userId = jwtDecode(response.access_token).user_id;
-      localStorage.setItem('userId', userId);
-      this.$router.push('/dashboard');
-    } else {
-      console.error('Access token not found in response');
-    }
-  } catch (error) {
-    this.errorMessage = error.message;
-  }
-},
-
-    // ... other methods
-  },
+				if (response.access_token) {
+					localStorage.setItem('accessToken', response.access_token);
+					const userId = jwtDecode(response.access_token).user_id;
+					localStorage.setItem('userId', userId);
+					this.$router.push('/dashboard');
+				} else {
+					console.error('Access token not found in response');
+				}
+			} catch (error) {
+				this.errorMessage = error.message;
+			}
+		},
+	},
 };
 </script>
 <template>
-  <Navbar :is-logged-in="isLoggedIn" :is-staff-login="isStaffLogin" @update:isStaffLogin="handleStaffLoginToggle"/>
-  <div class="full-page d-flex justify-content-center align-items-center">
-    <div class="card login-card shadow">
-      <div v-if="isStaffLogin" class="card-header staff-header text-center text-white">
-        Staff Login
-      </div>
-      <div class="card-header text-center bg-transparent">
-        <img src="/src/images/mental.svg" alt="Logo" style="width: 200px; height: auto;">
-      </div>
+	<navbar :is-logged-in="isLoggedIn"/>
+	<div class="full-page d-flex justify-content-center align-items-center">
+		<div class="card login-card shadow">
+			<div class="card-header text-center bg-transparent">
+				<img src="/src/images/mental.svg" alt="Logo" style="width: 200px; height: auto;">
+			</div>
 			<div class="card-body">
 				<form @submit.prevent="login" class="row g-3">
 					<div class="col-12">

@@ -1,25 +1,5 @@
-<script>
-export default {
-	name: 'Navbar',
-	props: {
-		isLoggedIn: {
-			type: Boolean,
-			default: false
-		},
-		isStaffLogin: {
-			type: Boolean,
-			default: false
-		}
-	},
-	methods: {
-		toggleLogin() {
-		this.$emit('update:isStaffLogin', !this.isStaffLogin);
-		}
-  }
-}
-</script>
 <template>
-  <nav :class="['navbar', { 'navbar-staff-login': isStaffLogin }]" class="navbar navbar-expand-lg navbar-custom">
+  <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">
         <img src="/src/images/mental-health-during-covid-19.png" alt="MindfulU Logo" width="45" height="30">
@@ -31,23 +11,115 @@ export default {
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li v-if="!isLoggedIn" class="nav-item">
-            <button type="button" class="nav-link btn btn-link" @click="toggleLogin">{{ isStaffLogin ? 'User Login' : 'Staff Login' }}</button>
+            <router-link to="/login" class="nav-link">Login</router-link>
           </li>
-          <li class="nav-item dropdown">
+          <li v-else class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="/src/images/bell.svg" alt="Notifications" style="width: 20px; height: 20px;"> 
+              <span v-if="friendRequests.length">({{ friendRequests.length }})</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+              <li v-for="request in friendRequests" :key="request.id" class="dropdown-item d-flex justify-content-between">
+                {{ request.sender }} wants to be friends.
+                <span>
+                  <button @click="acceptRequest(request.id)">✓</button>
+                  <button @click="declineRequest(request.id)">✗</button>
+                </span>
+              </li>
+              <li v-if="!friendRequests.length">
+                <a class="dropdown-item" href="#">No new notifications</a>
+              </li>
+            </ul>
+          </li>
+          <li v-if="isLoggedIn" class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Profile
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <li><router-link class="dropdown-item" to="/action">Action</router-link></li>
-              <li><router-link class="dropdown-item" to="/another-action">Another action</router-link></li>
+              <li><a class="dropdown-item" href="#" @click="openProfileModal">Profile</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><router-link class="dropdown-item" to="/logout">Logout</router-link></li>
             </ul>
           </li>
-        </ul>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Pages
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="pagesDropdown">
+                <li v-for="route in router.getRoutes()" :key="route.path">
+                  <router-link :to="route.path" class="dropdown-item">{{ route.name }}</router-link>
+                </li>
+              </ul>
+            </li>
+        </ul> 
       </div>
     </div>
   </nav>
+  <profile-modal ref="profileModalRef" />
 </template>
 
 
+<script>
+import { fetchFriendRequests, acceptFriendRequest, rejectFriendRequest } from '@/api/friends';
+import ProfileModal from './ProfileModal.vue';
+import router from '../router';
+
+export default {
+  name: 'Navbar',
+  components: {
+    ProfileModal,
+  },
+  data() {
+    return {
+      notifications: [],
+      friendRequests: [],
+      router: router,
+    };
+  },
+  computed: {
+    isLoggedIn() {
+      return !!localStorage.getItem('accessToken');
+    },
+  },
+  methods: {
+    async fetchFriendRequests() {
+      try {
+        const requests = await fetchFriendRequests();
+        this.friendRequests = requests;
+      } catch (error) {
+        console.error('Error fetching friend requests:', error);
+      }
+  },
+    async acceptRequest(username) {
+      try {
+        const response = await acceptFriendRequest(username);
+        console.log('Accept friend request response:', response);
+        await this.fetchFriendRequests();
+        await this.loadFriendsData();
+      } catch (error) {
+        console.error('Error accepting friend request:', error);
+      }
+    },
+    async declineRequest(username) {
+      try {
+        await rejectFriendRequest(username);
+        await this.fetchFriendRequests();
+      } catch (error) {
+        console.error('Error declining friend request:', error);
+      }
+    },
+    openProfileModal() {
+      this.$refs.profileModalRef.show();
+    },
+  },
+    mounted() {
+    if (this.isLoggedIn) {
+      this.fetchFriendRequests();
+    }
+    const dropdownElements = document.querySelectorAll('.dropdown-toggle');
+    dropdownElements.forEach(dropdown => {
+      new bootstrap.Dropdown(dropdown);
+    });
+  }
+};
+</script>

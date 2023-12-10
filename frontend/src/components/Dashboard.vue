@@ -1,34 +1,75 @@
+<template>
+	<navbar :isLoggedIn="true" :isStaff="isStaff" @update:isStaffLogin="isLoggedIn" @login-success="handleLoginSuccess" />
+	<div class="main-container">
+		<div v-if="broadcastMessage" class="broadcast-message">
+      {{ broadcastMessage }}
+    </div>
+		<div class="mood-container">
+			<Mood 
+				v-for="(mood, index) in moodChoices"
+				:key="index"
+				:mood="mood[0]"
+				:user-id="userId || ''"
+			/>
+		</div>
+		<div class="panels-container">
+			<div class="panel">
+				<event-panel />
+			</div>
+			<div class="panel">
+				<support-panel />
+			</div>
+			<div class="panel">
+				<mood-history-panel :user-moods="userMoods" />
+			</div>
+			<div class="panel">
+				<friends-panel />
+		</div>
+		</div>
+	</div>
+	<custom-footer />
+</template>
+
 <script>
 import Navbar from './Navbar.vue';
 import CustomFooter from './CustomFooter.vue';
 import Mood from './Mood.vue';
-import Card from './Card.vue';
-import { fetchMoodChoices } from '../api/moods.js'; 
-import SupportForYou from './SupportForYou.vue';
+import { fetchMoodChoices, fetchUserMoods } from '../api/moods.js'; 
+import MoodHistoryPanel from './MoodHistoryPanel.vue';
+import EventPanel from './EventPanel.vue';
+import SupportPanel from './SupportPanel.vue';
+import FriendsPanel from './FriendsPanel.vue';
+import { getLatestBroadcastMessage } from '../api/broadcastMessage.js';
+
 
 export default {
-  name: 'Dashboard',
-  components: {
-    Navbar,
-    Mood,
-    Card,
-    SupportForYou,
-    CustomFooter,
-  },
-  data() {
+	name: 'Dashboard',
+	components: {
+		Navbar,
+		Mood,
+		CustomFooter,
+		MoodHistoryPanel,
+		EventPanel,
+		SupportPanel,
+		FriendsPanel,
+},
+	data() {
 		return {
 			userId: null, 
-      moods: [],
-      isLoading: true,
-      isError: false,
-      errorMessage: '',
-      cardHeaders: ['Activities', 'Mood History', 'Support', 'Friends']
-    };
+			moodChoices: [],
+			userMoods: [],
+			isLoading: true,
+			isError: false,
+			errorMessage: '',
+			broadcastMessage: '',
+		};
 	},
 	async mounted() {
 		this.userId = localStorage.getItem('userId');
 		try {
-			this.moods = await fetchMoodChoices();
+			this.moodChoices = await fetchMoodChoices();
+			this.userMoods = await fetchUserMoods(this.userId);
+			this.broadcastMessage = await getLatestBroadcastMessage();
 		} catch (error) {
 			this.isError = true;
 			this.errorMessage = 'Failed to load moods.';
@@ -38,72 +79,45 @@ export default {
 	},
 };
 </script>
-<template>
-	<navbar :isLoggedIn="true" :isStaff="isStaff" @update:isStaffLogin="isLoggedIn" @login-success="handleLoginSuccess" />
-	<div class="container-fluid pt-4 pb-4">
-		<div class="row mb-4">
-			<div class="col-12 mood-container">
-				<Mood 
-					v-for="(mood, index) in moods"
-					:key="index"
-					:mood="mood[0]"
-					:selectionCount="mood.count"
-					:user-id="userId || ''"
-				/>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-6 col-md-6 col-sm-12 mb-4" v-for="(header, index) in cardHeaders.slice(0, 2)" :key="'top-row-' + index">
-				<card :header="header" :body="'This is the ' + header" />
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-6 col-md-6 col-sm-12 mb-4" v-for="(header, index) in cardHeaders.slice(2, 4)" :key="'bottom-row-' + index">
-				<card :header="header" :body="'This is the ' + header" />
-			</div>
-		</div>
-	</div>
-	<div class="container-fluid">
-		<div class="row justify-content-center">
-			<div class="col-lg-6 col-md-8 col-sm-12 mb-4">
-				<support-for-you />
-			</div>
-		</div>
-	</div>
-	<custom-footer />
-</template>
-
 
 <style scoped>
+.main-container {
+	max-width: 80%;
+	margin: auto;
+	padding-bottom: 3rem;
+}
+
+.broadcast-message {
+  background-color: #f8d7da; /* Example background color */
+  color: #721c24; /* Example text color */
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  text-align: center;
+}
+
 .mood-container {
+	padding: 2rem 0;
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
-	align-items: stretch;
+	justify-content: space-around;
 	gap: 1rem;
 }
 
-.mood-component {
-	flex-grow: 1;
-	min-width: 250px;
+.panel {
+	flex: 1 1 50%;
+	max-width: 50%;
 }
 
-/* Style for the SupportForYou container */
-.container-fluid:last-child {
-	margin-top: 2rem; /* Adjust the top margin as needed */
-	margin-bottom: 2rem; /* Adjust the bottom margin as needed */
+.panels-container {
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: 2rem;
 }
 
-/* Adjust the width of the SupportForYou component on smaller screens if needed */
-@media (max-width: 576px) {
-	.col-md-8 {
-		min-width: 100%; /* Full width on extra small screens */
-	}
-}
 @media (max-width: 992px) {
-	.mood-component,
-	.col-lg-6 {
-		min-width: 100%; /* Full width on medium and small screens */
+	.panel {
+		max-width: 100%;
 	}
 }
 </style>

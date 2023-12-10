@@ -1,6 +1,6 @@
 <script>
 export default {
-    name: 'CustomFooter'
+		name: 'CustomFooter'
 }
 </script>
 <template>

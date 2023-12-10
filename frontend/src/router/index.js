@@ -1,17 +1,50 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Registration from '@/components/Registration.vue';
-import Login from '@/components/Login.vue';
-import EventComponent from '@/components/activeCanvas/EventComponent.vue';
-import Dashboard from '@/components/Dashboard.vue';
-import SupportForYou from '../components/SupportForYou.vue';
 
 const routes = [
-    { path: '/register', component: Registration },
-    { path: '/login', component: Login },
-    { path: '/events', component: EventComponent },
-     { path: '/support', component: SupportForYou },
-    { path: '/dashboard', component: Dashboard },
-    { path: '/', redirect: '/login' }
+    { 
+        path: '/register',
+        name: 'Register', 
+        component: () => import('@/components/Registration.vue') 
+    },
+    { 
+        path: '/login', 
+        name: 'Login',
+        component: () => import('@/components/Login.vue') 
+    },
+    { 
+        path: '/events',
+        name: 'Events',
+        component: () => import('@/components/activeCanvas/EventComponent.vue') 
+    },
+    { 
+        path: '/support',
+        name: 'Support', 
+        component: () => import('@/components/SupportForYou.vue') 
+    },
+    {
+        path: '/friends',
+        name: 'Friends',
+        component: () => import('@/components/Friends.vue')
+    },
+    { 
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: () => import('@/components/Dashboard.vue') 
+    },
+    { 
+        path: '/admin_dashboard',
+        name: 'AdminDashboard',
+        component: () => import('@/components/AdminDashboard.vue') 
+    },
+    { 
+        path: '/mood-history', 
+        name: 'MoodHistory',
+        component: () => import('@/components/MoodHistory.vue') 
+    },
+    { 
+        path: '/', 
+        redirect: '/login' 
+    }
 ];
 
 const router = createRouter({

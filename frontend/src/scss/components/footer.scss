@@ -1,16 +1,17 @@
 .footer-custom {
-	background: $color-dusty-rose;
-	max-height: 60px;
+  background: $color-dusty-rose;
+  max-height: 60px;
 }
 
 .text-muted {
-	color: $default--text-color !important;
+  color: $default--text-color !important;
 }
 
 .footer {
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 100%;
+  position: relative;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  padding-top: 1rem;
 }

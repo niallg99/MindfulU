@@ -2,9 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User as DjangoUser
 
 
-class ProfilePicture(models.Model):
+class ProfileInfo(models.Model):
     user = models.OneToOneField(DjangoUser, on_delete=models.CASCADE)
     image_url = models.CharField(max_length=255)
+    phonenumber = models.CharField(max_length=20, blank=True, null=True)  # New field
 
     def __str__(self):
         return self.user.username
@@ -25,7 +26,6 @@ class MoodCause(models.Model):
 
 
 class Mood(models.Model):
-    # ... other fields ...
 
     MOOD_CHOICES = [
         ("Meh", "Meh"),
@@ -44,19 +44,33 @@ class Mood(models.Model):
     )
     description = models.TextField(blank=True)
 
-    # Add other mood-related fields if needed
     def __str__(self):
         return f"{self.user.username} - {self.mood_type} on {self.mood_date}"
 
 
-class Friendship(models.Model):
+class Friends(models.Model):
+    FRIENDSHIP_STATUS_CHOICES = [
+        ("Requested", "Requested"),
+        ("Accepted", "Accepted"),
+        ("Blocked", "Blocked"),
+    ]
+
     user = models.ForeignKey(
         DjangoUser, on_delete=models.CASCADE, related_name="friendships"
     )
     friend = models.ForeignKey(DjangoUser, on_delete=models.CASCADE)
-    friendship_status = models.CharField(max_length=50)
-    # Add other friendship-related fields
+    friendship_status = models.CharField(
+        max_length=50, choices=FRIENDSHIP_STATUS_CHOICES, default="Requested"
+    )
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        unique_together = ('user', 'friend')
+
+    def get_most_recent_mood(self):
+        return Mood.objects.filter(user=self.friend).order_by('-mood_date').first()
+    
     def __str__(self):
         return f"{self.user.username} and {self.friend.username} - Status: {self.friendship_status}"
 
@@ -65,7 +79,7 @@ class ScrapedData(models.Model):
     url = models.URLField()
     title = models.CharField(max_length=255)
     description = models.TextField()
-    scraped_content = models.TextField(default="")  # Specify the default value
+    scraped_content = models.TextField(default="")
 
     def __str__(self):
         return self.title
@@ -101,3 +115,10 @@ class SupportLink(models.Model):
     )
     link_text = models.CharField(max_length=255)
     link_url = models.URLField()
+
+class BroadcastMessage(models.Model):
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Broadcast Message created at {self.created_at}"

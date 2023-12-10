@@ -1,71 +1,75 @@
-<template>
-  <div class="event-panel">
-    <h2 class="event-panel-title">Upcoming Events</h2>
-    <div v-if="events.length > 0">
-      <ul class="event-list">
-        <li class="event-snippet" v-for="(event, index) in snippetEvents" :key="event.id">
-          <h3>{{ event.name }}</h3>
-          <p><strong>Date:</strong> {{ event.date }}</p>
-          <p><strong>Venue:</strong> {{ event.venue }}</p>
-        </li>
-      </ul>
-    </div>
-    <p v-else>No upcoming events.</p>
-  </div>
-</template>
-
 <script>
+import { fetchEvents } from '@/api/events';
+import { useRouter } from 'vue-router';
+
 export default {
-  name: 'EventPanel',
-  data() {
-    return {
-      // Local copy of events to show in the panel
-      events: []
-    };
-  },
-  computed: {
-    snippetEvents() {
-      // Return the first three events for the snippet
-      return this.events.slice(0, 3);
-    }
-  },
-  created() {
-    this.fetchEventSnippet();
-  },
-  methods: {
-    fetchEventSnippet() {
-      // Placeholder for fetching events logic, should be replaced with actual API call
-      this.events = this.$parent.events; // This will access the events from the parent component
-    }
-  }
-};
+	name: 'EventPanel',
+	setup() {
+		const router = useRouter();
+		const navigateToEvents = () => {
+			router.push('/events');
+		};
+
+		return { navigateToEvents };
+	},
+	data() {
+		return {
+			events: [],
+			isLoading: true,
+			isError: false,
+			errorMessage: '',
+		};
+	},
+	computed: {
+		upcomingEvents() {
+			return this.events.slice(1, 4);
+		},
+	},
+	created() {
+		fetchEvents()
+			.then(data => {
+				this.events = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+				this.isLoading = false;
+			})
+			.catch(error => {
+				console.error('There was a problem fetching the events:', error);
+				this.isError = true;
+				this.errorMessage = 'Failed to load events.';
+			});
+	}
+}
 </script>
 
-<style scoped>
-.event-panel {
-  background: #f5f5f5;
-  padding: 1rem;
-  border-radius: 8px;
-}
-
-.event-panel-title {
-  margin-bottom: 1rem;
-}
-
-.event-list {
-  list-style: none;
-  padding: 0;
-}
-
-.event-snippet {
-  margin-bottom: 0.5rem;
-  background: white;
-  padding: 0.75rem;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.event-snippet h3 {
-  margin-top: 0;
-}
-</style>
+<template>
+		<div class="container mt-4">
+			<div class="row justify-content-center">
+				<div class="col-lg-12">
+					<div class="card panel-card">
+						<div class="card-header">
+							Upcoming Events
+						</div>
+						<div class="card-body">
+							<div v-if="isLoading">
+								Loading events...
+							</div>
+							<div v-else-if="isError">
+								{{ errorMessage }}
+							</div>
+							<div v-else>
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item" v-for="event in upcomingEvents" :key="event.id">
+										<strong>{{ event.name }}</strong><br>
+										Date: {{ event.date }}<br>
+										Venue: {{ event.venue }}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="card-footer text-center">
+							<button class="btn btn-primary" @click="navigateToEvents">See More Events</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</template>
