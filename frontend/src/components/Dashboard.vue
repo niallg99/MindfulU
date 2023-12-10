@@ -1,6 +1,9 @@
 <template>
 	<navbar :isLoggedIn="true" :isStaff="isStaff" @update:isStaffLogin="isLoggedIn" @login-success="handleLoginSuccess" />
 	<div class="main-container">
+		<div v-if="broadcastMessage" class="broadcast-message">
+      {{ broadcastMessage }}
+    </div>
 		<div class="mood-container">
 			<Mood 
 				v-for="(mood, index) in moodChoices"
@@ -36,6 +39,8 @@ import MoodHistoryPanel from './MoodHistoryPanel.vue';
 import EventPanel from './EventPanel.vue';
 import SupportPanel from './SupportPanel.vue';
 import FriendsPanel from './FriendsPanel.vue';
+import { getLatestBroadcastMessage } from '../api/broadcastMessage.js';
+
 
 export default {
 	name: 'Dashboard',
@@ -46,7 +51,7 @@ export default {
 		MoodHistoryPanel,
 		EventPanel,
 		SupportPanel,
-		FriendsPanel
+		FriendsPanel,
 },
 	data() {
 		return {
@@ -56,6 +61,7 @@ export default {
 			isLoading: true,
 			isError: false,
 			errorMessage: '',
+			broadcastMessage: '',
 		};
 	},
 	async mounted() {
@@ -63,6 +69,7 @@ export default {
 		try {
 			this.moodChoices = await fetchMoodChoices();
 			this.userMoods = await fetchUserMoods(this.userId);
+			this.broadcastMessage = await getLatestBroadcastMessage();
 		} catch (error) {
 			this.isError = true;
 			this.errorMessage = 'Failed to load moods.';
@@ -78,6 +85,15 @@ export default {
 	max-width: 80%;
 	margin: auto;
 	padding-bottom: 3rem;
+}
+
+.broadcast-message {
+  background-color: #f8d7da; /* Example background color */
+  color: #721c24; /* Example text color */
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  text-align: center;
 }
 
 .mood-container {

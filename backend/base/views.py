@@ -3,12 +3,14 @@ from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
 from rest_framework import status
+from django.db.models import Count
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
-from base.models import Event, ScrapedData, Mood, SupportLink, MoodCause, Friends
+from rest_framework.permissions import IsAdminUser
+from base.models import Event, ScrapedData, Mood, SupportLink, MoodCause, Friends, BroadcastMessage
 from base.serializers import (
     EventSerializer,
     ScrapedDataSerializer,
@@ -27,6 +29,7 @@ def register(request):
     email = request.data.get("email")
     first_name = request.data.get("first_name")
     last_name = request.data.get("last_name")
+    phone = request.data.get("phone", None)
 
     if not all([username, password, email, first_name, last_name]):
         return Response(
@@ -45,9 +48,15 @@ def register(request):
         first_name=first_name,
         last_name=last_name,
     )
+
+    if phone:
+        user.profile.phone = phone
+        user.profile.save()
+
     return Response(
         {"message": "User registered successfully!"}, status=status.HTTP_201_CREATED
     )
+
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -224,4 +233,44 @@ def get_friend_requests(request):
     serializer = FriendRequestSerializer(friend_requests, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def mood_statistics(request):
+    mood_counts = Mood.objects.values('mood_type').annotate(count=Count('mood_type'))
+    return Response(mood_counts)
 
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def save_broadcast_message(request):
+    message = request.data.get('message')
+    if message:
+        BroadcastMessage.objects.create(message=message)
+        return Response({"message": "Broadcast message saved successfully"})
+    return Response({"error": "No message provided"}, status=400)
+
+@api_view(['GET'])
+def get_latest_broadcast_message(request):
+    latest_message = BroadcastMessage.objects.last()
+    if latest_message:
+        return Response({"message": latest_message.message})
+    return Response({"message": ""})
+
+@api_view(['GET'])
+def get_users(request):
+    search = request.query_params.get('search')
+    users = User.objects.all()
+    if search:
+        users = users.filter(username__icontains=search)
+
+    user_data = []
+    for user in users:
+        user_moods = Mood.objects.filter(user=user)
+        serializer = MoodSerializer(user_moods, many=True)
+        user_data.append({
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'moods': serializer.data,
+            'email': user.email,
+        })
+
+    return Response(user_data)

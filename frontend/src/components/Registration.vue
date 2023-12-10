@@ -1,5 +1,5 @@
 <template>
-  <Navbar />
+  <navbar />
   <div class="container content h-100">
     <div class="row justify-content-center align-items-center">
       <div class="col-md-8">
@@ -20,6 +20,10 @@
               <div class="col-12">
                 <label for="username" class="form-label">Username</label>
                 <input v-model="username" type="text" class="form-control" id="username" required />
+              </div>
+              <div class="col-12">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input v-model="phone" type="tel" class="form-control" id="phone" placeholder="123-456-7890" />
               </div>
               <div class="col-12">
                 <label for="email" class="form-label">Email</label>
@@ -64,6 +68,7 @@ export default {
       password: "",
       first_name: "",
       last_name: "",
+      phone: "",
       errorMessage: '',
       isRegistering: false,
     };
@@ -75,6 +80,7 @@ export default {
           const csrfToken = await loginApi.getCSRFToken();
           const userData = {
               username: this.username,
+              phone: this.phone,
               email: this.email,
               password: this.password,
               first_name: this.first_name,

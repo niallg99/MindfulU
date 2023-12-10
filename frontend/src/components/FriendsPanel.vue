@@ -1,57 +1,66 @@
 <template>
-	<div class="container mt-4">
-		<div class="row justify-content-center">
-			<div class="col-lg-12">
-				<div class="card panel-card">
-					<div class="card-header">
-						Friends
-					</div>
-					<div class="card-body">
-						<div v-if="friendRequests.length" class="incoming-requests mb-4">
-							<h3>Incoming Friend Requests</h3>
-							<ul class="list-group">
-								<li v-for="request in friendRequests" :key="request.id" class="list-group-item d-flex justify-content-between align-items-center">
-									{{ request.sender }}
-									<span>
-									<button class="btn btn-success btn-sm" @click="acceptRequest(request.username)">Accept</button>
-									<button class="btn btn-danger btn-sm" @click="declineRequest(request.username)">Decline</button>
-									</span>
-								</li>
-							</ul>
-						</div>
-						<div v-if="showAddFriendModal" class="modal fade show d-block" id="addFriendModal" tabindex="-1" aria-hidden="true">
-							<div class="modal-dialog">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title" id="addFriendModalLabel">Add a Friend</h5>
-										<button type="button" class="btn-close" @click="closeAddFriendModal"></button>
-									</div>
-									<div class="modal-body">
-										<input type="text" class="form-control" placeholder="Enter friend's username" v-model="friendUsername">
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-secondary" @click="closeAddFriendModal">Close</button>
-										<button type="button" class="btn btn-primary" @click="addFriend">Add Friend</button>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="modal-backdrop fade show" v-if="showAddFriendModal"></div>
-						<div v-if="!isLoading && !isError">
-							<div class="row">
-								<div class="col-md-4 friend-card-container" v-for="friend in limitedFriendsList" :key="friend.id">
-									<div class="card friend-card mb-3">
-										<div class="card-header text-center">
-											<img :src="friend.profilePicture || '/src/images/person.svg'" class="img-fluid rounded-circle" :alt="friend.friend.first_name" style="width: 60px; height: 60px;">
-										</div>
-										<div class="card-body">
-											<h5 class="card-title">Username: @{{ friend.friend.username }}</h5>
-											<template v-if="friend.most_recent_mood">
-												<img :src="moodImageUrl(friend.most_recent_mood)" alt="Mood Image" class="mood-image"/>
-											</template>
-										</div>
-									</div>
-								</div>
+  <div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-12">
+        <div class="card panel-card">
+          <div class="card-header">
+            Friends
+          </div>
+          <div class="card-body">
+            <!-- Incoming Friend Requests Section -->
+            <div v-if="friendRequests.length" class="incoming-requests mb-4">
+              <h3>Incoming Friend Requests</h3>
+              <ul class="list-group">
+                <li v-for="request in friendRequests" :key="request.id" class="list-group-item d-flex justify-content-between align-items-center">
+                  {{ request.sender }}
+                  <span>
+                    <button class="btn btn-success btn-sm" @click="acceptRequest(request.username)">Accept</button>
+                    <button class="btn btn-danger btn-sm" @click="declineRequest(request.username)">Decline</button>
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Add Friend Modal -->
+            <div v-if="showAddFriendModal" class="modal fade show d-block" id="addFriendModal" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="addFriendModalLabel">Add a Friend</h5>
+                    <button type="button" class="btn-close" @click="closeAddFriendModal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <input type="text" class="form-control" placeholder="Enter friend's username" v-model="friendUsername">
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="closeAddFriendModal">Close</button>
+                    <button type="button" class="btn btn-primary" @click="addFriend">Add Friend</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-backdrop fade show" v-if="showAddFriendModal"></div>
+
+<div v-if="!isLoading && !isError" class="friends-list-container">
+      <div v-for="friend in limitedFriendsList" :key="friend.id" class="friend-card-container mb-3">
+        <div class="card friend-card">
+          <table class="table-friend">
+            <tr>
+              <td class="cell-profile-picture">
+                <img :src="friend.profilePicture || '/src/images/person.svg'" class="profile-picture" :alt="`Profile picture of ${friend.friend.first_name}`">
+              </td>
+              <td class="cell-username">
+                <h5 class="card-title">@{{ friend.friend.username }}</h5>
+              </td>
+              <td class="cell-mood">
+                <template v-if="friend.most_recent_mood">
+                  <img :src="moodImageUrl(friend.most_recent_mood)" alt="Mood Image" class="mood-image"/>
+                </template>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
 								<div class="col-md-4 friend-card-container" v-if="friendsList.length < 3">
 									<div class="card friend-card mb-3">
 										<div class="card-header text-center">
@@ -63,18 +72,18 @@
 										</div>
 									</div>
 								</div>
-							</div>
 						</div>
 						<div v-if="isLoading"><spinner /></div>
-						<div v-if="isError">{{ errorMessage }}</div>
-					</div>
-					<div class="card-footer text-center">
-						<button class="btn btn-primary" @click="navigateToAllFriends">See All Friends</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+            <div v-if="isError">{{ errorMessage }}</div>
+          </div>
+
+          <div class="card-footer text-center">
+            <button class="btn btn-primary" @click="navigateToAllFriends">See All Friends</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -185,52 +194,41 @@ export default {
 
 
 <style scoped>
-  .friends-container {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
+/* ... other styles ... */
 
-  .friend-card-container {
-    flex: 1 1 30%;
-    display: flex;
-    flex-direction: column;
-  }
+.table-friend {
+  width: 100%; /* Set the table to fill the card */
+  table-layout: fixed; /* This helps to prevent the table from expanding beyond the card width */
+}
 
-  .card.friend-card {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1rem;
-  }
+.cell-profile-picture,
+.cell-username,
+.cell-mood {
+  text-align: center; /* Center content in the cell */
+}
 
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.profile-picture {
+  width: 40px; 
+  height: 40px;
+  border-radius: 50%;
+}
 
-  .card-body {
-    flex-grow: 1;
-    text-align: center;
-  }
+.username {
+  /* If you have additional styling for username */
+}
 
-  .card-footer {
-    height: 4rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.mood-image {
+  width: 24px;
+  height: 24px;
+}
 
-  .mood-image {
-    width: 40px;
-    height: 40px;
-    margin-top: 10px;
-  }
+/* ... more styles ... */
 
-  @media (max-width: 992px) {
-    .friend-card-container {
-      flex: 1 1 100%;
-    }
-  }
 </style>
+
+
+
+
+
+
 
