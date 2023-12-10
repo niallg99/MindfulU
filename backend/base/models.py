@@ -2,9 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User as DjangoUser
 
 
-class ProfilePicture(models.Model):
+class ProfileInfo(models.Model):
     user = models.OneToOneField(DjangoUser, on_delete=models.CASCADE)
     image_url = models.CharField(max_length=255)
+    phonenumber = models.CharField(max_length=20, blank=True, null=True)  # New field
 
     def __str__(self):
         return self.user.username
@@ -114,3 +115,10 @@ class SupportLink(models.Model):
     )
     link_text = models.CharField(max_length=255)
     link_url = models.URLField()
+
+class BroadcastMessage(models.Model):
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Broadcast Message created at {self.created_at}"

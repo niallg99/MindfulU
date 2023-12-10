@@ -26,4 +26,8 @@ urlpatterns = [
     path('api/reject-friend-request/<str:username>/', views.reject_friend_request, name='reject_friend_request'),
     path('api/remove-friend/<str:username>/', views.remove_friend, name='remove_friend'),
     path('api/friend-requests/', views.get_friend_requests, name='get_friend_requests'),
+    path('api/mood-statistics/', views.mood_statistics, name='mood-statistics'),
+    path('api/save-broadcast-message/', views.save_broadcast_message, name='save_broadcast_message'),
+    path('api/get-latest-broadcast-message/', views.get_latest_broadcast_message, name='get_latest_broadcast_message'),
+    path('api/users/', views.get_users, name='get_users'),
 ]

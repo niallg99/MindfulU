@@ -32,6 +32,11 @@ const routes = [
         component: () => import('@/components/Dashboard.vue') 
     },
     { 
+        path: '/admin_dashboard',
+        name: 'AdminDashboard',
+        component: () => import('@/components/AdminDashboard.vue') 
+    },
+    { 
         path: '/mood-history', 
         name: 'MoodHistory',
         component: () => import('@/components/MoodHistory.vue') 
