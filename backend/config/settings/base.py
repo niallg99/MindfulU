@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.debug(f"BASE.PY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -127,7 +132,7 @@ SIMPLE_JWT = {
 }
 
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:8080", "http://localhost:8000"]
+# CORS_ALLOWED_ORIGINS = ["http://localhost:8080", "http://localhost:8000"]
 CORS_ALLOW_ALL_ORIGINS = True
 
 

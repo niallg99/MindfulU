@@ -1,7 +1,7 @@
-const baseUrl = 'http://0.0.0.0:8000/api';
+const baseUrl = 'http://0.0.0.0:8000';
 
 const fetchUsers = async (searchQuery) => {
-  const url = new URL(`${baseUrl}/users`);
+  const url = new URL(`${baseUrl}/api/users`);
   if (searchQuery) {
     url.searchParams.append('search', searchQuery);
   }

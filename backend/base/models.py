@@ -5,7 +5,7 @@ from django.contrib.auth.models import User as DjangoUser
 class ProfileInfo(models.Model):
     user = models.OneToOneField(DjangoUser, on_delete=models.CASCADE)
     image_url = models.CharField(max_length=255)
-    phonenumber = models.CharField(max_length=20, blank=True, null=True)  # New field
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
         return self.user.username

@@ -20,3 +20,35 @@
   max-width: 100%;
 }
 
+.dropdown-menu-end {
+  right: 0; /* Align to the right side of the parent */
+  text-align: right;
+}
+
+.no-notifications {
+  max-width: 100%; /* Prevent from extending */
+}
+
+.notification-icon {
+  filter: brightness(0) invert(1); /* Make white */
+}
+
+.hover-dropdown:hover .dropdown-menu {
+  display: block; /* Show on hover */
+}
+
+/* Add custom CSS to correctly style dropdowns for small screens */
+@media (max-width: 991px) {
+  .navbar-custom .navbar-collapse {
+    position: absolute;
+    background-color: var(--navbar-background-color); /* Use your navbar color */
+    top: var(--navbar-height);
+    left: 0;
+    right: 0;
+    padding: 0.5rem;
+  }
+
+  .navbar-custom .navbar-toggler.collapsed + .navbar-collapse {
+    display: none; /* Hide when toggler is collapsed */
+  }
+}

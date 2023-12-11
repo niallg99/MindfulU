@@ -36,12 +36,12 @@ admin.site.register(SupportLink)
 admin.site.register(SupportSection)
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ("id", "username", "email", "first_name", "last_name", "is_staff", "get_phonenumber")
+    list_display = ("id", "username", "email", "first_name", "last_name", "is_staff", "get_phone_number")
 
-    def get_phonenumber(self, obj):
-        return obj.profileinfo.phonenumber if hasattr(obj, 'profileinfo') else 'N/A'
+    def get_phone_number(self, obj):
+        return obj.profileinfo.phone_number if hasattr(obj, 'profileinfo') else 'N/A'
 
-    get_phonenumber.short_description = 'Phone Number'
+    get_phone_number.short_description = 'Phone Number'
 
 
 # Re-register UserAdmin
