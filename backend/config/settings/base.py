@@ -46,7 +46,6 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
-    "captcha",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
@@ -97,10 +96,6 @@ DATABASES = {
     }
 }
 
-RECAPTCHA_PUBLIC_KEY = "6LckjvIoAAAAACiQJaX2xfy1RcDPdZckdcr2GOFl"
-RECAPTCHA_PRIVATE_KEY = "6LckjvIoAAAAAJJ3tOOfZl8dUyw-DLKZCVupACD4"
-RECAPTCHA_USE_SSL = True
-
 # Email configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
@@ -133,7 +128,18 @@ SIMPLE_JWT = {
 
 
 # CORS_ALLOWED_ORIGINS = ["http://localhost:8080", "http://localhost:8000"]
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = ['*']
+CORS_ALLOW_HEADERS = ["*"]
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
 
 
 # Password validation

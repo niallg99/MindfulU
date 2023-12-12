@@ -27,6 +27,8 @@ services:
     volumes:
       - ./backend:/backend
     env_file: .env
+    environment:
+      - DJANGO_CURRENT_IP=0.0.0.0
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - postgres
@@ -49,7 +51,13 @@ services:
     container_name: nginx_container
     networks:
       - app-network
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/ssl/cert.pem:/etc/ssl/cert.pem:ro
+      - /etc/ssl/key.pem:/etc/ssl/key.pem:ro
     depends_on:
       - frontend
+

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User as DjangoUser
+from django.contrib.auth.models import User
 
 
 class ProfileInfo(models.Model):
@@ -9,6 +10,15 @@ class ProfileInfo(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
+    
+User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
 
 class MoodCause(models.Model):

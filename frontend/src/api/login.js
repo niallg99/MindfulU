@@ -1,4 +1,4 @@
-const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : window.location.origin;
+const baseUrl = 'http://0.0.0.0:8000';
 
 const getCSRFToken = async () => {
 	try {
