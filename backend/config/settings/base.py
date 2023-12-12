@@ -128,9 +128,14 @@ SIMPLE_JWT = {
 
 
 # CORS_ALLOWED_ORIGINS = ["http://localhost:8080", "http://localhost:8000"]
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",  # Your Vue.js frontend server
+    "http://127.0.0.1:8080",  # Also your local server
+    "https://mindful-u.co.uk",  # Your production domain
+    "http://mindful-u.co.uk",  # Also your production domain
+    "http://192.168.0.106:8080"
+]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = ['*']
 CORS_ALLOW_HEADERS = ["*"]
 CORS_ALLOW_METHODS = (
     "DELETE",

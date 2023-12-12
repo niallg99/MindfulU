@@ -1,4 +1,4 @@
-const baseUrl = 'http://0.0.0.0:8000';
+const baseUrl = `http://${window.location.hostname}:8000`;
 
 export function registerUser(userData, csrfToken) {
     return fetch(`${baseUrl}/api/register/`, {

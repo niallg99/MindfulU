@@ -7,8 +7,6 @@ networks:
 services:
   postgres:
     image: postgres:latest
-    networks:
-      - app-network
     ports:
       - 3000:5432
     volumes:
@@ -20,8 +18,6 @@ services:
 
   backend:
     build: backend/
-    networks:
-      - app-network
     ports:
       - "8000:8000"
     volumes:
@@ -36,8 +32,6 @@ services:
 
   frontend:
     build: frontend/
-    networks:
-      - app-network
     ports:
       - "8080:8080"
     volumes: 
@@ -49,8 +43,6 @@ services:
   nginx:
     image: nginx:latest
     container_name: nginx_container
-    networks:
-      - app-network
     ports:
       - "80:80"
       - "443:443"

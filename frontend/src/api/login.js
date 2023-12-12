@@ -1,4 +1,7 @@
-const baseUrl = 'http://0.0.0.0:8000';
+const baseUrl = `http://${window.location.hostname}:8000`;
+
+console.log(window.location.hostname, 'window.location')
+console.log(baseUrl, 'baseUrl')
 
 const getCSRFToken = async () => {
 	try {
