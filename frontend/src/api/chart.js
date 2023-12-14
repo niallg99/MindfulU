@@ -1,4 +1,4 @@
-const baseUrl = 'http://0.0.0.0:8000';
+const baseUrl = `http://${window.location.hostname}:8000`;
 
 const getAccessToken = () => {
   return localStorage.getItem('accessToken');

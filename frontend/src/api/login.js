@@ -1,8 +1,14 @@
-const baseUrl = 'http://0.0.0.0:8000';
+const baseUrl = `http://${window.location.hostname}:8000`;
+
+console.log(window.location.hostname, 'window.location')
+console.log(baseUrl, 'baseUrl')
 
 const getCSRFToken = async () => {
 	try {
 		const response = await fetch(`${baseUrl}/api/get-csrf-token/`);
+		console.log(response, 'responseS')
+		console.log(baseUrl, 'baseUrl')
+
 		if (!response.ok) {
 			throw new Error('Failed to fetch CSRF token');
 		}
@@ -81,9 +87,61 @@ export async function resetUserPassword(email) {
 	}
 }
 
+async function verifyUserDetails(userData) {
+  try {
+    const csrfToken = await getCSRFToken();
+
+    const response = await fetch(`${baseUrl}/api/verify-user-details/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error('Verification failed: ' + (errorData.error || 'Unknown error'));
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error in verifyUserDetails:', error);
+    throw error;
+  }
+}
+
+async function changeUserPassword(userData) {
+  try {
+    const csrfToken = await getCSRFToken();
+
+    const response = await fetch(`${baseUrl}/api/change-user-password/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error('Password change failed: ' + (errorData.error || 'Unknown error'));
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error in changeUserPassword:', error);
+    throw error;
+  }
+}
+
 export default {
 	getCSRFToken,
 	checkCSRFToken,
 	loginUser,
 	resetUserPassword,
+	verifyUserDetails,
+	changeUserPassword
 };

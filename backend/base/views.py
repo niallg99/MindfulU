@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
@@ -20,6 +21,9 @@ from base.serializers import (
     FriendSerializer,
     FriendRequestSerializer,
 )
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -146,10 +150,11 @@ def post_mood(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["GET"])
 def get_csrf_token(request):
     csrf_token = get_token(request)
-    return JsonResponse({"csrf_token": csrf_token})
+    logger.debug(f"CSRF Token generated: {csrf_token}")
+    logger.debug(f"Request META: {request.META}")
+    return JsonResponse({'csrf_token': csrf_token})
 
 @api_view(["GET"])
 def get_mood_causes(request):
