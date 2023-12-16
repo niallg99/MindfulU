@@ -1,10 +1,12 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">
-        <img src="/src/images/mental-health-during-covid-19.png" alt="MindfulU Logo" width="45" height="30">
-        MindfulU
-      </a>
+      <template v-if="isLoggedIn">
+        <router-link to="/dashboard" class="navbar-brand">MindfulU</router-link>
+      </template>
+      <template v-else>
+        <a class="navbar-brand" href="#">MindfulU</a>
+      </template>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -31,26 +33,34 @@
               </li>
             </ul>
           </li>
-          <li v-if="isLoggedIn" class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Profile
+           <li class="nav-item" v-if="isLoggedIn">
+            <a class="nav-link" href="#" @click="openProfileModal">Profile</a>
+          </li>
+          <li class="nav-item" v-if="isLoggedIn">
+            <router-link to="/events" class="nav-link">Events</router-link>
+          </li>
+          <li class="nav-item" v-if="isLoggedIn">
+            <router-link to="/support" class="nav-link">Support</router-link>
+          </li>
+          <li class="nav-item" v-if="isLoggedIn">
+            <router-link to="/friends" class="nav-link">Friends</router-link>
+          </li>
+          <li class="nav-item" v-if="isLoggedIn">
+            <router-link to="/mood-history" class="nav-link">Mood History</router-link>
+          </li>
+          <li class="nav-item" v-if="isLoggedIn">
+            <router-link to="/login" class="nav-link">Logout</router-link>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Pages
             </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="#" @click="openProfileModal">Profile</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><router-link class="dropdown-item" to="/logout">Logout</router-link></li>
+            <ul class="dropdown-menu" aria-labelledby="pagesDropdown">
+              <li v-for="route in router.getRoutes()" :key="route.path">
+                <router-link :to="route.path" class="dropdown-item">{{ route.name }}</router-link>
+              </li>
             </ul>
           </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Pages
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="pagesDropdown">
-                <li v-for="route in router.getRoutes()" :key="route.path">
-                  <router-link :to="route.path" class="dropdown-item">{{ route.name }}</router-link>
-                </li>
-              </ul>
-            </li>
         </ul> 
       </div>
     </div>
@@ -111,6 +121,14 @@ export default {
     openProfileModal() {
       this.$refs.profileModalRef.show();
     },
+    logout() {
+    localStorage.removeItem('accessToken');
+    this.$router.push('/login');
+    },
+  toggleNavbar() {
+    const navbarCollapse = this.$refs.navbarCollapse;
+    navbarCollapse.classList.toggle('show');
+  },
   },
     mounted() {
     if (this.isLoggedIn) {

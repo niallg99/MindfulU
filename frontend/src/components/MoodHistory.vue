@@ -122,24 +122,3 @@ export default {
 	}
 };
 </script>
-
-<style scoped>
-.mood-history {
-	text-align: center;
-	margin-top: 20px;
-}
-
-.mood-item {
-	margin-bottom: 20px;
-}
-
-.page-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.main-container {
-  flex: 1;
-}
-</style>
