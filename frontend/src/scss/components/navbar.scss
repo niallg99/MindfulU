@@ -2,9 +2,9 @@
   background-color: $color-dusty-rose;
   max-height: 100px;
 
-    .nav-link, .navbar-brand {
-      color: $default--text-color;
-    }
+  .nav-link, .navbar-brand {
+    color: $default--text-color;
+  }
 
   .nav-link, .nav-link.btn {
     background: none;
@@ -17,31 +17,31 @@
 .navbar .dropdown-menu {
   right: 0;
   left: auto;
+  text-align: right;
   max-width: 100%;
 }
 
 .dropdown-menu-end {
-  right: 0; /* Align to the right side of the parent */
+  right: 0; 
   text-align: right;
 }
 
 .no-notifications {
-  max-width: 100%; /* Prevent from extending */
+  max-width: 100%; 
 }
 
 .notification-icon {
-  filter: brightness(0) invert(1); /* Make white */
+  filter: brightness(0) invert(1); 
 }
 
 .hover-dropdown:hover .dropdown-menu {
-  display: block; /* Show on hover */
+  display: block; 
 }
 
-/* Add custom CSS to correctly style dropdowns for small screens */
 @media (max-width: 991px) {
   .navbar-custom .navbar-collapse {
     position: absolute;
-    background-color: var(--navbar-background-color); /* Use your navbar color */
+    background-color: $color-dusty-rose; 
     top: var(--navbar-height);
     left: 0;
     right: 0;
@@ -49,6 +49,21 @@
   }
 
   .navbar-custom .navbar-toggler.collapsed + .navbar-collapse {
-    display: none; /* Hide when toggler is collapsed */
+    display: none; 
+  }
+
+  .navbar-collapse {
+    background-color: $color-dusty-rose; 
+  }
+
+  .dropdown-menu {
+    position: static; 
+    text-align: right;
+  }
+
+  .dropdown-menu-end {
+    position: static;
+    background-color: $color-dusty-rose; 
+    border: 0;
   }
 }

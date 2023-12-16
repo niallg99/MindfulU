@@ -56,85 +56,58 @@ export function loginUser(userData) {
 		});
 }
 
-export async function resetUserPassword(email) {
+async function resetUserPassword(email, newPassword) {
 	try {
 		const csrfToken = await getCSRFToken();
 
-		const response = await fetch(`${baseUrl}/api/password-reset/`, {
+		const response = await fetch(`${baseUrl}/api/reset-password/`, {
 				method: 'POST',
 				headers: {
 						'Content-Type': 'application/json',
 						'X-CSRFToken': csrfToken,
 				},
-				body: JSON.stringify({ email }),
+				body: JSON.stringify({ email, new_password: newPassword }),
 		});
 
 		if (!response.ok) {
-			if (response.headers.get("content-type")?.includes("application/json")) {
-				const errorData = await response.json();
-				throw new Error('Password reset failed: ' + (errorData.error || 'Unknown error'));
-			} else {
-				const errorText = await response.text();
-				throw new Error('Password reset failed: ' + errorText);
-			}
+				if (response.headers.get("content-type")?.includes("application/json")) {
+						const errorData = await response.json();
+						throw new Error('Password reset failed: ' + (errorData.error || 'Unknown error'));
+				} else {
+						const errorText = await response.text();
+						throw new Error('Password reset failed: ' + errorText);
+				}
 		}
 
-		const data = await response.json();
-		return data;
 	} catch (error) {
-		console.error('Error in resetUserPassword:', error);
-		throw error;
+			console.error('Error in resetUserPassword:', error);
+			throw error;
 	}
 }
 
 async function verifyUserDetails(userData) {
-  try {
-    const csrfToken = await getCSRFToken();
+	try {
+		const csrfToken = await getCSRFToken();
 
-    const response = await fetch(`${baseUrl}/api/verify-user-details/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      body: JSON.stringify(userData),
-    });
+		const response = await fetch(`${baseUrl}/api/verify-user-details/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': csrfToken,
+			},
+			body: JSON.stringify(userData),
+		});
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error('Verification failed: ' + (errorData.error || 'Unknown error'));
-    }
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error('Verification failed: ' + (errorData.error || 'Unknown error'));
+		}
 
-    return await response.json();
-  } catch (error) {
-    console.error('Error in verifyUserDetails:', error);
-    throw error;
-  }
-}
-
-async function changeUserPassword(userData) {
-  try {
-    const csrfToken = await getCSRFToken();
-
-    const response = await fetch(`${baseUrl}/api/change-user-password/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      body: JSON.stringify(userData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error('Password change failed: ' + (errorData.error || 'Unknown error'));
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error in changeUserPassword:', error);
-    throw error;
-  }
+		return await response.json();
+	} catch (error) {
+		console.error('Error in verifyUserDetails:', error);
+		throw error;
+	}
 }
 
 export default {
@@ -143,5 +116,4 @@ export default {
 	loginUser,
 	resetUserPassword,
 	verifyUserDetails,
-	changeUserPassword
 };

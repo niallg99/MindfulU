@@ -1,9 +1,13 @@
 <template>
 	<navbar :isLoggedIn="true" :isStaff="isStaff" @update:isStaffLogin="isLoggedIn" @login-success="handleLoginSuccess" />
 	<div class="main-container">
-		<div v-if="broadcastMessage" class="broadcast-message">
-      {{ broadcastMessage }}
-    </div>
+		<div class="padding-top-1">
+			<div v-if="broadcastMessage"
+				class="broadcast-message"
+			>
+				{{ broadcastMessage }}
+			</div>
+		</div>
 		<div class="mood-container">
 			<Mood 
 				v-for="(mood, index) in moodChoices"
@@ -14,17 +18,31 @@
 		</div>
 		<div class="panels-container">
 			<div class="panel">
-				<event-panel />
+				<event-panel
+					:events="events"
+					:is-loading="isLoading"
+					:is-error="isError"
+					:error-message="errorMessage"
+				/>
 			</div>
 			<div class="panel">
-				<support-panel />
+				<support-panel
+					:support-sections="supportSections"
+					:is-loading="isLoading"
+				/>
 			</div>
 			<div class="panel">
-				<mood-history-panel :user-moods="userMoods" />
+				<mood-history-panel
+					:user-moods="userMoods"
+				/>
 			</div>
 			<div class="panel">
-				<friends-panel />
-		</div>
+				<friends-panel 
+					:friends-list="friendsList" 
+					:friend-requests="friendRequests" 
+					:is-loading="isLoading"
+				/>
+			</div>
 		</div>
 	</div>
 	<custom-footer />
@@ -40,6 +58,9 @@ import EventPanel from './EventPanel.vue';
 import SupportPanel from './SupportPanel.vue';
 import FriendsPanel from './FriendsPanel.vue';
 import { getLatestBroadcastMessage } from '../api/broadcastMessage.js';
+import { fetchEvents } from '@/api/events';
+import { fetchSupport } from '@/api/supportforyou.js';
+import { fetchFriends, fetchFriendRequests } from '@/api/friends';
 
 
 export default {
@@ -62,6 +83,10 @@ export default {
 			isError: false,
 			errorMessage: '',
 			broadcastMessage: '',
+			events: [],
+			supportSections: [],
+			friendsList: [],
+			friendRequests: [],
 		};
 	},
 	async mounted() {
@@ -76,48 +101,34 @@ export default {
 		} finally {
 			this.isLoading = false;
 		}
+		try {
+			const eventsData = await fetchEvents();
+			this.events = eventsData.sort((a, b) => new Date(a.date) - new Date(b.date));
+		} catch (error) {
+			console.error('There was a problem fetching the events:', error);
+			this.isError = true;
+			this.errorMessage = 'Failed to load events.';
+		} finally {
+			this.isLoading = false;
+		}
+		try {
+			const supportData = await fetchSupport();
+			this.supportSections = supportData;
+		} catch (error) {
+			console.error('Error fetching support data:', error);
+		} finally {
+			this.isLoading = false;
+		}
+		try {
+			const friendsData = await fetchFriends();
+			this.friendsList = friendsData;
+			const requestsData = await fetchFriendRequests();
+			this.friendRequests = requestsData;
+		} catch (error) {
+			console.error('Error fetching friends data:', error);
+		} finally {
+			this.isLoading = false;
+		}
 	},
 };
 </script>
-
-<style scoped>
-.main-container {
-	max-width: 80%;
-	margin: auto;
-	padding-bottom: 3rem;
-}
-
-.broadcast-message {
-  background-color: #f8d7da; /* Example background color */
-  color: #721c24; /* Example text color */
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 0.25rem;
-  text-align: center;
-}
-
-.mood-container {
-	padding: 2rem 0;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-around;
-	gap: 1rem;
-}
-
-.panel {
-	flex: 1 1 50%;
-	max-width: 50%;
-}
-
-.panels-container {
-	display: flex;
-	flex-wrap: wrap;
-	margin-top: 2rem;
-}
-
-@media (max-width: 992px) {
-	.panel {
-		max-width: 100%;
-	}
-}
-</style>

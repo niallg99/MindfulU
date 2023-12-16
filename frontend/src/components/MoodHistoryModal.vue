@@ -69,7 +69,7 @@ export default {
 						try {
 								const updatedMood = await updateMood(this.editedMood.id, this.editedMood);
 								this.$emit('save', updatedMood);
-								this.hide(); // Replace this.closeModal() with this.hide()
+								this.hide();
 						} catch (error) {
 								console.error('Error updating mood:', error);
 								this.saveError = 'Failed to update mood. Please try again.';
@@ -79,7 +79,7 @@ export default {
 						try {
 								await deleteMood(this.editedMood.id);
 								this.$emit('delete', this.editedMood.id);
-								this.hide(); // Replace this.closeModal() with this.hide()
+								this.hide();
 						} catch (error) {
 								console.error('Error deleting mood:', error);
 								this.saveError = 'Failed to delete mood. Please try again.';

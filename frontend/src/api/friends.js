@@ -2,7 +2,7 @@ import { getAccessToken } from '@/api/auth';
 
 const baseUrl = `http://${window.location.hostname}:8000`;
 
-const fetchFriends = async (userId) => {
+const fetchFriends = async () => {
     try {
         const accessToken = getAccessToken();
         if (!accessToken) {
