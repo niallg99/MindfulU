@@ -1,7 +1,7 @@
 const baseUrl = `http://${window.location.hostname}:8000`;
 
 const fetchUsers = async (searchQuery) => {
-  const url = new URL(`${baseUrl}/api/users`);
+  const url = new URL(`${baseUrl}/api/users/`);
   if (searchQuery) {
     url.searchParams.append('search', searchQuery);
   }
@@ -38,7 +38,6 @@ const determineRiskLevel = (userMoods) => {
     return 'Low';
   }
 };
-
 
 const calculateAverageMood = (moods) => {
   if (moods.length === 0) {

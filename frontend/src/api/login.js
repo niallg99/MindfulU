@@ -1,13 +1,8 @@
 const baseUrl = `http://${window.location.hostname}:8000`;
 
-console.log(window.location.hostname, 'window.location')
-console.log(baseUrl, 'baseUrl')
-
 const getCSRFToken = async () => {
 	try {
 		const response = await fetch(`${baseUrl}/api/get-csrf-token/`);
-		console.log(response, 'responseS')
-		console.log(baseUrl, 'baseUrl')
 
 		if (!response.ok) {
 			throw new Error('Failed to fetch CSRF token');
@@ -30,7 +25,7 @@ const checkCSRFToken = async () => {
 	}
 };
 
-export function loginUser(userData) {
+function loginUser(userData) {
 	return checkCSRFToken()
 		.then(csrfToken => {
 			return fetch(`${baseUrl}/api/login/`, {
@@ -110,10 +105,37 @@ async function verifyUserDetails(userData) {
 	}
 }
 
+async function checkStaffStatus() {
+	try {
+		const csrfToken = await getCSRFToken();
+		const accessToken = localStorage.getItem('accessToken'); 
+
+		const response = await fetch(`${baseUrl}/api/check-staff-status/`, {
+				method: 'GET',
+				headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': csrfToken,
+						'Authorization': `Bearer ${accessToken}`,
+				},
+		});
+
+		if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error('Staff status check failed: ' + (errorData.detail || 'Unknown error'));
+		}
+
+		return await response.json();
+	} catch (error) {
+		console.error('Error in checkStaffStatus:', error);
+		throw error;
+	}
+}
+
 export default {
 	getCSRFToken,
 	checkCSRFToken,
 	loginUser,
 	resetUserPassword,
 	verifyUserDetails,
+	checkStaffStatus,
 };

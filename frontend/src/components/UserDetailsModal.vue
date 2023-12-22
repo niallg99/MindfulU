@@ -7,10 +7,10 @@
 					<button type="button" class="btn-close" @click="hide"></button>
 				</div>
 				<div class="modal-body">
-					<p v-if="userDetails">Email: {{ userDetails.email }}</p>
-          <p v-if="userDetails">Phone: {{ userDetails.phone }}</p>
-					<p v-else>Loading user details...</p>
-				</div>
+          <p v-if="userDetails">Email: {{ userDetails.email }}</p>
+          <p v-if="userDetails">Phone: {{ phone }}</p>
+          <p v-else>Loading user details...</p>
+        </div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" @click="hide">Close</button>
 				</div>
@@ -22,7 +22,14 @@
 <script>
 export default {
   props: {
-    userDetails: Object,
+    userDetails: {
+      type: Object,
+      default: () => {}
+    },
+    phone: {
+      type: String,
+      default: ''
+    },
   },
   mounted() {
     this.modalInstance = new bootstrap.Modal(this.$refs.userModal, {
@@ -48,15 +55,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.modal {
-	/* Your modal styling here */
-}
-.modal-content {
-	/* Your modal content styling here */
-}
-.close {
-	/* Style for close button */
-}
-</style>

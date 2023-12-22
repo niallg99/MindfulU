@@ -2,11 +2,11 @@
 	<div class="admin-dashboard">
 		<navbar />
 		<stats-overview 
-			:average-mood="averageMood"
+			:average-mood="mostSelectedMood"
 			:active-users="activeUsers"
 			:most-provided-mood-cause="mostProvidedMoodCause">
 		</stats-overview>
-		<div class="broadcast-message mt-4">
+		<div class="broadcast-message-admin mt-4">
 			<div class="card">
 				<h5 class="card-header">Admin Broadcast Message</h5>
 				<div class="card-body">
@@ -16,20 +16,19 @@
 			</div>
 		</div>
 		<div class="mood-analytics">>
-		<mood-chart :mood-data="moodStats" :mood-cause-data="moodCauseStats" />
+		<mood-chart :mood-data="moodStats" />
 		</div>
-<user-management 
-  :users="users" 
-  v-model:searchQuery="searchQuery" 
-  @user-clicked="openUserModal">
-</user-management>
-
-	<user-details-modal 
-		:user-details="selectedUser"
-		:show="showUserModal"
-		@close="showUserModal = false">
-	</user-details-modal>
-
+		<user-management 
+			:users="users" 
+			v-model:searchQuery="searchQuery" 
+			@user-clicked="openUserModal"
+		/>
+		<user-details-modal 
+			:user-details="selectedUser"
+			:show="showUserModal"
+			:phone="phone"
+			@close="showUserModal = false"
+		/>
 	</div>
 	<custom-footer />
 </template>
@@ -38,10 +37,11 @@
 import Navbar from './Navbar.vue';
 import CustomFooter from './CustomFooter.vue';
 import MoodChart from './MoodChart.vue';
+import { fetchUserProfile } from '../api/moods.js'; 
 import UserManagement from './UserManagement.vue'
 import { saveBroadcastMessage } from '../api/broadcastMessage';
 import { fetchMoodStatistics } from '../api/chart';
-import { fetchUsers, determineRiskLevel, calculateAverageMood } from '../api/userManagement';
+import { fetchUsers, determineRiskLevel } from '../api/userManagement';
 import StatsOverview from './StatsOverview.vue';
 import UserDetailsModal from './UserDetailsModal.vue'
 
@@ -60,6 +60,7 @@ export default {
 			searchQuery: '',
 			moodStats: [],
 			users: [],
+			userProfile: {},
 			selectedUser: null,
 			showUserModal: false
 		};
@@ -70,18 +71,26 @@ export default {
 			const end = start + this.pageSize;
 			return this.filteredUsers.slice(start, end);
 		},
-		 averageMood() {
-      if (!this.users.length) return 'N/A';
-      let totalMoods = 0;
-      let moodCount = 0;
-      this.users.forEach(user => {
-        user.moods.forEach(mood => {
-          totalMoods += mood.mood_type; // Assuming mood_type is a numerical value
-          moodCount++;
-        });
-      });
-      return moodCount ? (totalMoods / moodCount).toFixed(1) : 'N/A';
-    },
+		 mostSelectedMood() {
+			const moodCount = {};
+			this.users.forEach(user => {
+				user.moods.forEach(mood => {
+					const moodType = mood.mood_type;
+					if (moodType) {
+						moodCount[moodType] = (moodCount[moodType] || 0) + 1;
+					}
+				});
+			});
+			let mostSelected = null;
+			let maxCount = 0;
+			for (const [moodType, count] of Object.entries(moodCount)) {
+				if (count > maxCount) {
+					mostSelected = moodType;
+					maxCount = count;
+				}
+			}
+			return mostSelected || 'N/A';
+		},
 	  activeUsers() {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 30);
@@ -90,16 +99,28 @@ export default {
       ).length;
     },
     mostProvidedMoodCause() {
-      const moodCauseCount = {};
-      this.users.forEach(user => {
-        user.moods.forEach(mood => {
-          if (mood.mood_cause) {
-            moodCauseCount[mood.mood_cause] = (moodCauseCount[mood.mood_cause] || 0) + 1;
-          }
-        });
-      });
-      return Object.entries(moodCauseCount).map(([cause, count]) => ({ cause, count }));
-    },
+			const moodCauseCount = {};
+			this.users.forEach(user => {
+				user.moods.forEach(mood => {
+					if (mood.mood_cause) {
+						moodCauseCount[mood.mood_cause] = (moodCauseCount[mood.mood_cause] || 0) + 1;
+					}
+				});
+			});
+			const sortedMoodCauses = Object.entries(moodCauseCount).sort((a, b) => b[1] - a[1]);
+			return sortedMoodCauses.length ? sortedMoodCauses[0][0] : 'N/A';
+		},
+		moodCauseStats() {
+			const moodCauseCount = {};
+			this.users.forEach(user => {
+				user.moods.forEach(mood => {
+					if (mood.mood_cause) {
+						moodCauseCount[mood.mood_cause] = (moodCauseCount[mood.mood_cause] || 0) + 1;
+					}
+				});
+			});
+			return Object.entries(moodCauseCount).map(([cause, count]) => ({ cause, count }));
+		},
   },
 	methods: {
 		async submitBroadcastMessage() {
@@ -115,26 +136,42 @@ export default {
 				const usersData = await fetchUsers();
 				this.users = usersData.map(user => {
 					const riskLevel = determineRiskLevel(user.moods);
-					const averageMood = calculateAverageMood(user.moods);
+					const mostSelectedMood = this.mostSelectedMood;
 					const lastMoodDate = user.moods.length > 0 ? new Date(user.moods[user.moods.length - 1].mood_date).toLocaleDateString() : 'N/A';
-					return { ...user, riskLevel, averageMood, lastMoodDate };
+					return { ...user, riskLevel, mostSelectedMood, lastMoodDate };
 				});
 			} catch (error) {
 				console.error('Error fetching users:', error);
 			}
 		},
 		openUserModal(user) {
-			console.log('hi')
-    this.selectedUser = user;
-    this.showUserModal = true;
-  }
+				console.log("Selected user:", user);
+				this.selectedUser = user;
+				this.resetModal();
+				this.fetchUserProfileData(user.username);
+		},
+		async fetchUserProfileData(username) {
+				try {
+						const userProfileData = await fetchUserProfile(username);
+						this.phone = userProfileData.phone || 'No phone number available';
+						this.showUserModal = true;
+				} catch (error) {
+						console.error('Failed to load user profile:', error);
+						this.phone = 'Failed to load phone number';
+						this.showUserModal = true;
+				}
+		},
+		resetModal() {
+				this.phone = '';
+				this.showUserModal = false;
+		},
 	},
 	async mounted() {
 		try {
-			this.moodStats = await fetchMoodStatistics();
-			await this.fetchUsers();
+				this.moodStats = await fetchMoodStatistics();
+				await this.fetchUsers();
 		} catch (error) {
-			console.error('Error:', error);
+				console.error('Error:', error);
 		}
 	}
 };

@@ -6,7 +6,6 @@
         <div class="chart-container">
           <canvas ref="barChartCanvas"></canvas>
         </div>
-				<!-- <canvas ref="donutChartCanvas"></canvas> Donut chart canvas -->
       </div>
     </div>
   </div>
@@ -25,25 +24,17 @@ export default {
     required: true,
     default: () => []
   },
-  moodCauseData: {
-    type: Array,
-    required: true,
-    default: () => []
-  }
 	},
 	data() {
 		return {
 			chartInstance: null,
-			donutChartInstance: null,
+			filteredData: [],
 		};
 	},
 	 mounted() {
     this.$nextTick(() => {
       if (this.$refs.barChartCanvas) {
         this.createBarChart();
-      }
-      if (this.$refs.donutChartCanvas) {
-        this.createDonutChart();
       }
     });
   },
@@ -84,44 +75,13 @@ export default {
 				}
 				});
 		},
-	 createDonutChart() {
-      if (this.donutChartInstance) {
-        this.donutChartInstance.destroy();
-      }
-      const ctx = this.$refs.donutChartCanvas.getContext('2d');
-      this.donutChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: this.moodCauseData.map(data => data.cause),
-          datasets: [{
-            label: 'Mood Causes',
-            data: this.moodCauseData.map(data => data.count),
-            backgroundColor: [
-              // Add more colors for different mood causes
-              'rgba(255, 99, 132, 0.5)',
-              'rgba(54, 162, 235, 0.5)',
-              'rgba(255, 206, 86, 0.5)',
-            ]
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-        }
-      });
-    }
   },
   watch: {
-		moodData(newData) {
-			if (newData) {
-				this.createBarChart();
-			}
-		},
-    moodCauseData(newData) {
-      if (newData) {
-        this.createDonutChart();
+    moodData(newData, oldData) {
+      if (newData !== oldData) {
+        this.createBarChart();
       }
-    }
+    },
   }
 };
 </script>

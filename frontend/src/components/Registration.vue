@@ -1,5 +1,4 @@
 <template>
-	<navbar />
 	<div class="container content h-100">
 		<div class="row justify-content-center align-items-center">
 			<div class="col-md-8">
@@ -47,21 +46,14 @@
       </div>
     </div>
   </div>
-  <CustomFooter />
 </template>
 
 <script>
 import { registerUser } from '@/api/registration';
 import loginApi from '@/api/login';
-import Navbar from './Navbar.vue';
-import CustomFooter from './CustomFooter.vue';
 
 export default {
 	name: 'Registration',
-	components: {
-		Navbar,
-		CustomFooter,
-	},
 	data() {
 		return {
 			username: "",
@@ -76,7 +68,7 @@ export default {
 	},
 	methods: {
 		async register() {
-			this.isRegistering = true;
+    this.isRegistering = true;
 			try {
 				const csrfToken = await loginApi.getCSRFToken();
 				const userData = {
@@ -88,8 +80,8 @@ export default {
 					last_name: this.last_name,
 				};
 				
-				const response = registerUser(userData, csrfToken);
-
+				const response = await registerUser(userData, csrfToken);
+				console.log(response);
 				if (response.success) {
 						this.$router.push("/login");
 				} else {

@@ -38,6 +38,18 @@
   display: block; 
 }
 
+.notification-icon {
+  width: 20px;
+  height: 20px;
+  filter: invert(1);
+}
+
+.notification-item {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 991px) {
   .navbar-custom .navbar-collapse {
     position: absolute;

@@ -8,7 +8,7 @@
 					</div>
 					<div class="card-body mt-5">
 						<div v-if="isLoading">
-							<Spinner />
+							<spinner />
 						</div>
 						<div v-else-if="isError">
 							{{ errorMessage }}
@@ -21,7 +21,6 @@
 											<img :src="moodImageUrl(mood.mood_type)" class="d-block w-100" :alt="mood.mood_type">
 											<div class="carousel-caption d-none d-md-block">
 												<h5>{{ mood.mood_type }}</h5>
-												<p>{{ mood.description }}</p>
 												<p v-if="mood.mood_cause">Cause: {{ mood.mood_cause }}</p>
 											</div>
 										</div>
@@ -36,7 +35,9 @@
 									</button>
 								</div>
 							</div>
-							<div v-if="userMoods.length === 0" class="no-data-state">No mood data available.</div>
+							<div v-if="userMoods.length === 0" class="no-data-state">
+								<p><strong>No mood data available. Start tracking your mood today!</strong></p>
+							</div>
 						</div>
 					</div>
 					<div class="card-footer text-center">
@@ -92,6 +93,12 @@ export default {
 	max-height: 50%;
 	max-width: 30%;
 	margin: auto;
+}
+
+.no-data-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .carousel-caption {

@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 
 class ProfileInfo(models.Model):
     user = models.OneToOneField(DjangoUser, on_delete=models.CASCADE)
-    image_url = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
+    picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True) 
 
     def __str__(self):
         return self.user.username
@@ -14,9 +14,11 @@ class ProfileInfo(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=20, blank=True, null=True)
+    streak_count = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username
+
     
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
