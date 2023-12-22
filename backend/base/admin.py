@@ -11,6 +11,7 @@ from .models import (
     Event,
     SupportLink,
     SupportSection,
+    UserProfile,
 )
 
 
@@ -34,6 +35,9 @@ admin.site.register(SupportLink)
 
 # Register the SupportLink model
 admin.site.register(SupportSection)
+
+# Register the UserProfile model
+admin.site.register(UserProfile)
 
 class UserAdmin(BaseUserAdmin):
     list_display = ("id", "username", "email", "first_name", "last_name", "is_staff", "get_phone_number")

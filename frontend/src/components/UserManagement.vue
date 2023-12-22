@@ -3,7 +3,6 @@
     <div class="card mt-4">
       <h5 class="card-header">User Management</h5>
       <div class="card-body">
-        <!-- Input Group for Search -->
         <div class="input-group mb-3">
           <input type="text" 
                  class="form-control" 
@@ -64,9 +63,9 @@
 import Spinner from './Spinner.vue';
 
 export default {
-	components: {
-		Spinner,
-	},
+  components: {
+    Spinner,
+  },
   props: {
     users: {
       type: Array,
@@ -74,18 +73,19 @@ export default {
     },
     searchQuery: String
   },
-	data() {
-		 return {
+  data() {
+    return {
+      localUsers: [], // Local copy of users array
       filteredUsers: [],
       currentPage: 1,
       pageSize: 25,
       totalPages: 0,
-			localSearchQuery: this.searchQuery,
-			selectedUser: null,
+      localSearchQuery: this.searchQuery,
+      selectedUser: null,
       showUserModal: false
     };
-	},
-	computed: {
+  },
+  computed: {
     paginatedUsers() {
       if (!Array.isArray(this.filteredUsers)) {
         return [];
@@ -96,19 +96,38 @@ export default {
     }
   },
   mounted() {
-    console.log('Received users:', this.users);
+    this.localUsers = JSON.parse(JSON.stringify(this.users)); // Deep copy users prop
+    this.processUsers();
     this.applySearchFilter();
   },
-	methods: {
-		applySearchFilter() {
-			this.filteredUsers = this.searchQuery ?
-				this.users.filter(user =>
-					user.username.includes(this.searchQuery) ||
-					user.first_name.includes(this.searchQuery) ||
-					user.last_name.includes(this.searchQuery)
-				) : this.users;
-			this.updatePagination();
-		},
+  methods: {
+    processUsers() {
+      this.localUsers = this.localUsers.map(user => {
+        return {
+          ...user,
+          averageMood: this.calculateMostSelectedMood(user.moods)
+        };
+      });
+    },
+    calculateMostSelectedMood(moods) {
+      if (!moods || moods.length === 0) {
+        return 'N/A';
+      }
+      const moodCount = moods.reduce((acc, mood) => {
+        acc[mood.mood_type] = (acc[mood.mood_type] || 0) + 1;
+        return acc;
+      }, {});
+      return Object.entries(moodCount).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+    },
+    applySearchFilter() {
+      this.filteredUsers = this.searchQuery ?
+        this.localUsers.filter(user =>
+          user.username.includes(this.searchQuery) ||
+          user.first_name.includes(this.searchQuery) ||
+          user.last_name.includes(this.searchQuery)
+        ) : this.localUsers;
+      this.updatePagination();
+    },
 		changePage(page) {
 			if (page < 1 || page > this.totalPages) {
 				return;
@@ -130,17 +149,15 @@ export default {
 		},
 	},
 	watch: {
-		users: {
-			immediate: true,
-			handler(newValue) {
-				this.filteredUsers = newValue || [];
-				this.updatePagination();
-			}
-		},
-		searchQuery(newValue) {
-			this.localSearchQuery = newValue;
-		}
-	}
+    users(newValue) {
+      this.localUsers = JSON.parse(JSON.stringify(newValue));
+      this.processUsers();
+      this.applySearchFilter();
+    },
+    searchQuery(newValue) {
+      this.localSearchQuery = newValue;
+    }
+  }
 };
 </script>
 

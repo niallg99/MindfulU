@@ -8,6 +8,7 @@ from base.models import (
     Mood,
     MoodCause,
     Friends,
+    UserProfile,
 )
 
 
@@ -57,10 +58,19 @@ class MoodCauseSerializer(serializers.ModelSerializer):
         model = MoodCause
         fields = "__all__"
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('user', 'phone', 'streak_count')
 class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer()  # Nested serializer for UserProfile
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'profile')
+
+    def get_streak_count(self, obj):
+        return obj.profile.calculate_streak_count() if obj.profile else 0
+
 
 class FriendSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -74,7 +84,6 @@ class FriendSerializer(serializers.ModelSerializer):
     def get_most_recent_mood(self, obj):
         last_mood = Mood.objects.filter(user=obj.friend).order_by('-mood_date').first()
         if last_mood:
-            # Format the mood as a string. You can customize this format as needed.
             return f"{last_mood.mood_type} on {last_mood.mood_date.strftime('%Y-%m-%d')}"
         return None
 

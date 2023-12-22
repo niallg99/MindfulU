@@ -14,6 +14,12 @@
 								<option v-for="mood in moodChoices" :key="mood" :value="mood">{{ mood }}</option>
 							</select>
 						</div>
+						<div class="form-group mb-3" v-if="shouldShowMoodCauses">
+							<label for="moodCause">Mood Cause:</label>
+							<select id="moodCause" class="form-control" v-model="editedMood.mood_cause">
+								<option v-for="cause in moodCauses" :key="cause" :value="cause">{{ cause }}</option>
+							</select>
+						</div>
 						<div class="form-group mb-3">
 							<label for="description">Description:</label>
 							<textarea id="description" class="form-control" v-model="editedMood.description"></textarea>
@@ -36,9 +42,10 @@ import { updateMood, deleteMood } from '@/api/moods';
 
 export default {
 		props: {
-				mood: Object,
-				showModal: Boolean,
-				moodChoices: Array
+			mood: Object,
+			showModal: Boolean,
+			moodChoices: Array,
+			moodCauses: Array,
 		},
 		data() {
 				return {
@@ -47,9 +54,9 @@ export default {
 				};
 		},
 		watch: {
-				mood(newVal) {
-						this.editedMood = { ...newVal };
-				},
+			mood(newVal) {
+				this.editedMood = { ...newVal, mood_cause: newVal.mood_cause || '-' };
+			},
 		},
 		methods: {
 				show() {
@@ -85,6 +92,11 @@ export default {
 								this.saveError = 'Failed to delete mood. Please try again.';
 						}
 				}
+	},
+	computed: {
+		shouldShowMoodCauses() {
+			return this.editedMood.mood_type !== 'Happy';
 		},
+	},
 };
 </script>

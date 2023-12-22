@@ -6,13 +6,13 @@
 					<div class="card-header">Friends</div>
 					<div class="card-body">
 						<!-- Incoming Friend Requests Section -->
-						<div v-if="friendRequests.length" class="incoming-requests mb-4">
+						<div v-if="friendRequests && friendRequests.length" class="incoming-requests mb-4">
 							<h3>Incoming Friend Requests</h3>
 							<ul class="list-group">
 								<li v-for="request in friendRequests" :key="request.id" class="list-group-item d-flex justify-content-between align-items-center">
 									{{ request.sender }}
 									<span>
-										<button class="btn btn-success btn-sm" @click="acceptRequest(request.username)">Accept</button>
+										<button class="btn btn-success btn-sm" @click="acceptRequest(request)">Accept</button>
 										<button class="btn btn-danger btn-sm" @click="declineRequest(request.username)">Decline</button>
 									</span>
 								</li>
@@ -56,12 +56,12 @@
 									</table>
 								</div>
 							</div>
-							<div class="friend-card-container" v-if="friendsList.length < 3">
-								<div class="card friend-card-add mb-3">
-									<div class="card-body text-center">
-										<p class="card-text">Expand your circle by adding more friends!</p>
-										<button class="btn btn-primary" @click="openAddFriendModal">Add Friend</button>
-									</div>
+						</div>
+						<div class="friend-card-container">
+							<div class="card friend-card-add mb-3">
+								<div class="card-body text-center">
+									<p class="card-text">Expand your circle by adding more friends!</p>
+									<button class="btn btn-primary" @click="openAddFriendModal">Add Friend</button>
 								</div>
 							</div>
 						</div>
@@ -84,7 +84,7 @@
 <script>
 import { useRouter } from 'vue-router';
 import Spinner from './Spinner.vue';
-import { acceptFriendRequest, rejectFriendRequest, sendFriendRequest } from '@/api/friends';
+import { acceptFriendRequest, rejectFriendRequest, sendFriendRequest, fetchFriendRequests} from '@/api/friends';
 
 export default {
 	name: 'FriendsPanel',
@@ -93,7 +93,11 @@ export default {
 	},
 	props: {
 		friendsList: Array,
-		friendRequests: Array,
+	  friendRequests: {
+    type: Array,
+    default: () => [] // Provides a default empty array if the prop is not passed
+  },
+  // ... other props
 		isLoading: Boolean,
 		isError: Boolean,
 		errorMessage: String,
@@ -117,23 +121,30 @@ export default {
 			friendUsername: '',
 		};
 	},
-	methods: {
-		async acceptRequest(username) {
-			try {
-				await acceptFriendRequest(username);
-				this.$emit('update:requests');
-			} catch (error) {
-				console.error('Error accepting friend request:', error);
-				
+methods: {
+  async acceptRequest(request) {
+		try {
+			const response = await acceptFriendRequest(request.username);
+			if (response.success) {
+				// Emit the event with the request object
+				this.$emit('friend-request-accepted', request);
+			} else {
+				console.error(response.message);
 			}
-		},
-		async declineRequest(username) {
+		} catch (error) {
+			console.error('Error accepting friend request:', error);
+		}
+	},
+  async declineRequest(username) {
 			try {
-				await rejectFriendRequest(username);
-				this.$emit('update:requests');
+				const response = await rejectFriendRequest(username);
+				if (response.success) {
+					this.$emit('friend-request-declined', username);
+				} else {
+					console.error(response.message);
+				}
 			} catch (error) {
 				console.error('Error declining friend request:', error);
-				
 			}
 		},
 		openAddFriendModal() {
@@ -159,6 +170,9 @@ export default {
 			const moodTypeKey = moodType.split(' ')[0];
 			return `/src/images/${moodTypeKey.toLowerCase()}.png`;
 		},
+	},
+	mounted() {
+		fetchFriendRequests();
 	},
 };
 </script>

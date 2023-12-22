@@ -5,13 +5,20 @@
 			<h1>Mood History</h1>
 			<div v-if="isLoading">Loading moods...</div>
 			<div v-else-if="isError">{{ errorMessage }}</div>
+			<div v-else-if="moods.length === 0">
+				<div class="card">
+					<div class="card-body empty-state">
+						<p>You have no moods yet. Start adding moods to see them here!</p>
+					</div>
+				</div>
+			</div>
 			<div v-else>
 				<div class="row">
 					<div class="col-md-2 mood-item" v-for="mood in paginatedMoods" :key="mood.id" @click="openModal(mood)">
 						<div class="card">
 							<img :src="moodImageUrl(mood.mood_type)" class="card-img-top" :alt="mood.mood_type">
 							<div class="card-body">
-								<p class="card-text">{{ formatDate(mood.mood_date) }}</p> <!-- Use formatDate method here -->
+								<p class="card-text">{{ formatDate(mood.mood_date) }}</p>
 							</div>
 						</div>
 					</div>
@@ -24,13 +31,14 @@
 					</ul>
 				</nav>
 			</div>
-			<MoodHistoryModal
-					ref="moodModalRef"
-					:mood="selectedMood"
-					:moodChoices="moodChoices"
-					@close-modal="showModal = false"
-					@save="handleSave"
-					@delete="handleDelete"
+			<mood-history-modal
+				ref="moodModalRef"
+				:mood="selectedMood"
+				:moodChoices="moodChoices"
+				:moodCauses="moodCauses"
+				@close-modal="showModal = false"
+				@save="handleSave"
+				@delete="handleDelete"
 			/>
 		</div>
 		<custom-footer />
@@ -38,7 +46,7 @@
 </template>
 
 <script>
-import { fetchUserMoods, fetchMoodChoices } from '@/api/moods';
+import { fetchUserMoods, fetchMoodChoices, fetchMoodCauses } from '@/api/moods';
 import MoodHistoryModal from './MoodHistoryModal.vue';
 import Navbar from './Navbar.vue';
 import CustomFooter from './CustomFooter.vue';
@@ -54,6 +62,7 @@ export default {
 		return {
 			moods: [],
 			moodChoices: [],
+			moodCauses: [],
 			currentPage: 1,
 			perPage: 25,
 			isLoading: true,
@@ -91,10 +100,17 @@ export default {
 		async loadMoodChoices() {
 			try {
 				const response = await fetchMoodChoices();
-				console.log("Mood choices response:", response);
 				this.moodChoices = response.map(choiceArray => choiceArray[0]);
 			} catch (error) {
 				console.error('Error fetching mood choices:', error);
+			}
+		},
+		async loadMoodCauses() {
+			try {
+				const moodCausesResponse = await fetchMoodCauses();
+				this.moodCauses = ['-', ...moodCausesResponse];
+			} catch (error) {
+				console.error('Error fetching mood causes:', error);
 			}
 		},
 		setCurrentPage(page) {
@@ -116,9 +132,10 @@ export default {
 				this.moods = this.moods.filter(mood => mood.id !== deletedMoodId);
 		},
 	},
-	mounted() {
+	async mounted() {
 		this.loadMoods();
 		this.loadMoodChoices();
+		this.loadMoodCauses();
 	}
 };
 </script>

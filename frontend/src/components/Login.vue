@@ -33,6 +33,7 @@ export default {
 					localStorage.setItem('accessToken', response.access_token);
 					const userId = jwtDecode(response.access_token).user_id;
 					localStorage.setItem('userId', userId);
+					localStorage.setItem('username', userData.username);
 					this.$router.push('/dashboard');
 				}
 			} catch (error) {
@@ -63,7 +64,7 @@ export default {
 		closeModal() {
 			let modal = document.getElementById('resetPasswordModal');
 			if (modal) {
-				let bsModal = bootstrap.Modal.getInstance(modal); // Bootstrap 5
+				let bsModal = bootstrap.Modal.getInstance(modal);
 				if (bsModal) {
 					bsModal.hide();
 				}

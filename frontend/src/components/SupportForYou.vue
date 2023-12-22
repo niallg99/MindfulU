@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <navbar :is-logged-in="isLoggedIn" />
-    <div class="main-container">
+    <div class="main-container-support">
       <div class="accordion" id="supportAccordion">
         <div
           class="accordion-item"
@@ -81,8 +81,7 @@ export default {
   min-height: 100vh;
 }
 
-.main-container {
-  display: flex;
+.main-container-support {
   justify-content: center;
   flex-grow: 1;
   padding: 20px;
@@ -90,8 +89,8 @@ export default {
 
 .accordion {
   width: 100%;
-  max-width: 80%;
-  margin: auto;
+  margin: 0 auto;
+  margin-top: 15%;
 }
 
 @media (max-width: 768px) {
@@ -104,7 +103,7 @@ export default {
   }
 
   .accordion {
-    max-width: 100%;
+    width: 100%; /* Keep full width for smaller screens */
   }
 }
 
@@ -113,3 +112,4 @@ export default {
   margin-top: auto;
 }
 </style>
+

@@ -13,6 +13,19 @@
 	margin-bottom: 1rem;
 	border-radius: 0.25rem;
 	text-align: center;
+	&-admin {
+		display: flex;
+		justify-content: center;
+		margin: 0 auto;
+		width: 80%;
+	}
+}
+
+.welcome-message {
+	text-align: center;
+	background-color: $color-soft-teal;
+	border-radius: 0.25rem;
+	color: $default--text-color
 }
 
 .mood-container {
@@ -41,6 +54,7 @@
 @media (max-width: 768px) {
 	.mood-container {
 		padding: 0;
+		padding-top: 2rem;
 	}
 
 	.panels-container {

@@ -86,7 +86,7 @@ const updateMood = async (moodId, moodData) => {
 const fetchUserMoods = async (userId) => {
   try {
     const accessToken = getAccessToken();
-    const response = await fetch(`${baseUrl}/api/user-moods/${userId}`, {
+    const response = await fetch(`${baseUrl}/api/user-moods/${userId}/`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
@@ -126,5 +126,25 @@ const deleteMood = async (moodId) => {
   }
 };
 
-export { fetchMoodChoices, fetchMoodCauses, postMood, fetchUserMoods, updateMood, deleteMood};
+const fetchUserProfile = async (username) => {
+  try {
+      const accessToken = getAccessToken();
+      const response = await fetch(`${baseUrl}/api/user/${username}/get-profile/`, {
+          headers: {
+              'Authorization': `Bearer ${accessToken}`,
+          },
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const userProfile = await response.json();
+      return userProfile;
+  } catch (error) {
+      console.error("Could not fetch user profile:", error);
+      throw error;
+}
+};
+
+export { fetchMoodChoices, fetchMoodCauses, postMood, fetchUserMoods, updateMood, deleteMood, fetchUserProfile };
 
