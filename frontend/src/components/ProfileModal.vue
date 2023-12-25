@@ -8,7 +8,7 @@
         </div>
         <div class="modal-body">
           <div class="text-center mb-3">
-            <img :src="localUserProfilePicture" class="rounded-circle" alt="Profile Picture" style="width: 100px; height: 100px;">
+            <img :src="computedUserProfilePicture" @error="imageLoadError" class="rounded-circle" alt="Profile Picture" style="width: 100px; height: 100px;">
           </div>
           <div class="mb-3">
             <label for="profilePicture" class="form-label">Update Profile Picture</label>
@@ -24,7 +24,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" @click="updateProfile">Save Changes</button>
+          <button type="button" class="btn btn-primary" @click="updateProfile">Save</button>
         </div>
       </div>
     </div>
@@ -69,24 +69,25 @@ export default {
         if (this.selectedFile) {
           formData.append('profilePicture', this.selectedFile);
         }
-        formData.append('showMood', this.localShowMood);
-        
+        formData.append('showMood', this.localShowMood.toString());
+
         const response = await updateProfile(formData);
 
         if (response.newProfilePictureUrl) {
-          const newProfilePictureUrl = response.newProfilePictureUrl;
-          this.localUserProfilePicture = newProfilePictureUrl;
-          this.$emit('profile-updated', newProfilePictureUrl);
+          this.localUserProfilePicture = response.newProfilePictureUrl;
+          this.$emit('profile-updated', response.newProfilePictureUrl);
         }
-        
+
+        if (response.data && response.data.showMood !== undefined) {
+          this.localShowMood = response.data.showMood;
+        }
         localStorage.setItem('showMood', this.localShowMood);
         this.$emit('showMood-updated', this.localShowMood);
-
       } catch (error) {
         console.error('Error updating profile:', error);
       }
     },
-    async updateShowMood() {
+    async updateShowMoodPreference() {
       try {
         await saveShowMoodPreference(this.localShowMood);
         localStorage.setItem('showMood', this.localShowMood);
@@ -95,29 +96,52 @@ export default {
         console.error('Error saving showMood preference:', error);
       }
     },
-    show() {
-      this.modalInstance.show();
+       show() {
+      if (this.modalInstance) {
+        this.modalInstance.show();
+      }
     },
     hide() {
       if (this.modalInstance) {
         this.modalInstance.hide();
       }
     },
+      imageLoadError(event) {
+    event.target.src = '/src/images/person.svg';
+  },
   },
   watch: {
-    showMood(newVal) {
-      this.localShowMood = newVal;
-    },
     userProfilePicture(newVal) {
       this.localUserProfilePicture = newVal || '/src/images/person.svg';
     },
+    localShowMood(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.updateShowMoodPreference();
+      }
+    },
+    showMood(newVal) {
+      this.localShowMood = newVal;
+    }
   },
   mounted() {
-    const modalElement = this.$el;
-    this.modalInstance = new bootstrap.Modal(modalElement, {
-      keyboard: false
+    this.$nextTick(() => {
+      const modalElement = this.$el;
+      if (modalElement) {
+        this.modalInstance = new bootstrap.Modal(modalElement, {
+          keyboard: false
+        });
+      }
     });
-    this.localShowMood = localStorage.getItem('showMood') === 'true' || this.showMood;
+  },
+  computed: {
+  computedUserProfilePicture() {
+    if (this.userProfilePicture && !this.userProfilePicture.startsWith('http')) {
+      return `http://localhost:8000${this.userProfilePicture}`;
+    }
+    return this.userProfilePicture || '/src/images/person.svg';
   }
+}
+
+
 };
 </script>

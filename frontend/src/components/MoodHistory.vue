@@ -34,6 +34,7 @@
 			<mood-history-modal
 				ref="moodModalRef"
 				:mood="selectedMood"
+				@update-mood="handleUpdateMood"
 				:moodChoices="moodChoices"
 				:moodCauses="moodCauses"
 				@close-modal="showModal = false"
@@ -108,7 +109,7 @@ export default {
 		async loadMoodCauses() {
 			try {
 				const moodCausesResponse = await fetchMoodCauses();
-				this.moodCauses = ['-', ...moodCausesResponse];
+				this.moodCauses = [...moodCausesResponse];
 			} catch (error) {
 				console.error('Error fetching mood causes:', error);
 			}
@@ -128,14 +129,22 @@ export default {
 			const options = { day: 'numeric', month: 'short', year: 'numeric' };
 			return date.toLocaleDateString('en-GB', options);
 		},
-		 handleDelete(deletedMoodId) {
-				this.moods = this.moods.filter(mood => mood.id !== deletedMoodId);
+		handleDelete(deletedMoodId) {
+			this.moods = this.moods.filter(mood => mood.id !== deletedMoodId);
+		},
+		handleUpdateMood(updatedMood) {
+			const index = this.moods.findIndex(mood => mood.id === updatedMood.id);
+			if (index !== -1) {
+				this.moods[index] = updatedMood;
+			}
 		},
 	},
 	async mounted() {
-		this.loadMoods();
-		this.loadMoodChoices();
-		this.loadMoodCauses();
+		Promise.all([
+		this.loadMoods(),
+		this.loadMoodChoices(),
+		this.loadMoodCauses(),
+		]);
 	}
 };
 </script>

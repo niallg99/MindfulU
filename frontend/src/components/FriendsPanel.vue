@@ -42,13 +42,13 @@
 									<table class="table-friend">
 										<tr>
 											<td class="cell-profile-picture">
-												<img :src="friend.profilePicture || '/src/images/person.svg'" class="profile-picture" :alt="`Profile picture of ${friend.friend.first_name}`">
+												<img :src="getProfilePicture(friend)" class="profile-picture" :alt="`Profile picture of ${friend.friend.first_name}`">
 											</td>
 											<td class="cell-username">
 												<h5 class="card-title">@{{ friend.friend.username }}</h5>
 											</td>
 											<td class="cell-mood">
-												<template v-if="friend.most_recent_mood">
+												<template v-if="friend.most_recent_mood && friend.show_mood">
 													<img :src="moodImageUrl(friend.most_recent_mood)" alt="Mood Image" class="mood-image"/>
 												</template>
 											</td>
@@ -95,9 +95,8 @@ export default {
 		friendsList: Array,
 	  friendRequests: {
     type: Array,
-    default: () => [] // Provides a default empty array if the prop is not passed
+    default: () => []
   },
-  // ... other props
 		isLoading: Boolean,
 		isError: Boolean,
 		errorMessage: String,
@@ -112,7 +111,7 @@ export default {
 	},
 	computed: {
 		limitedFriendsList() {
-			return this.friendsList ? this.friendsList.slice(0, 3) : [];
+			return this.friendsList ? this.friendsList.slice(0, 4) : [];
 		},
 	},
 	data() {
@@ -126,13 +125,12 @@ methods: {
 		try {
 			const response = await acceptFriendRequest(request.username);
 			if (response.success) {
-				// Emit the event with the request object
 				this.$emit('friend-request-accepted', request);
 			} else {
-				console.error(response.message);
+				throw  new Error(response.message);
 			}
 		} catch (error) {
-			console.error('Error accepting friend request:', error);
+			throw  new Error('Error accepting friend request:', error);
 		}
 	},
   async declineRequest(username) {
@@ -141,10 +139,10 @@ methods: {
 				if (response.success) {
 					this.$emit('friend-request-declined', username);
 				} else {
-					console.error(response.message);
+					throw  new Error(response.message);
 				}
 			} catch (error) {
-				console.error('Error declining friend request:', error);
+					throw  new Error('Error declining friend request:', error);
 			}
 		},
 		openAddFriendModal() {
@@ -170,6 +168,9 @@ methods: {
 			const moodTypeKey = moodType.split(' ')[0];
 			return `/src/images/${moodTypeKey.toLowerCase()}.png`;
 		},
+		getProfilePicture(friend) {
+			return friend.friend.profile.picture ? `http://${window.location.hostname}:8000${friend.friend.profile.picture}` : 'src/images/person.svg';
+		}
 	},
 	mounted() {
 		fetchFriendRequests();

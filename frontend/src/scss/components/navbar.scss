@@ -52,6 +52,7 @@
 
 @media (max-width: 991px) {
   .navbar-custom .navbar-collapse {
+    z-index: 1050;
     position: absolute;
     background-color: $color-dusty-rose; 
     top: var(--navbar-height);
@@ -74,6 +75,7 @@
   }
 
   .dropdown-menu-end {
+    z-index: 1051;
     position: static;
     background-color: $color-dusty-rose; 
     border: 0;

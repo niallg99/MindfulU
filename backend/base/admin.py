@@ -4,7 +4,6 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 # Register your models here.
 from django.contrib import admin
 from .models import (
-    ProfileInfo,
     MoodCause,
     Mood,
     Friends,
@@ -13,10 +12,6 @@ from .models import (
     SupportSection,
     UserProfile,
 )
-
-
-# Register the ProfilePicture model
-admin.site.register(ProfileInfo)
 
 # Register the MoodCause model
 admin.site.register(MoodCause)
@@ -43,7 +38,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ("id", "username", "email", "first_name", "last_name", "is_staff", "get_phone_number")
 
     def get_phone_number(self, obj):
-        return obj.profileinfo.phone_number if hasattr(obj, 'profileinfo') else 'N/A'
+        return obj.UserProfile.phone_number if hasattr(obj, 'profileinfo') else 'N/A'
 
     get_phone_number.short_description = 'Phone Number'
 

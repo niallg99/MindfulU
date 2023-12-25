@@ -1,26 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User as DjangoUser
-from django.contrib.auth.models import User
 
 
-class ProfileInfo(models.Model):
-    user = models.OneToOneField(DjangoUser, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
-    picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True) 
-
-    def __str__(self):
-        return self.user.username
-    
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(DjangoUser, on_delete=models.CASCADE, related_name='profile')
     phone = models.CharField(max_length=20, blank=True, null=True)
+    picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
     streak_count = models.IntegerField(default=0)
+    show_mood = models.BooleanField(default=False, null=True)  # Add null=True if you want to allow null values
 
     def __str__(self):
         return self.user.username
-
-    
-User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
 
 class MoodCause(models.Model):

@@ -40,20 +40,20 @@ computed: {
 			this.isModalVisible = !this.isModalVisible;
 		},
 		async submitForm() {
-      try {
-        const moodData = {
-          mood_type: this.mood,
-          description: this.feedback,
-          mood_cause: this.selectedCause,
-          user: this.userId,
-        };
-        await postMood(moodData);
-        this.resetForm();
-        this.isModalVisible = false;
-      } catch (error) {
-        console.error('Error posting mood:', error);
-      }
-    },
+			try {
+				const moodData = {
+					mood_type: this.mood,
+					description: this.feedback,
+					mood_cause: this.selectedCause,
+					user: this.userId,
+				};
+				await postMood(moodData);
+				this.resetForm();
+				this.isModalVisible = false;
+			} catch (error) {
+				console.error('Error posting mood:', error);
+			}
+		},
 	resetForm() {
 		this.selectedCause = '';
 		this.feedback = '';
@@ -98,7 +98,7 @@ computed: {
 						<button type="submit" class="btn btn-success">Submit</button>
 					</div>
 				</form>
-  		</div>
+			</div>
 		</div>
 	</div>
 </template>
