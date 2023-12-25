@@ -44,7 +44,7 @@ export default {
   display: flex;
   justify-content: center;
   margin: 0 auto;
-  width: 80%;
+  width: 90%;
 }
 
 .card-body {
@@ -55,6 +55,7 @@ export default {
 
 .info-card {
   background-color: #afcfd6;
+  color: #fff;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
@@ -66,6 +67,6 @@ export default {
 }
 
 .info-card-content {
-  /* Your styles for content */
+
 }
 </style>

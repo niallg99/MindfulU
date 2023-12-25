@@ -1,10 +1,10 @@
-@mixin flexCenter {
+@mixin flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-@mixin absoluteCenter {
+@mixin absolute-center {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -18,7 +18,8 @@
 }
 
 .main-container {
-  flex: 1;
+  flex-grow: 1;
+  padding: 20px;
 }
 
 .mood-history {
@@ -26,80 +27,65 @@
   margin-top: 20px;
 }
 
-.mood-item {
-  margin-bottom: 20px;
-  width: calc(33.333% - 10px);
-  display: inline-block;
-
-  @media (min-width: 992px) {
-    width: calc(20% - 10px);
-  }
-}
-
 .card {
   width: 100%;
-
-  &-img-top {
+  .img-top {
     width: 100%;
   }
-
-  &-body {
+  .body {
     padding: 0.5rem;
   }
 }
 
 .mood-container {
-  @include flexCenter;
+  @include flex-center;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 0 10px;
 }
 
 .mood-card {
   flex: 0 0 auto;
-  width: 220px;
   position: relative;
   overflow: hidden;
   margin-bottom: 20px;
   min-height: 250px;
   background-color: transparent;
+  width: calc(33.333% - 10px); // Default width for smaller screens
 
   &:hover {
-    .mood-overlay {
+    .overlay {
       background-color: rgba(0, 0, 0, 0.5);
     }
-    .mood-btn-primary {
+    .btn-primary {
       visibility: visible;
       opacity: 1;
     }
   }
 
   img {
-    @include absoluteCenter;
+    @include absolute-center;
     max-width: 100%;
     max-height: 100%;
   }
 
-  .mood-overlay {
-    @include absoluteCenter;
-    @include flexCenter;
+  .overlay {
+    @include absolute-center;
+    @include flex-center;
     transition: background-color 0.3s ease;
   }
 
-   .mood-modal {
+  .modal {
+    @include flex-center;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 1050;
     background-color: rgba(0, 0, 0, 0.5);
   }
 
-  .mood-modal .modal-content {
+  .modal-content {
     z-index: 1051;
     background: white;
     padding: 20px;
@@ -114,11 +100,11 @@
     cursor: pointer;
   }
 
-  .mood-name {
+  .name {
     color: white;
   }
 
-  .mood-btn-primary {
+  .btn-primary {
     padding: 10px 20px;
     visibility: hidden;
     opacity: 0;
@@ -126,32 +112,72 @@
   }
 }
 
-.empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.mood-overlay {
+  @include flex-center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .btn {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0.3s, opacity 0.3s ease;
+  }
+
+  &:hover .btn {
+    visibility: visible;
+    opacity: 1;
+  }
 }
 
-@media (max-width: 600px) {
-  .mood-container {
-    gap: 5px;
+.mood-modal {
+  @include flex-center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1050;
+  background-color: rgba(0, 0, 0, 0.5);
+  
+  .modal-content {
+    @include absolute-center;
+    z-index: 1051;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 500px;
   }
+}
+
+.empty-state {
+  @include flex-center;
+}
+
+@media (min-width: 992px) {
   .mood-card {
-    flex: 1 0 calc(50% - 10px);
-    min-height: 200px;
-    margin-bottom: 10px;
+    width: calc(20% - 10px); // Adjust width for larger screens
   }
 }
 
 @media (hover: hover) {
-  .mood-card:hover .mood-overlay, .mood-card:hover .mood-btn-primary {
+  .mood-card:hover .overlay, .mood-card:hover .btn-primary {
     visibility: visible;
     opacity: 1;
   }
 }
 
 @media (hover: none) {
-  .mood-overlay, .mood-btn-primary {
+  .overlay, .btn-primary {
     visibility: visible;
     opacity: 1;
   }

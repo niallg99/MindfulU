@@ -203,25 +203,40 @@ def post_mood(request):
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def update_streak(self):
-				today = timezone.localtime(timezone.now()).date()
-				moods = self.user.moods.order_by('-mood_date')
-				
-				if not moods.exists():
-						self.streak_count = 0
-						self.save()
-						return self.streak_count
-				
-				last_mood = moods.first()
-				last_mood_date = timezone.localtime(last_mood.mood_date).date()
+from datetime import timedelta
 
-				if last_mood_date == today - timedelta(days=1):
-						self.streak_count += 1
-				elif last_mood_date < today - timedelta(days=1):
-						self.streak_count = 1
-				
-				self.save()
-				return self.streak_count
+# Assuming this is a method inside the UserProfile model
+def update_streak(self):
+    # Get all moods for the user, ordered from most to least recent
+    moods = self.moods.order_by('-mood_date')
+    
+    # If there are no moods, there's no streak
+    if not moods.exists():
+        self.streak_count = 0
+        self.save()
+        return self.streak_count
+    
+    # Start counting from the most recent mood
+    streak_count = 1
+    previous_mood_date = timezone.localtime(moods[0].mood_date).date()
+
+    # Start checking from the second most recent mood
+    for mood in moods[1:]:
+        mood_date = timezone.localtime(mood.mood_date).date()
+        if mood_date == previous_mood_date - timedelta(days=1):
+            # The mood was entered the day after the previous mood, increment streak
+            streak_count += 1
+        else:
+            # Found a gap in the streak, stop counting
+            break
+        # Update the previous_mood_date for the next iteration
+        previous_mood_date = mood_date
+
+    # Set the streak count and save the user profile
+    self.streak_count = streak_count
+    self.save()
+    return self.streak_count
+
 
 def get_csrf_token(request):
 		csrf_token = get_token(request)

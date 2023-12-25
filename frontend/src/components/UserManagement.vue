@@ -86,6 +86,48 @@ export default {
 			updateSearchQuery() {
 			this.$emit('update:searchQuery', this.localSearchQuery);
 		},
+		toggleSortRiskLevel() {
+				if (this.sortRiskLevel === 'asc') {
+						this.sortRiskLevel = 'desc';
+				} else {
+						this.sortRiskLevel = 'asc';
+				}
+				this.sortUsersByRiskLevel();
+		},
+		sortUsersByRiskLevel() {
+			this.localUsers.sort((a, b) => {
+				if (!a.riskLevel || !b.riskLevel) return 0;
+
+				const riskLevelOrder = { 'Low': 1, 'Medium': 2, 'High': 3 };
+				const compareA = riskLevelOrder[a.riskLevel];
+				const compareB = riskLevelOrder[b.riskLevel];
+
+				if (this.sortRiskLevel === 'asc') {
+						return compareA - compareB;
+				} else {
+						return compareB - compareA;
+				}
+			});
+			this.applySearchFilter();
+		},
+		toggleSortAverageMood() {
+				if (this.sortAverageMood === 'asc') {
+						this.sortAverageMood = 'desc';
+				} else {
+						this.sortAverageMood = 'asc';
+				}
+				this.sortUsersByAverageMood();
+		},
+		sortUsersByAverageMood() {
+				this.localUsers.sort((a, b) => {
+						if (this.sortAverageMood === 'asc') {
+								return a.averageMood.localeCompare(b.averageMood);
+						} else {
+								return b.averageMood.localeCompare(a.averageMood);
+						}
+				});
+				this.applySearchFilter(); // Reapply filters after sorting
+		},
 	},
 	watch: {
 		users(newValue) {
@@ -124,8 +166,16 @@ export default {
 								<th>First Name</th>
 								<th>Last Name</th>
 								<th>Last Mood Date</th>
-								<th>Average Mood</th>
-								<th>Risk Level</th>
+								<th @click="toggleSortAverageMood">
+										Average Mood
+										<span class="sort-arrow" :class="{ active: sortAverageMood === 'asc' }">▲</span>
+										<span class="sort-arrow" :class="{ active: sortAverageMood === 'desc' }">▼</span>
+								</th>
+								<th @click="toggleSortRiskLevel">
+										Risk Level
+										<span class="sort-arrow" :class="{ active: sortRiskLevel === 'asc' }">▲</span>
+										<span class="sort-arrow" :class="{ active: sortRiskLevel === 'desc' }">▼</span>
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -175,7 +225,15 @@ export default {
 	display: flex;
 	justify-content: center;
 	margin: 0 auto;
-	width: 80%;
+	width: 90%;
+}
+
+.sort-arrow {
+		color: #aaa; /* Inactive color */
+}
+
+.sort-arrow.active {
+		color: black; /* Active color */
 }
 
 </style>

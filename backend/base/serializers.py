@@ -62,6 +62,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		class Meta:
 				model = UserProfile
 				fields = ('user', 'phone', 'streak_count', 'picture')
+				
 class UserSerializer(serializers.ModelSerializer):
 		profile = UserProfileSerializer()  # Nested serializer for UserProfile
 		class Meta:

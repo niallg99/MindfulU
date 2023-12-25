@@ -13,6 +13,9 @@
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 					<li class="nav-item" v-if="isLoggedIn">
+						<router-link to="/dashboard" class="nav-link">Home</router-link>
+					</li>
+					<li class="nav-item" v-if="isLoggedIn">
 						<a class="nav-link" href="#" @click="openProfileModal">Profile</a>
 					</li>
 					<li class="nav-item" v-if="isLoggedIn">
@@ -28,7 +31,7 @@
 						<router-link to="/mood-history" class="nav-link">Mood History</router-link>
 					</li>
 					<li v-if="isLoggedIn && isStaff" class="nav-item">
-						<router-link to="/admin_dashboard" class="nav-link">Admin Dashboard</router-link>
+						<router-link to="/admin_dashboard" class="nav-link">Admin</router-link>
 					</li>
 					<li class="nav-item" v-if="isLoggedIn">
 						<router-link to="/login" class="nav-link">Logout</router-link>
@@ -156,14 +159,11 @@ export default {
 			navbarCollapse.classList.toggle('show');
 		},
 		toggleNavbarCollapse() {
-			const bsCollapse = new bootstrap.Collapse(document.getElementById('navbarSupportedContent'), {
+			const navbarCollapse = document.getElementById('navbarSupportedContent');
+			const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
 				toggle: false
 			});
-			if (bsCollapse._element.classList.contains('show')) {
-				bsCollapse.hide();
-			} else {
-				bsCollapse.show();
-			}
+			bsCollapse.toggle(); // This will automatically handle the show/hide
 		},
 		async fetchAndSetUserProfile() {
 			if (!this.isLoggedIn || !this.username) {

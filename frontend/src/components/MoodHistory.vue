@@ -1,50 +1,57 @@
 <template>
-	<div class="page-container">
-		<navbar />
-		<div class="container mood-history">
-			<h1>Mood History</h1>
-			<div v-if="isLoading">Loading moods...</div>
-			<div v-else-if="isError">{{ errorMessage }}</div>
-			<div v-else-if="moods.length === 0">
-				<div class="card">
-					<div class="card-body empty-state">
-						<p>You have no moods yet. Start adding moods to see them here!</p>
-					</div>
-				</div>
-			</div>
-			<div v-else>
-				<div class="row">
-					<div class="col-md-2 mood-item" v-for="mood in paginatedMoods" :key="mood.id" @click="openModal(mood)">
-						<div class="card">
-							<img :src="moodImageUrl(mood.mood_type)" class="card-img-top" :alt="mood.mood_type">
-							<div class="card-body">
-								<p class="card-text">{{ formatDate(mood.mood_date) }}</p>
-							</div>
-						</div>
-					</div>
-				</div>
-				<nav>
-					<ul class="pagination">
-						<li v-for="page in totalPages" :key="page" class="page-item">
-							<button class="page-link" @click="setCurrentPage(page)">{{ page }}</button>
-						</li>
-					</ul>
-				</nav>
-			</div>
-			<mood-history-modal
-				ref="moodModalRef"
-				:mood="selectedMood"
-				@update-mood="handleUpdateMood"
-				:moodChoices="moodChoices"
-				:moodCauses="moodCauses"
-				@close-modal="showModal = false"
-				@save="handleSave"
-				@delete="handleDelete"
-			/>
-		</div>
-		<custom-footer />
-	</div>
+  <div class="page-container">
+    <navbar />
+    <div class="container mood-history my-4">
+      <div class="card shadow">
+        <div class="card-header bg-light">
+          <h2 class="card-title mb-0">Mood History</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-text mb-4">Track your mood over time to see how you're doing. Click on a mood to see more details or to edit it.</p>
+          <div v-if="isLoading">
+            <span>Loading moods...</span>
+          </div>
+          <div v-else-if="isError">
+            <span>{{ errorMessage }}</span>
+          </div>
+          <div v-else-if="moods.length === 0" class="text-center py-5">
+            <p class="lead">You have no moods yet. Start adding moods to see them here!</p>
+          </div>
+          <div v-else class="row g-3">
+            <div class="col-4 col-md-6 col-lg-3" v-for="mood in paginatedMoods" :key="mood.id" @click="openModal(mood)">
+              <div class="card h-100">
+                <img :src="moodImageUrl(mood.mood_type)" class="card-img-top" :alt="mood.mood_type">
+                <div class="card-body">
+                  <p class="card-text">{{ formatDate(mood.mood_date) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <nav v-if="totalPages > 1" class="mt-4">
+            <ul class="pagination justify-content-center">
+              <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+                <button class="page-link" @click="setCurrentPage(page)">{{ page }}</button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <mood-history-modal
+        ref="moodModalRef"
+        :mood="selectedMood"
+        @update-mood="handleUpdateMood"
+        :moodChoices="moodChoices"
+        :moodCauses="moodCauses"
+        @close-modal="showModal = false"
+        @save="handleSave"
+        @delete="handleDelete"
+      />
+    </div>
+    <custom-footer />
+  </div>
 </template>
+
+
 
 <script>
 import { fetchUserMoods, fetchMoodChoices, fetchMoodCauses } from '@/api/moods';
@@ -148,3 +155,4 @@ export default {
 	}
 };
 </script>
+
