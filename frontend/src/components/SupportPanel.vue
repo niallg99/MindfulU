@@ -1,3 +1,40 @@
+<script>
+import { useRouter } from 'vue-router';
+import Spinner from './Spinner.vue';
+
+export default {
+	name: 'SupportPanel',
+	components: {
+		Spinner,
+	},
+	props: {
+		supportSections: Array,
+		isLoading: Boolean,
+	},
+	data() {
+		return {
+			collapsed: null,
+		};
+	},
+	computed: {
+		limitedSupportSections() {
+			return this.supportSections.slice(0, 5);
+		},
+	},
+	methods: {
+		toggleCollapse(index) {
+			this.collapsed = this.collapsed === index ? null : index;
+		},
+	},
+	setup() {
+		const router = useRouter();
+		const navigateToSupportForYou = () => {
+			router.push('/support');
+		};
+		return { navigateToSupportForYou };
+	},
+};
+</script>
 <template>
 	<div class="container mt-4">
 		<div class="row justify-content-center">
@@ -54,40 +91,3 @@
 	</div>
 </template>
 
-<script>
-import { useRouter } from 'vue-router';
-import Spinner from './Spinner.vue';
-
-export default {
-	name: 'SupportPanel',
-	components: {
-		Spinner,
-	},
-	props: {
-		supportSections: Array,
-		isLoading: Boolean,
-	},
-	data() {
-		return {
-			collapsed: null,
-		};
-	},
-	computed: {
-		limitedSupportSections() {
-			return this.supportSections.slice(0, 5);
-		},
-	},
-	methods: {
-		toggleCollapse(index) {
-			this.collapsed = this.collapsed === index ? null : index;
-		},
-	},
-	setup() {
-		const router = useRouter();
-		const navigateToSupportForYou = () => {
-			router.push('/support');
-		};
-		return { navigateToSupportForYou };
-	},
-};
-</script>

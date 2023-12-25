@@ -1,7 +1,7 @@
 @import '../base/_variables.scss'; 
 
 .main-container {
-	max-width: 80%;
+	max-width: 90%;
 	margin: auto;
 	padding-bottom: 3rem;
 }
@@ -10,14 +10,14 @@
 	background-color: $color-soft-teal;
 	color: $default--text-color;
 	padding: 1rem;
-	margin-bottom: 1rem;
+	margin: 1rem;
 	border-radius: 0.25rem;
 	text-align: center;
 	&-admin {
 		display: flex;
 		justify-content: center;
 		margin: 0 auto;
-		width: 80%;
+		width: 90%;
 	}
 }
 
@@ -25,11 +25,12 @@
 	text-align: center;
 	background-color: $color-soft-teal;
 	border-radius: 0.25rem;
-	color: $default--text-color
+	color: $default--text-color;
+	margin: 1rem;
 }
 
 .mood-container {
-	padding: 2rem 0;
+	padding-top: 2rem;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-around;
@@ -39,7 +40,6 @@
 .panels-container {
 	display: flex;
 	flex-wrap: wrap;
-	margin-top: 2rem;
 
 	.panel {
 		flex: 1 1 50%;

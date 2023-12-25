@@ -18,7 +18,7 @@
   right: 0;
   left: auto;
   text-align: right;
-  max-width: 100%;
+  min-width: 100%;
 }
 
 .dropdown-menu-end {
@@ -45,19 +45,26 @@
 }
 
 .notification-item {
+  max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
+
 @media (max-width: 991px) {
   .navbar-custom .navbar-collapse {
+    z-index: 1050;
     position: absolute;
     background-color: $color-dusty-rose; 
     top: var(--navbar-height);
     left: 0;
     right: 0;
     padding: 0.5rem;
+  }
+
+  .navbar-toggler.collapsed {
+    display: none;
   }
 
   .navbar-custom .navbar-toggler.collapsed + .navbar-collapse {
@@ -74,6 +81,7 @@
   }
 
   .dropdown-menu-end {
+    z-index: 1051;
     position: static;
     background-color: $color-dusty-rose; 
     border: 0;

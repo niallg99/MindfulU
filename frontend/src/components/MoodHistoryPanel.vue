@@ -116,7 +116,7 @@ export default {
 	}
 
 	.mood-carousel-container img {
-		max-width: 80%;
+		max-width: 90%;
 	}
 }
 </style>

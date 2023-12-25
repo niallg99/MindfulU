@@ -4,31 +4,28 @@
 			<div class="container mt-4">
 			<div class="row">
 				<template v-if="friendsList && friendsList.length">
-					<div class="col-md-4" v-for="friendship in friendsList" :key="friendship.id">
+					<div class="col-md-4" v-for="friend in friendsList" :key="friend.id">
 						<div class="card friend-card mb-3">
 							<div class="card-body">
 								<div class="row align-items-center">
 									<div class="col-auto">
 										<img 
-											:src="getProfilePicture(friendship.friend)" 
+											:src="getProfilePicture(friend)" 
 											class="img-fluid rounded-circle" 
-											:alt="`${friendship.friend.first_name} ${friendship.friend.last_name}`" 
+											:alt="`${friend.friend.first_name} ${friend.friend.last_name}`" 
 											style="width: 60px; height: 60px;"
 										>
 									</div>
 									<div class="col">
 										<h5 class="card-title">
-											@{{ friendship.friend.username }}
+											{{ friend.friend.username }}  ({{ friend.friend.first_name }})
 										</h5>
-										<p class="card-text">
-											{{ friendship.friend.first_name }}
-										</p>
-										<template v-if="friendship.most_recent_mood">
-											Mood: <img :src="getMoodImageUrl(friendship.most_recent_mood)" class="mood-image" />
+										<template v-if="friend.most_recent_mood && friend.show_mood">
+											Mood: <img :src="getMoodImageUrl(friend.most_recent_mood)" class="mood-image" />
 										</template>
 									</div>
 									<div class="col-auto">
-										<button class="btn btn-danger" @click="removeFriend(friendship.friend.username)">
+										<button class="btn btn-danger" @click="removeFriend(friend.friend.username)">
 											Remove
 										</button>
 									</div>
@@ -194,7 +191,7 @@ export default {
 			this.currentPage = page;
 		},
 		getProfilePicture(friend) {
-			return friend.profile_picture || 'src/images/person.svg';
+			return friend.friend.profile.picture ? `http://${window.location.hostname}:8000${friend.friend.profile.picture}` : 'src/images/person.svg';
 		},
 		getMood(mostRecentMood) {
 			return mostRecentMood.split(' ')[0];
@@ -233,10 +230,6 @@ export default {
 .friend-card img {
 	width: 100%;
 	object-fit: cover;
-}
-
-.friend-card .card-title {
-	margin-bottom: 0.5rem;
 }
 
 .pagination {

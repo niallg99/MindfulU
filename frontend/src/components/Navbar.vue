@@ -7,11 +7,14 @@
 			<template v-else>
 				<a class="navbar-brand" href="#">MindfulU</a>
 			</template>
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" @click="toggleNavbarCollapse">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+					<li class="nav-item" v-if="isLoggedIn">
+						<router-link to="/dashboard" class="nav-link">Home</router-link>
+					</li>
 					<li class="nav-item" v-if="isLoggedIn">
 						<a class="nav-link" href="#" @click="openProfileModal">Profile</a>
 					</li>
@@ -28,7 +31,7 @@
 						<router-link to="/mood-history" class="nav-link">Mood History</router-link>
 					</li>
 					<li v-if="isLoggedIn && isStaff" class="nav-item">
-						<router-link to="/admin_dashboard" class="nav-link">Admin Dashboard</router-link>
+						<router-link to="/admin_dashboard" class="nav-link">Admin</router-link>
 					</li>
 					<li class="nav-item" v-if="isLoggedIn">
 						<router-link to="/login" class="nav-link">Logout</router-link>
@@ -69,17 +72,20 @@
 			</div>
 		</div>
 	</nav>
-	<profile-modal
-		ref="profileModalRef"
-		:userProfilePicture="userProfilePicture"
-    @update:showMood="handleShowMoodUpdate"
-		@profile-updated="handleProfileUpdated"
-	/>
+	 <profile-modal
+  ref="profileModalRef"
+  :userProfilePicture="userProfilePicture"
+  :showMood="showMood"
+  @update:showMood="handleShowMoodUpdate"
+  @profile-updated="handleProfileUpdated"
+/>
+
 </template>
 
 
 <script>
 import { fetchFriendRequests, acceptFriendRequest, rejectFriendRequest } from '@/api/friends';
+import { fetchUserProfile } from '../api/moods.js';
 import APILogin from '@/api/login.js';
 import ProfileModal from './ProfileModal.vue';
 import router from '../router';
@@ -95,11 +101,16 @@ export default {
 			friendRequests: [],
 			router: router,
 			isStaff: false,
+			showMood: localStorage.getItem('showMood') === 'true',
+      userProfilePicture: localStorage.getItem('userProfilePicture') || '/src/images/person.svg',
 		};
 	},
 	computed: {
 		isLoggedIn() {
 			return !!localStorage.getItem('accessToken');
+		},
+		username() { 
+      return localStorage.getItem('username');
 		},
 	},
 	methods: {
@@ -108,9 +119,9 @@ export default {
 				const requests = await fetchFriendRequests();
 				this.friendRequests = requests;
 			} catch (error) {
-				console.error('Error fetching friend requests:', error);
+				throw new Error('Error fetching friend requests:', error);
 			}
-	},
+		},
 		async acceptRequest(username) {
 			try {
 				const response = await acceptFriendRequest(username);
@@ -118,7 +129,7 @@ export default {
 				await this.fetchFriendRequests();
 				await this.loadFriendsData();
 			} catch (error) {
-				console.error('Error accepting friend request:', error);
+				throw new Error('Error accepting friend request:', error);
 			}
 		},
 		async declineRequest(username) {
@@ -126,7 +137,7 @@ export default {
 				await rejectFriendRequest(username);
 				await this.fetchFriendRequests();
 			} catch (error) {
-				console.error('Error declining friend request:', error);
+				throw new Error('Error declining friend request:', error);
 			}
 		},
 		async fetchStaffStatus() {
@@ -134,34 +145,70 @@ export default {
 				const response = await APILogin.checkStaffStatus();
 				this.isStaff = response.is_staff;
 			} catch (error) {
-				console.error('Error fetching staff status:', error);
+				throw new Error('Error fetching staff status:', error);
 			}
-		},
-		openProfileModal() {
-			this.$refs.profileModalRef.show();
 		},
 		logout() {
 			localStorage.removeItem('accessToken');
+			localStorage.removeItem('username');
+			localStorage.removeItem('userProfilePicture');
 			this.$router.push('/login');
 		},
 		toggleNavbar() {
 			const navbarCollapse = this.$refs.navbarCollapse;
 			navbarCollapse.classList.toggle('show');
 		},
-		handleProfileUpdated(newProfilePictureUrl) {
-			const timestamp = new Date().getTime();
-			this.userProfilePicture = `${newProfilePictureUrl}?t=${timestamp}`; // Append timestamp to bust cache
+		toggleNavbarCollapse() {
+			const navbarCollapse = document.getElementById('navbarSupportedContent');
+			const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+				toggle: false
+			});
+			bsCollapse.toggle(); // This will automatically handle the show/hide
 		},
-	},
-		mounted() {
-			if (this.isLoggedIn) {
+		async fetchAndSetUserProfile() {
+			if (!this.isLoggedIn || !this.username) {
+				return;
+			}
+			try {
+				const userData = await fetchUserProfile(this.username);
+				this.userProfilePicture = userData.picture || '/src/images/person.svg';
+				localStorage.setItem('userProfilePicture', this.userProfilePicture);
+			} catch (error) {
+				throw new Error('Error fetching user profile:', error);
+			}
+		},
+		handleProfileUpdated(newProfilePictureUrl) {
+			this.userProfilePicture = newProfilePictureUrl;
+			localStorage.setItem('userProfilePicture', newProfilePictureUrl);
+		},
+		async openProfileModal() {
+			if (!this.isLoggedIn || !this.username) {
+				return;
+			}
+			try {
+				await this.fetchAndSetUserProfile();
+				if (this.$refs.profileModalRef) {
+					this.$refs.profileModalRef.show();
+				}
+			} catch (error) {
+				throw new Error('Error fetching user profile:', error);
+			}
+		},
+     handleShowMoodUpdate(newShowMoodValue) {
+      this.showMood = newShowMoodValue;
+      localStorage.setItem('showMood', newShowMoodValue);
+    }
+  },
+	mounted() {
+		if (this.isLoggedIn) {
 			this.fetchStaffStatus();
 			this.fetchFriendRequests();
+			this.fetchAndSetUserProfile();
 		}
 		const dropdownElements = document.querySelectorAll('.dropdown-toggle');
 		dropdownElements.forEach(dropdown => {
 			new bootstrap.Dropdown(dropdown);
 		});
-	}
+	},
 };
 </script>

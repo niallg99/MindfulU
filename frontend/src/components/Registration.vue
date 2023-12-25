@@ -1,3 +1,52 @@
+<script>
+import { registerUser } from '@/api/registration';
+import loginApi from '@/api/login';
+
+export default {
+	name: 'Registration',
+	data() {
+		return {
+			username: "",
+			email: "",
+			password: "",
+			first_name: "",
+			last_name: "",
+			phone: "",
+			errorMessage: '',
+			isRegistering: false,
+		};
+	},
+	methods: {
+		async register() {
+		this.isRegistering = true;
+			try {
+				const csrfToken = await loginApi.getCSRFToken();
+				const userData = {
+					username: this.username,
+					phone: this.phone,
+					email: this.email,
+					password: this.password,
+					first_name: this.first_name,
+					last_name: this.last_name,
+				};
+				
+				const response = await registerUser(userData, csrfToken);
+				console.log(response);
+				if (response.success) {
+						this.$router.push("/login");
+				} else {
+						this.errorMessage = response.message;
+				}
+			} catch (error) {
+					console.error('Error during registration:', error);
+					this.errorMessage = error.message;
+			} finally {
+					this.isRegistering = false;
+			}
+		}
+	},
+};
+</script>
 <template>
 	<div class="container content h-100">
 		<div class="row justify-content-center align-items-center">
@@ -48,52 +97,3 @@
   </div>
 </template>
 
-<script>
-import { registerUser } from '@/api/registration';
-import loginApi from '@/api/login';
-
-export default {
-	name: 'Registration',
-	data() {
-		return {
-			username: "",
-			email: "",
-			password: "",
-			first_name: "",
-			last_name: "",
-			phone: "",
-			errorMessage: '',
-			isRegistering: false,
-		};
-	},
-	methods: {
-		async register() {
-    this.isRegistering = true;
-			try {
-				const csrfToken = await loginApi.getCSRFToken();
-				const userData = {
-					username: this.username,
-					phone: this.phone,
-					email: this.email,
-					password: this.password,
-					first_name: this.first_name,
-					last_name: this.last_name,
-				};
-				
-				const response = await registerUser(userData, csrfToken);
-				console.log(response);
-				if (response.success) {
-						this.$router.push("/login");
-				} else {
-						this.errorMessage = response.message;
-				}
-			} catch (error) {
-					console.error('Error during registration:', error);
-					this.errorMessage = error.message;
-			} finally {
-					this.isRegistering = false;
-			}
-		}
-	},
-};
-</script>

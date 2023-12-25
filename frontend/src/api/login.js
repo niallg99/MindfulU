@@ -55,23 +55,23 @@ async function resetUserPassword(email, newPassword) {
 	try {
 		const csrfToken = await getCSRFToken();
 
-		const response = await fetch(`${baseUrl}/api/reset-password/`, {
-				method: 'POST',
-				headers: {
-						'Content-Type': 'application/json',
-						'X-CSRFToken': csrfToken,
-				},
-				body: JSON.stringify({ email, new_password: newPassword }),
-		});
+	const response = await fetch(`${baseUrl}/api/reset-password/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': csrfToken,
+			},
+			body: JSON.stringify({ email, new_password: newPassword }),
+});
 
 		if (!response.ok) {
-				if (response.headers.get("content-type")?.includes("application/json")) {
-						const errorData = await response.json();
-						throw new Error('Password reset failed: ' + (errorData.error || 'Unknown error'));
-				} else {
-						const errorText = await response.text();
-						throw new Error('Password reset failed: ' + errorText);
-				}
+			if (response.headers.get("content-type")?.includes("application/json")) {
+				const errorData = await response.json();
+				throw new Error('Password reset failed: ' + (errorData.error || 'Unknown error'));
+			} else {
+				const errorText = await response.text();
+				throw new Error('Password reset failed: ' + errorText);
+			}
 		}
 
 	} catch (error) {
@@ -111,17 +111,17 @@ async function checkStaffStatus() {
 		const accessToken = localStorage.getItem('accessToken'); 
 
 		const response = await fetch(`${baseUrl}/api/check-staff-status/`, {
-				method: 'GET',
-				headers: {
-						'Content-Type': 'application/json',
-						'X-CSRFToken': csrfToken,
-						'Authorization': `Bearer ${accessToken}`,
-				},
-		});
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': csrfToken,
+				'Authorization': `Bearer ${accessToken}`,
+		},
+});
 
 		if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error('Staff status check failed: ' + (errorData.detail || 'Unknown error'));
+			const errorData = await response.json();
+			throw new Error('Staff status check failed: ' + (errorData.detail || 'Unknown error'));
 		}
 
 		return await response.json();

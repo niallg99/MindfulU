@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAdminUser
-from base.models import Event, ScrapedData, Mood, SupportLink, MoodCause, Friends, BroadcastMessage, ProfileInfo, UserProfile, UserProfile
+from base.models import Event, ScrapedData, Mood, SupportLink, MoodCause, Friends, BroadcastMessage, UserProfile, UserProfile
 from base.serializers import (
 		EventSerializer,
 		ScrapedDataSerializer,
@@ -33,43 +33,43 @@ logger = logging.getLogger(__name__)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def register(request):
-    username = request.data.get("username")
-    password = request.data.get("password")
-    email = request.data.get("email")
-    first_name = request.data.get("first_name")
-    last_name = request.data.get("last_name")
-    phone = request.data.get("phone", None)  # Get phone number from request
+		username = request.data.get("username")
+		password = request.data.get("password")
+		email = request.data.get("email")
+		first_name = request.data.get("first_name")
+		last_name = request.data.get("last_name")
+		phone = request.data.get("phone", None)  # Get phone number from request
 
-    # Validation logic
-    if not all([username, password, email, first_name, last_name]):
-        return Response(
-            {"success": False, "message": "All fields are required!"},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+		# Validation logic
+		if not all([username, password, email, first_name, last_name]):
+				return Response(
+						{"success": False, "message": "All fields are required!"},
+						status=status.HTTP_400_BAD_REQUEST
+				)
 
-    if User.objects.filter(username=username).exists():
-        return Response(
-            {"success": False, "message": "Username already exists!"},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+		if User.objects.filter(username=username).exists():
+				return Response(
+						{"success": False, "message": "Username already exists!"},
+						status=status.HTTP_400_BAD_REQUEST
+				)
 
-    # User creation
-    user = User.objects.create_user(
-        username=username,
-        password=password,
-        email=email,
-        first_name=first_name,
-        last_name=last_name,
-    )
+		# User creation
+		user = User.objects.create_user(
+				username=username,
+				password=password,
+				email=email,
+				first_name=first_name,
+				last_name=last_name,
+		)
 
-    # Saving phone number in UserProfile
-    if phone:
-        UserProfile.objects.create(user=user, phone=phone)
+		# Saving phone number in UserProfile
+		if phone:
+				UserProfile.objects.create(user=user, phone=phone)
 
-    return Response(
-        {"success": True, "message": "User registered successfully!"},
-        status=status.HTTP_201_CREATED
-    )
+		return Response(
+				{"success": True, "message": "User registered successfully!"},
+				status=status.HTTP_201_CREATED
+		)
 
 
 @api_view(['GET'])
@@ -195,27 +195,48 @@ def get_support_links_view(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def post_mood(request):
-    serializer = MoodSerializer(data=request.data)
+		serializer = MoodSerializer(data=request.data)
 
-    if serializer.is_valid():
-        mood = serializer.save(user=request.user)
-        update_streak(mood.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		if serializer.is_valid():
+				mood = serializer.save(user=request.user)
+				update_streak(mood.user)
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def update_streak(user):
-    latest_mood = Mood.objects.filter(user=user).order_by('-mood_date').first()
-    if latest_mood:
-        # Calculate the difference in days between the current date and the last mood date
-        delta = timezone.now().date() - latest_mood.mood_date.date()
-        
-        if delta.days == 1:
-            # Increment streak if the last mood was posted the previous day
-            user.profile.streak_count += 1
-        elif delta.days > 1:
-            # Reset streak if there's a gap of more than one day
-            user.profile.streak_count = 1
-        user.profile.save()
+from datetime import timedelta
+
+# Assuming this is a method inside the UserProfile model
+def update_streak(self):
+    # Get all moods for the user, ordered from most to least recent
+    moods = self.moods.order_by('-mood_date')
+    
+    # If there are no moods, there's no streak
+    if not moods.exists():
+        self.streak_count = 0
+        self.save()
+        return self.streak_count
+    
+    # Start counting from the most recent mood
+    streak_count = 1
+    previous_mood_date = timezone.localtime(moods[0].mood_date).date()
+
+    # Start checking from the second most recent mood
+    for mood in moods[1:]:
+        mood_date = timezone.localtime(mood.mood_date).date()
+        if mood_date == previous_mood_date - timedelta(days=1):
+            # The mood was entered the day after the previous mood, increment streak
+            streak_count += 1
+        else:
+            # Found a gap in the streak, stop counting
+            break
+        # Update the previous_mood_date for the next iteration
+        previous_mood_date = mood_date
+
+    # Set the streak count and save the user profile
+    self.streak_count = streak_count
+    self.save()
+    return self.streak_count
+
 
 def get_csrf_token(request):
 		csrf_token = get_token(request)
@@ -268,32 +289,32 @@ def get_friends_list_view(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def send_friend_request(request, username):
-    friend_user = get_object_or_404(User, username__iexact=username)
-    if request.user == friend_user or Friends.objects.filter(user=request.user, friend=friend_user).exists():
-        return Response({"error": "Invalid friend request."}, status=status.HTTP_400_BAD_REQUEST)
-    Friends.objects.create(user=request.user, friend=friend_user, friendship_status="Requested")
-    return Response({"success": True, "message": "Friend request sent."}, status=status.HTTP_200_OK)
+		friend_user = get_object_or_404(User, username__iexact=username)
+		if request.user == friend_user or Friends.objects.filter(user=request.user, friend=friend_user).exists():
+				return Response({"error": "Invalid friend request."}, status=status.HTTP_400_BAD_REQUEST)
+		Friends.objects.create(user=request.user, friend=friend_user, friendship_status="Requested")
+		return Response({"success": True, "message": "Friend request sent."}, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def accept_friend_request(request, username):
-    sender_user = get_object_or_404(User, username=username)
-    existing_request = Friends.objects.filter(user=sender_user, friend=request.user, friendship_status="Requested").first()
-    if existing_request:
-        existing_request.friendship_status = "Accepted"
-        existing_request.save()
-        Friends.objects.create(user=request.user, friend=sender_user, friendship_status="Accepted")
-        return Response({"success": True, "message": "Friend request accepted."}, status=status.HTTP_200_OK)
-    else:
-        return Response({"error": "Friend request not found."}, status=status.HTTP_404_NOT_FOUND)
+		sender_user = get_object_or_404(User, username=username)
+		existing_request = Friends.objects.filter(user=sender_user, friend=request.user, friendship_status="Requested").first()
+		if existing_request:
+				existing_request.friendship_status = "Accepted"
+				existing_request.save()
+				Friends.objects.create(user=request.user, friend=sender_user, friendship_status="Accepted")
+				return Response({"success": True, "message": "Friend request accepted."}, status=status.HTTP_200_OK)
+		else:
+				return Response({"error": "Friend request not found."}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def remove_friend(request, username):
-    friend_user = get_object_or_404(User, username=username)
-    Friends.objects.filter(user=request.user, friend=friend_user).delete()
-    Friends.objects.filter(user=friend_user, friend=request.user).delete()
-    return Response({"success": True, "message": "Friend removed."}, status=status.HTTP_200_OK)
+		friend_user = get_object_or_404(User, username=username)
+		Friends.objects.filter(user=request.user, friend=friend_user).delete()
+		Friends.objects.filter(user=friend_user, friend=request.user).delete()
+		return Response({"success": True, "message": "Friend removed."}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -358,46 +379,44 @@ def get_users(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_user_profile(request):
-    user = request.user
-    profile_picture = request.FILES.get('profilePicture')
-    show_mood = request.data.get('showMood') == 'true'
+		user = request.user
+		profile_picture = request.FILES.get('profilePicture')
+		show_mood_str = request.data.get('showMood')
+		# Convert 'true'/'false' string to boolean
 
-    if profile_picture:
-        file_path = default_storage.save(f'profile_pictures/{user.username}/{profile_picture.name}', profile_picture)
-        profile_info, created = ProfileInfo.objects.get_or_create(user=user)
-        profile_info.picture = file_path
-        profile_info.save()
-        new_profile_picture_url = f"{settings.MEDIA_URL}{profile_info.picture}"
-    else:
-        new_profile_picture_url = user.profileinfo.picture.url if hasattr(user, 'profileinfo') and user.profileinfo.picture else None
+		user_profile, created = UserProfile.objects.get_or_create(user=user)
 
-    user_profile, created = UserProfile.objects.get_or_create(user=user)
-    user_profile.show_mood = show_mood
-    user_profile.save()
+		if profile_picture:
+				file_path = default_storage.save(f'profile_pictures/{user.username}/{profile_picture.name}', profile_picture)
+				user_profile.picture = file_path
+				user_profile.save()
+				new_profile_picture_url = f"{settings.MEDIA_URL}{file_path}"
+		else:
+				new_profile_picture_url = user_profile.picture.url if user_profile.picture else None
 
-    return Response({
-        "message": "Profile updated successfully", 
-        "newProfilePictureUrl": new_profile_picture_url
-    }, status=status.HTTP_200_OK)
+		return Response({
+				"message": "Profile updated successfully", 
+				"newProfilePictureUrl": new_profile_picture_url,
+		}, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_profile(request, username):
-       user = User.objects.get(username=username)
-       user_profile = UserProfile.objects.get(user=user)
-       serializer = UserProfileSerializer(user_profile)
-       return Response(serializer.data)
-
+			user = User.objects.get(username=username)
+			user_profile = UserProfile.objects.get(user=user)
+			serializer = UserProfileSerializer(user_profile)
+			return Response(serializer.data)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_show_mood_preference(request):
-    user = request.user
-    show_mood = request.data.get('showMood')
+		user = request.user
+		show_mood = request.data.get('showMood', False)
 
-    user_profile, created = UserProfile.objects.get_or_create(user=user)
-    user_profile.show_mood = show_mood
-    user_profile.save()
+		user_profile, created = UserProfile.objects.get_or_create(user=user)
+		user_profile.show_mood = show_mood
+		user_profile.save()
 
-    return Response({"message": "Preference updated successfully"}, status=status.HTTP_200_OK)
+		return Response({"message": "Preference updated successfully"}, status=status.HTTP_200_OK)

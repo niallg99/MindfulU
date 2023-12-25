@@ -17,6 +17,8 @@ import logging
 logger = logging.getLogger(__name__)
 logger.debug(f"BASE.PY")
 
+TEST_APPS = ['base'] 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

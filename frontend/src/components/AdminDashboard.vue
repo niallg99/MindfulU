@@ -188,7 +188,7 @@ export default {
 	display: flex;
 	justify-content: center;
 	margin: 0 auto;
-	width: 80%;
+	width: 90%;
 }
 
 .custom-footer {
