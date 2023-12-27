@@ -41,7 +41,7 @@ const determineRiskLevel = (userMoods) => {
 
 const calculateAverageMood = (moods) => {
 	if (moods.length === 0) {
-		return 'N/A'; // Return 'N/A' if there are no moods
+		return 'N/A';
 	}
 
 	const moodCounts = moods.reduce((counts, mood) => {

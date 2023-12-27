@@ -5,8 +5,8 @@ import CustomFooter from '../CustomFooter.vue';
 
 export default {
 	components: {
-    Navbar,
-    CustomFooter,
+		Navbar,
+		CustomFooter,
 },
 	data() {
 		return {
@@ -63,31 +63,31 @@ export default {
 }
 </script>
 <template>
-  <div class="page-container">
-    <navbar :is-logged-in="true"/>
-    <div class="container mt-4">
-      <div class="d-flex justify-content-center align-items-center">
-        <div class="card shadow">
-          <div class="card-body">
-            <h1 class="card-title">Events</h1>
-            <div class="table-responsive">
-              <table class="table">
-                <thead class="thead-light">
-                  <tr>
-                    <th>Event/Programme</th>
-                    <th>Date</th>
-                    <th>Venue</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="event in limitedEvents" :key="event.id">
-                    <td>{{ event.name }}</td>
-                    <td>{{ event.date }}</td>
-                    <td>{{ event.venue }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+	<div class="page-container">
+		<navbar :is-logged-in="true"/>
+		<div class="container mt-4">
+			<div class="d-flex justify-content-center align-items-center">
+				<div class="card shadow">
+					<div class="card-body">
+						<h1 class="card-title">Events</h1>
+						<div class="table-responsive">
+							<table class="table">
+								<thead class="thead-light">
+									<tr>
+										<th>Event/Programme</th>
+										<th>Date</th>
+										<th>Venue</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="event in limitedEvents" :key="event.id">
+										<td>{{ event.name }}</td>
+										<td>{{ event.date }}</td>
+										<td>{{ event.venue }}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 						<nav v-if="totalPages > 1">
 							<ul class="pagination">
 								<li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -112,37 +112,37 @@ export default {
 							</ul>
 						</nav>
 						<p v-if="limitedEvents.length === 0">No events found.</p>
-					 </div>
-        </div>
-      </div>
-    </div>
-    <custom-footer />
-  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<custom-footer />
+	</div>
 </template>
 
 <style scoped>
 .page-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 }
 
 .container {
-  flex: 1;
-  padding-top: 1rem;
+	flex: 1;
+	padding-top: 1rem;
 }
 
 .table-responsive {
-  overflow-x: auto;
+	overflow-x: auto;
 }
 
 .custom-footer {
-  margin-top: auto;
+	margin-top: auto;
 }
 
 @media (max-width: 768px) {
-  .table {
-    font-size: smaller;
-  }
+	.table {
+		font-size: smaller;
+	}
 }
 </style>

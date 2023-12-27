@@ -1,12 +1,12 @@
 <template>
 	<navbar :isLoggedIn="true" :isStaff="isStaff" @update:isStaffLogin="isLoggedIn" @login-success="handleLoginSuccess" />
 	<div class="main-container">
-		<div class="col-auto padding-top-1">
-			<div v-if="broadcastMessage" class="broadcast-message"> 
-				<h1>{{ broadcastMessage }}</h1>
-			</div>
-		</div>
 		<div class="welcome-message padding-top-1 padding-bottom-1">
+			<div class="col-auto padding-top-1">
+				<div v-if="broadcastMessage" class="broadcast-message"> 
+					<h1>{{ broadcastMessage }}</h1>
+				</div>
+			</div>
 			<div class="row">
 				<div class="col-12 col-md-6">
 					<h2 class="text-center padding-2">Hi {{ username }}! How are you feeling today?</h2>
@@ -166,8 +166,16 @@ export default {
   } finally {
     this.isLoading = false;
   }
-}
-
-
+	},
+	watch: {
+		userProfile: {
+			handler: function (val, oldVal) {
+				if (val.streak_count !== oldVal.streak_count) {
+					this.userProfile.streak_count = val.streak_count;
+				}
+			},
+			deep: true
+		}
+	}
 };
 </script>
