@@ -38,9 +38,8 @@ def register(request):
 		email = request.data.get("email")
 		first_name = request.data.get("first_name")
 		last_name = request.data.get("last_name")
-		phone = request.data.get("phone", None)  # Get phone number from request
+		phone = request.data.get("phone", None)
 
-		# Validation logic
 		if not all([username, password, email, first_name, last_name]):
 				return Response(
 						{"success": False, "message": "All fields are required!"},
@@ -62,7 +61,6 @@ def register(request):
 				last_name=last_name,
 		)
 
-		# Saving phone number in UserProfile
 		if phone:
 				UserProfile.objects.create(user=user, phone=phone)
 
@@ -205,37 +203,27 @@ def post_mood(request):
 
 from datetime import timedelta
 
-# Assuming this is a method inside the UserProfile model
 def update_streak(self):
-    # Get all moods for the user, ordered from most to least recent
-    moods = self.moods.order_by('-mood_date')
-    
-    # If there are no moods, there's no streak
-    if not moods.exists():
-        self.streak_count = 0
-        self.save()
-        return self.streak_count
-    
-    # Start counting from the most recent mood
-    streak_count = 1
-    previous_mood_date = timezone.localtime(moods[0].mood_date).date()
+		moods = self.moods.order_by('-mood_date')
+		
+		if not moods.exists():
+				self.streak_count = 0
+				self.save()
+				return self.streak_count
+		streak_count = 1
+		previous_mood_date = timezone.localtime(moods[0].mood_date).date()
 
-    # Start checking from the second most recent mood
-    for mood in moods[1:]:
-        mood_date = timezone.localtime(mood.mood_date).date()
-        if mood_date == previous_mood_date - timedelta(days=1):
-            # The mood was entered the day after the previous mood, increment streak
-            streak_count += 1
-        else:
-            # Found a gap in the streak, stop counting
-            break
-        # Update the previous_mood_date for the next iteration
-        previous_mood_date = mood_date
+		for mood in moods[1:]:
+				mood_date = timezone.localtime(mood.mood_date).date()
+				if mood_date == previous_mood_date - timedelta(days=1):
+						streak_count += 1
+				else:
+						break
+				previous_mood_date = mood_date
 
-    # Set the streak count and save the user profile
-    self.streak_count = streak_count
-    self.save()
-    return self.streak_count
+		self.streak_count = streak_count
+		self.save()
+		return self.streak_count
 
 
 def get_csrf_token(request):
@@ -382,7 +370,6 @@ def update_user_profile(request):
 		user = request.user
 		profile_picture = request.FILES.get('profilePicture')
 		show_mood_str = request.data.get('showMood')
-		# Convert 'true'/'false' string to boolean
 
 		user_profile, created = UserProfile.objects.get_or_create(user=user)
 

@@ -20,6 +20,7 @@ export default {
 			selectedCause: '',
 			feedback: '',
 			causeChoices: [],
+			windowWidth: window.innerWidth,
 		};
 	},
 computed: {
