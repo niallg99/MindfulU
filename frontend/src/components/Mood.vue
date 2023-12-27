@@ -40,20 +40,20 @@ computed: {
 			this.isModalVisible = !this.isModalVisible;
 		},
 		async submitForm() {
-      try {
-        const moodData = {
-          mood_type: this.mood,
-          description: this.feedback,
-          mood_cause: this.selectedCause,
-          user: this.userId,
-        };
-        await postMood(moodData);
-        this.resetForm();
-        this.isModalVisible = false;
-      } catch (error) {
-        console.error('Error posting mood:', error);
-      }
-    },
+			try {
+				const moodData = {
+					mood_type: this.mood,
+					description: this.feedback,
+					mood_cause: this.selectedCause,
+					user: this.userId,
+				};
+				await postMood(moodData);
+				this.resetForm();
+				this.isModalVisible = false;
+			} catch (error) {
+				console.error('Error posting mood:', error);
+			}
+		},
 	resetForm() {
 		this.selectedCause = '';
 		this.feedback = '';
@@ -82,11 +82,7 @@ computed: {
 					<span class="close" @click="toggleModal">&times;</span>
 					<form @submit.prevent="submitForm">
 						<p>You have selected: {{ mood }}</p>
-						<div class="form-group">
-							<label for="feedback">Your feedback:</label>
-							<textarea id="feedback" class="form-control" v-model="feedback"></textarea>
-						</div>
-						<div class="form-group padding-top-1" v-if="shouldShowCauseInput">
+						<div class="form-group" v-if="shouldShowCauseInput">
 							<label for="cause">Select a cause:</label>
 							<select id="cause" class="form-control" v-model="selectedCause">
 								<option v-for="cause in causeChoices" :key="cause" :value="cause">
@@ -94,11 +90,15 @@ computed: {
 								</option>
 							</select>
 					</div>
+					<div class="form-group padding-top-1">
+						<label for="feedback">Your feedback:</label>
+						<textarea id="feedback" class="form-control" v-model="feedback"></textarea>
+					</div>
 					<div class="padding-top-1">
 						<button type="submit" class="btn btn-success">Submit</button>
 					</div>
 				</form>
-  		</div>
+			</div>
 		</div>
 	</div>
 </template>

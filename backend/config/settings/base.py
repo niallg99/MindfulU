@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
+logger.debug(f"BASE.PY")
+
+TEST_APPS = ['base'] 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +47,6 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
-    "captcha",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
@@ -92,10 +97,6 @@ DATABASES = {
     }
 }
 
-RECAPTCHA_PUBLIC_KEY = "6LckjvIoAAAAACiQJaX2xfy1RcDPdZckdcr2GOFl"
-RECAPTCHA_PRIVATE_KEY = "6LckjvIoAAAAAJJ3tOOfZl8dUyw-DLKZCVupACD4"
-RECAPTCHA_USE_SSL = True
-
 # Email configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
@@ -127,8 +128,24 @@ SIMPLE_JWT = {
 }
 
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:8080", "http://localhost:8000"]
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = ["http://localhost:8080", "http://localhost:8000"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",  # Your Vue.js frontend server
+    "http://127.0.0.1:8080",  # Also your local server
+    "https://mindful-u.co.uk",  # Your production domain
+    "http://mindful-u.co.uk",  # Also your production domain
+    "http://192.168.0.106:8080"
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = ["*"]
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
 
 
 # Password validation

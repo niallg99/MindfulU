@@ -1,44 +1,60 @@
 <template>
-	<div class="page-container">
-		<navbar />
-		<div class="container mood-history">
-			<h1>Mood History</h1>
-			<div v-if="isLoading">Loading moods...</div>
-			<div v-else-if="isError">{{ errorMessage }}</div>
-			<div v-else>
-				<div class="row">
-					<div class="col-md-2 mood-item" v-for="mood in paginatedMoods" :key="mood.id" @click="openModal(mood)">
-						<div class="card">
-							<img :src="moodImageUrl(mood.mood_type)" class="card-img-top" :alt="mood.mood_type">
-							<div class="card-body">
-								<p class="card-text">{{ formatDate(mood.mood_date) }}</p> <!-- Use formatDate method here -->
-							</div>
-						</div>
-					</div>
-				</div>
-				<nav>
-					<ul class="pagination">
-						<li v-for="page in totalPages" :key="page" class="page-item">
-							<button class="page-link" @click="setCurrentPage(page)">{{ page }}</button>
-						</li>
-					</ul>
-				</nav>
-			</div>
-			<MoodHistoryModal
-					ref="moodModalRef"
-					:mood="selectedMood"
-					:moodChoices="moodChoices"
-					@close-modal="showModal = false"
-					@save="handleSave"
-					@delete="handleDelete"
-			/>
-		</div>
-		<custom-footer />
-	</div>
+  <div class="page-container">
+    <navbar />
+    <div class="container mood-history my-4">
+      <div class="card shadow">
+        <div class="card-header bg-light">
+          <h2 class="card-title mb-0">Mood History</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-text mb-4">Track your mood over time to see how you're doing. Click on a mood to see more details or to edit it.</p>
+          <div v-if="isLoading">
+            <span>Loading moods...</span>
+          </div>
+          <div v-else-if="isError">
+            <span>{{ errorMessage }}</span>
+          </div>
+          <div v-else-if="moods.length === 0" class="text-center py-5">
+            <p class="lead">You have no moods yet. Start adding moods to see them here!</p>
+          </div>
+          <div v-else class="row g-3">
+            <div class="col-4 col-md-6 col-lg-3" v-for="mood in paginatedMoods" :key="mood.id" @click="openModal(mood)">
+              <div class="card h-100">
+                <img :src="moodImageUrl(mood.mood_type)" class="card-img-top" :alt="mood.mood_type">
+                <div class="card-body">
+                  <p class="card-text">{{ formatDate(mood.mood_date) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <nav v-if="totalPages > 1" class="mt-4">
+            <ul class="pagination justify-content-center">
+              <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+                <button class="page-link" @click="setCurrentPage(page)">{{ page }}</button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <mood-history-modal
+        ref="moodModalRef"
+        :mood="selectedMood"
+        @update-mood="handleUpdateMood"
+        :moodChoices="moodChoices"
+        :moodCauses="moodCauses"
+        @close-modal="showModal = false"
+        @save="handleSave"
+        @delete="handleDelete"
+      />
+    </div>
+    <custom-footer />
+  </div>
 </template>
 
+
+
 <script>
-import { fetchUserMoods, fetchMoodChoices } from '@/api/moods';
+import { fetchUserMoods, fetchMoodChoices, fetchMoodCauses } from '@/api/moods';
 import MoodHistoryModal from './MoodHistoryModal.vue';
 import Navbar from './Navbar.vue';
 import CustomFooter from './CustomFooter.vue';
@@ -54,6 +70,7 @@ export default {
 		return {
 			moods: [],
 			moodChoices: [],
+			moodCauses: [],
 			currentPage: 1,
 			perPage: 25,
 			isLoading: true,
@@ -91,10 +108,17 @@ export default {
 		async loadMoodChoices() {
 			try {
 				const response = await fetchMoodChoices();
-				console.log("Mood choices response:", response);
 				this.moodChoices = response.map(choiceArray => choiceArray[0]);
 			} catch (error) {
 				console.error('Error fetching mood choices:', error);
+			}
+		},
+		async loadMoodCauses() {
+			try {
+				const moodCausesResponse = await fetchMoodCauses();
+				this.moodCauses = [...moodCausesResponse];
+			} catch (error) {
+				console.error('Error fetching mood causes:', error);
 			}
 		},
 		setCurrentPage(page) {
@@ -112,34 +136,23 @@ export default {
 			const options = { day: 'numeric', month: 'short', year: 'numeric' };
 			return date.toLocaleDateString('en-GB', options);
 		},
-		 handleDelete(deletedMoodId) {
-				this.moods = this.moods.filter(mood => mood.id !== deletedMoodId);
+		handleDelete(deletedMoodId) {
+			this.moods = this.moods.filter(mood => mood.id !== deletedMoodId);
+		},
+		handleUpdateMood(updatedMood) {
+			const index = this.moods.findIndex(mood => mood.id === updatedMood.id);
+			if (index !== -1) {
+				this.moods[index] = updatedMood;
+			}
 		},
 	},
-	mounted() {
-		this.loadMoods();
-		this.loadMoodChoices();
+	async mounted() {
+		Promise.all([
+		this.loadMoods(),
+		this.loadMoodChoices(),
+		this.loadMoodCauses(),
+		]);
 	}
 };
 </script>
 
-<style scoped>
-.mood-history {
-	text-align: center;
-	margin-top: 20px;
-}
-
-.mood-item {
-	margin-bottom: 20px;
-}
-
-.page-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.main-container {
-  flex: 1;
-}
-</style>

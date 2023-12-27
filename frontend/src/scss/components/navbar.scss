@@ -2,9 +2,9 @@
   background-color: $color-dusty-rose;
   max-height: 100px;
 
-    .nav-link, .navbar-brand {
-      color: $default--text-color;
-    }
+  .nav-link, .navbar-brand {
+    color: $default--text-color;
+  }
 
   .nav-link, .nav-link.btn {
     background: none;
@@ -17,6 +17,73 @@
 .navbar .dropdown-menu {
   right: 0;
   left: auto;
-  max-width: 100%;
+  text-align: right;
+  min-width: 100%;
 }
 
+.dropdown-menu-end {
+  right: 0; 
+  text-align: right;
+}
+
+.no-notifications {
+  max-width: 100%; 
+}
+
+.notification-icon {
+  filter: brightness(0) invert(1); 
+}
+
+.hover-dropdown:hover .dropdown-menu {
+  display: block; 
+}
+
+.notification-icon {
+  width: 20px;
+  height: 20px;
+  filter: invert(1);
+}
+
+.notification-item {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+@media (max-width: 991px) {
+  .navbar-custom .navbar-collapse {
+    z-index: 1050;
+    position: absolute;
+    background-color: $color-dusty-rose; 
+    top: var(--navbar-height);
+    left: 0;
+    right: 0;
+    padding: 0.5rem;
+  }
+
+  .navbar-toggler.collapsed {
+    display: none;
+  }
+
+  .navbar-custom .navbar-toggler.collapsed + .navbar-collapse {
+    display: none; 
+  }
+
+  .navbar-collapse {
+    background-color: $color-dusty-rose; 
+  }
+
+  .dropdown-menu {
+    position: static; 
+    text-align: right;
+  }
+
+  .dropdown-menu-end {
+    z-index: 1051;
+    position: static;
+    background-color: $color-dusty-rose; 
+    border: 0;
+  }
+}

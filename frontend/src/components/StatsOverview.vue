@@ -1,15 +1,3 @@
-<template>
-  <div class="stats-overview mt-4">
-    <div class="card">
-      <div class="card-header">Overview</div>
-      <div class="card-body">
-        <p>Average Mood: {{ averageMood }}</p>
-        <p>Active Users: {{ activeUsers }}</p>
-        <p>Most Provided Mood Cause: {{ mostProvidedMoodCause }}</p>
-      </div>
-    </div>
-  </div>
-</template>
 <script>
 export default {
   props: {
@@ -28,17 +16,57 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="stats-overview mt-4">
+    <div class="card">
+      <div class="card-header">Overview</div>
+      <div class="card-body text-center">
+        <div class="info-card ">
+          <div class="info-card-header">Average Mood</div>
+          <div class="info-card-content">{{ averageMood }}</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-header">Active Users</div>
+          <div class="info-card-content">{{ activeUsers }}</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-header">Most Provided Mood Cause</div>
+          <div class="info-card-content">{{ mostProvidedMoodCause }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <style scoped>
 .stats-overview {
-    display: flex;
-	justify-content: center;
-	margin: 0 auto;
-	width: 80%;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  width: 90%;
 }
 
-
 .card-body {
-  /* Your styles for body */
+  display: flex;
+  justify-content: space-between;
   padding: 15px;
+}
+
+.info-card {
+  background-color: #afcfd6;
+  color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  width: 30%;
+}
+
+.info-card-header {
+  font-weight: bold;
+}
+
+.info-card-content {
+
 }
 </style>

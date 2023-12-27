@@ -1,3 +1,40 @@
+<script>
+import { useRouter } from 'vue-router';
+import Spinner from './Spinner.vue';
+
+export default {
+	name: 'SupportPanel',
+	components: {
+		Spinner,
+	},
+	props: {
+		supportSections: Array,
+		isLoading: Boolean,
+	},
+	data() {
+		return {
+			collapsed: null,
+		};
+	},
+	computed: {
+		limitedSupportSections() {
+			return this.supportSections.slice(0, 5);
+		},
+	},
+	methods: {
+		toggleCollapse(index) {
+			this.collapsed = this.collapsed === index ? null : index;
+		},
+	},
+	setup() {
+		const router = useRouter();
+		const navigateToSupportForYou = () => {
+			router.push('/support');
+		};
+		return { navigateToSupportForYou };
+	},
+};
+</script>
 <template>
 	<div class="container mt-4">
 		<div class="row justify-content-center">
@@ -8,7 +45,7 @@
 					</div>
 					<div class="card-body">
 						<div v-if="isLoading">
-							<Spinner />
+							<spinner />
 						</div>
 						<div v-else>
 							<div class="accordion" id="supportAccordion">
@@ -54,52 +91,3 @@
 	</div>
 </template>
 
-<script>
-import { fetchSupport } from '@/api/supportforyou.js';
-import { useRouter } from 'vue-router';
-import Spinner from './Spinner.vue';
-
-
-export default {
-	name: 'SupportPanel',
-		components: {
-		Spinner,
-	},
-	setup() {
-		const router = useRouter();
-		const navigateToSupportForYou = () => {
-			router.push('/support');
-		};
-		return { navigateToSupportForYou };
-	},
-	data() {
-		return {
-			supportSections: [],
-			collapsed: null,
-			isLoading: true,
-		};
-	},
-	computed: {
-		limitedSupportSections() {
-			return this.supportSections.slice(0, 3);
-		},
-	},
-	methods: {
-		async loadSupportData() {
-			try {
-				const response = await fetchSupport();
-				this.supportSections = response;
-				this.isLoading = false;
-			} catch (error) {
-				console.error('Error fetching support data:', error);
-			}
-		},
-		toggleCollapse(index) {
-			this.collapsed = this.collapsed === index ? null : index;
-		},
-	},
-	mounted() {
-		this.loadSupportData();
-	},
-};
-</script>

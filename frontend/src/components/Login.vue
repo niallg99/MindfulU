@@ -6,13 +6,15 @@ import { jwtDecode } from 'jwt-decode';
 export default {
 	name: 'Login',
 	data() {
-		return {
-			login_username: '',
-			login_password: '',
-			reset_email: '',
-			errorMessage: '',
-		};
-	},
+	return {
+		login_username: '',
+		login_password: '',
+		email: '',
+		newPassword: '',
+		errorMessage: '',
+		verifyStage: false,
+	};
+},
 	computed: {
 		isLoggedIn() {
 			return !!localStorage.getItem('accessToken');
@@ -27,21 +29,47 @@ export default {
 					password: this.login_password,
 				};
 				const response = await loginApi.loginUser(userData, csrfToken);
-
-				console.log('API Response:', response);
-
 				if (response.access_token) {
 					localStorage.setItem('accessToken', response.access_token);
 					const userId = jwtDecode(response.access_token).user_id;
 					localStorage.setItem('userId', userId);
+					localStorage.setItem('username', userData.username);
 					this.$router.push('/dashboard');
-				} else {
-					console.error('Access token not found in response');
 				}
 			} catch (error) {
 				this.errorMessage = error.message;
 			}
 		},
+		async verifyDetails() {
+			try {
+				const response = await loginApi.verifyUserDetails({ email: this.email });
+				if (response.verified) {
+					this.verifyStage = true;
+				} else {
+					throw new Error('Verification failed: Incorrect details');
+				}
+			} catch (error) {
+				this.errorMessage = error.message;
+			}
+		},
+		async resetPassword() {
+			try {
+				await loginApi.resetUserPassword(this.email, this.newPassword);
+				this.verifyStage = false;
+				this.$emit('close-modal');
+			} catch (error) {
+				this.errorMessage = error.message;
+			}
+		},
+		closeModal() {
+			let modal = document.getElementById('resetPasswordModal');
+			if (modal) {
+				let bsModal = bootstrap.Modal.getInstance(modal);
+				if (bsModal) {
+					bsModal.hide();
+				}
+			}
+		}
 	},
 };
 </script>
@@ -55,24 +83,26 @@ export default {
 			<div class="card-body">
 				<form @submit.prevent="login" class="row g-3">
 					<div class="col-12">
-						<label for="login_username" class="form-label">Username</label>
-						<input v-model="login_username" type="text" class="form-control" id="login_username" required />
+							<label for="login_username" class="form-label">Username</label>
+							<input v-model="login_username" type="text" class="form-control" id="login_username" required />
 					</div>
 					<div class="col-12">
-						<label for="login_password" class="form-label">Password</label>
-						<input v-model="login_password" type="password" class="form-control" id="login_password" placeholder="*******" required />
+							<label for="login_password" class="form-label">Password</label>
+							<input v-model="login_password" type="password" class="form-control" id="login_password" placeholder="*******" required />
 					</div>
 					<div class="col-12 text-center">
-						<button type="submit" class="btn btn-primary">Login</button>
+							<button type="submit" class="btn btn-primary">Login</button>
 					</div>
 				</form>
 			</div>
 			<div class="card-footer text-center">
-				New around here? <router-link to="/register">Sign up</router-link><br>
-				<a href="#" @click="preventDefault" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">Forgot your password?</a>
+				<div class="grid">
+					<div>New around here? <router-link to="/register">Sign up</router-link></div>
+					<div class="row"><a href="#" @click="preventDefault" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">Forgot your password?</a></div>
+				</div>
 			</div>
 			<div v-if="errorMessage" class="alert alert-danger text-center">
-				{{ errorMessage }}
+					{{ errorMessage }}
 			</div>
 		</div>
 	</div>
@@ -84,14 +114,24 @@ export default {
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<form @submit.prevent="resetPassword">
+					<form v-if="!verifyStage" @submit.prevent="verifyDetails">
 						<div class="mb-3">
 							<label for="reset_email" class="col-form-label">Email:</label>
-							<input type="email" class="form-control" id="reset_email" v-model="reset_email" required>
+							<input type="email" class="form-control" id="reset_email" v-model="email" required>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-primary">Send Reset Link</button>
+							<button type="submit" class="btn btn-primary">Verify</button>
+						</div>
+					</form>
+					<form v-else @submit.prevent="resetPassword">
+						<div class="mb-3">
+							<label for="newPassword" class="col-form-label">New Password:</label>
+							<input type="password" class="form-control" id="newPassword" v-model="newPassword" required>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" @click="verifyStage = false">Back</button>
+							<button type="submit" class="btn btn-primary">Reset Password</button>
 						</div>
 					</form>
 				</div>

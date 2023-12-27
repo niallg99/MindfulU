@@ -1,8 +1,9 @@
-const baseUrl = 'http://0.0.0.0:8000';
+const baseUrl = `http://${window.location.hostname}:8000`;
 
 const getCSRFToken = async () => {
 	try {
 		const response = await fetch(`${baseUrl}/api/get-csrf-token/`);
+
 		if (!response.ok) {
 			throw new Error('Failed to fetch CSRF token');
 		}
@@ -24,7 +25,7 @@ const checkCSRFToken = async () => {
 	}
 };
 
-export function loginUser(userData) {
+function loginUser(userData) {
 	return checkCSRFToken()
 		.then(csrfToken => {
 			return fetch(`${baseUrl}/api/login/`, {
@@ -50,18 +51,18 @@ export function loginUser(userData) {
 		});
 }
 
-export async function resetUserPassword(email) {
+async function resetUserPassword(email, newPassword) {
 	try {
 		const csrfToken = await getCSRFToken();
 
-		const response = await fetch(`${baseUrl}/api/password-reset/`, {
-				method: 'POST',
-				headers: {
-						'Content-Type': 'application/json',
-						'X-CSRFToken': csrfToken,
-				},
-				body: JSON.stringify({ email }),
-		});
+	const response = await fetch(`${baseUrl}/api/reset-password/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': csrfToken,
+			},
+			body: JSON.stringify({ email, new_password: newPassword }),
+});
 
 		if (!response.ok) {
 			if (response.headers.get("content-type")?.includes("application/json")) {
@@ -73,10 +74,59 @@ export async function resetUserPassword(email) {
 			}
 		}
 
-		const data = await response.json();
-		return data;
 	} catch (error) {
-		console.error('Error in resetUserPassword:', error);
+			console.error('Error in resetUserPassword:', error);
+			throw error;
+	}
+}
+
+async function verifyUserDetails(userData) {
+	try {
+		const csrfToken = await getCSRFToken();
+
+		const response = await fetch(`${baseUrl}/api/verify-user-details/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': csrfToken,
+			},
+			body: JSON.stringify(userData),
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error('Verification failed: ' + (errorData.error || 'Unknown error'));
+		}
+
+		return await response.json();
+	} catch (error) {
+		console.error('Error in verifyUserDetails:', error);
+		throw error;
+	}
+}
+
+async function checkStaffStatus() {
+	try {
+		const csrfToken = await getCSRFToken();
+		const accessToken = localStorage.getItem('accessToken'); 
+
+		const response = await fetch(`${baseUrl}/api/check-staff-status/`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': csrfToken,
+				'Authorization': `Bearer ${accessToken}`,
+		},
+});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error('Staff status check failed: ' + (errorData.detail || 'Unknown error'));
+		}
+
+		return await response.json();
+	} catch (error) {
+		console.error('Error in checkStaffStatus:', error);
 		throw error;
 	}
 }
@@ -86,4 +136,6 @@ export default {
 	checkCSRFToken,
 	loginUser,
 	resetUserPassword,
+	verifyUserDetails,
+	checkStaffStatus,
 };
