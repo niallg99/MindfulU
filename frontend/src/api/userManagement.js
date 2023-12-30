@@ -1,12 +1,21 @@
 const baseUrl = `http://${window.location.hostname}:8000`;
+import { getAccessToken } from '@/api/auth';
 
 const fetchUsers = async (searchQuery) => {
+	const accessToken = getAccessToken();
 	const url = new URL(`${baseUrl}/api/users/`);
 	if (searchQuery) {
 		url.searchParams.append('search', searchQuery);
 	}
 
-	const response = await fetch(url);
+	const response = await fetch(url, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${accessToken}`,
+		},
+	});
+
 	if (!response.ok) {
 		throw new Error(`HTTP error! status: ${response.status}`);
 	}

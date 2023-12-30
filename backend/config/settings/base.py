@@ -13,6 +13,9 @@ import os
 from datetime import timedelta
 from pathlib import Path
 import logging
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 logger = logging.getLogger(__name__)
 logger.debug(f"BASE.PY")
@@ -28,6 +31,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
+
+
+cloudinary.config(
+  cloud_name = "dtvusggem",
+  api_key = os.environ.get("CLOUDINARY_API_KEY"),
+  api_secret = os.environ.get("CLOUDINARY_API_SECRET")
+)
+
+MIXPANEL_TOKEN = os.environ.get("MIXPANEL_TOKEN")
+
 
 # Application definition
 DJANGO_APPS = [
@@ -132,7 +145,8 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
-    "https://mindful-u.co.uk",
+    "http://mindful-u.co.uk",
+    "http://mindful-u.co.uk:8080",
     "http://mindful-u.co.uk",
     "http://192.168.0.106:8080"
 ]
