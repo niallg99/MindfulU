@@ -175,7 +175,7 @@ export default {
 				}
 			},
 			deep: true
-		}
+		},
 	}
 };
 </script>

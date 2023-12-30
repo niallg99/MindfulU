@@ -84,7 +84,8 @@
 <script>
 import { useRouter } from 'vue-router';
 import Spinner from './Spinner.vue';
-import { acceptFriendRequest, rejectFriendRequest, sendFriendRequest, fetchFriendRequests} from '@/api/friends';
+import { acceptFriendRequest, rejectFriendRequest, sendFriendRequest, fetchFriendRequests } from '@/api/friends';
+import { trackEvent } from '../api/mixpanel';
 
 export default {
 	name: 'FriendsPanel',
@@ -105,6 +106,10 @@ export default {
 		const router = useRouter();
 		return {
 			navigateToAllFriends() {
+					trackEvent('Navigate to Friends Page', {
+					UserID: localStorage.getItem('userId'),
+					Username: localStorage.getItem('username'),
+				});
 				router.push('/friends');
 			},
 		};
@@ -169,7 +174,7 @@ methods: {
 			return `/src/images/${moodTypeKey.toLowerCase()}.png`;
 		},
 		getProfilePicture(friend) {
-			return friend.friend.profile.picture ? `http://${window.location.hostname}:8000${friend.friend.profile.picture}` : 'src/images/person.svg';
+			return friend.friend.profile.picture || '/src/images/person.svg';
 		}
 	},
 	mounted() {

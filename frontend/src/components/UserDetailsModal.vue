@@ -2,40 +2,40 @@
 import Spinner from './Spinner.vue';
 
 export default {
-    props: {
-        userDetails: {
-            type: Object,
-            default: () => { }
-        },
-        phone: {
-            type: String,
-            default: ''
-        },
-    },
-    mounted() {
-        this.modalInstance = new bootstrap.Modal(this.$refs.userModal, {
-            keyboard: false
-        });
-    },
-    methods: {
-        show() {
-            this.modalInstance.show();
-        },
-        hide() {
-            this.modalInstance.hide();
-        }
-    },
-    watch: {
-        userDetails(newVal) {
-            if (newVal) {
-                this.show();
-            }
-            else {
-                this.hide();
-            }
-        }
-    },
-    components: { Spinner }
+		components: { Spinner },
+		props: {
+			userDetails: {
+				type: Object,
+				default: () => { }
+			},
+			phone: {
+				type: String,
+				default: ''
+			},
+		},
+		mounted() {
+			this.modalInstance = new bootstrap.Modal(this.$refs.userModal, {
+					keyboard: false
+			});
+		},
+		methods: {
+			show() {
+				this.modalInstance.show();
+			},
+			hide() {
+				this.modalInstance.hide();
+			}
+		},
+		watch: {
+			userDetails(newVal) {
+				if (newVal) {
+					this.show();
+				}
+				else {
+					this.hide();
+				}
+				}
+		},
 };
 </script>
 

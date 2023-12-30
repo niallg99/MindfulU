@@ -35,6 +35,7 @@ const sendFriendRequest = async (username) => {
 						'Authorization': `Bearer ${accessToken}`,
 				},
 		});
+		console.log(response,'response')
 		if (!response.ok) {
 			const errorBody = await response.json();
 			throw new Error(`HTTP error ${response.status}: ${errorBody.error || 'Unknown error'}`);
@@ -125,7 +126,6 @@ const fetchFriendRequests = async () => {
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
 		const requestsData = await response.json();
-		console.log('Friend requests data received:', requestsData);
 		return requestsData;
 	} catch (error) {
 		console.error("Could not fetch friend requests:", error);

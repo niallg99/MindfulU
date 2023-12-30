@@ -31,7 +31,8 @@ urlpatterns = [
     path('api/users/', views.get_users, name='get-users'),
     path('api/check-staff-status/', views.check_staff_status, name='check-staff-status'),
     path('api/user/update-profile/', views.update_user_profile, name='update-user-profile'),
-    path('api/user/<str:username>/get-profile/', views.get_user_profile, name='get-user-profile'),
+    path('api/user/<str:username>/get-profile/', views.get_user_profile, name='get-profile'),
     path('api/user/update-preferences', views.update_show_mood_preference, name='update-show-mood-preference'),
+    path('api/track-event/', views.track_event, name='track-event'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

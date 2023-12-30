@@ -48,8 +48,10 @@
   position: relative;
   overflow: hidden;
   margin-bottom: 20px;
-  min-height: 250px;
+  min-height: 190px;
+  padding: 10px 0;
   background-color: transparent;
+  background-repeat: no-repeat;
   width: calc(33.333% - 10px);
 
   &:hover {
@@ -64,8 +66,8 @@
 
   img {
     @include absolute-center;
-    max-width: 75%;
-    max-height: 75%;
+    max-width: 60%;
+    max-height: 60%;
   }
 
   .overlay {
@@ -171,7 +173,7 @@
 
 @media (max-width: 768px) {
   .mood-card {
-    width: calc(50% - 10px);
+    width: calc(45% - 10px);
     img {
       max-width: 50%;
       height: auto;

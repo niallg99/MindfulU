@@ -163,7 +163,7 @@ export default {
 			const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
 				toggle: false
 			});
-			bsCollapse.toggle(); // This will automatically handle the show/hide
+			bsCollapse.toggle();
 		},
 		async fetchAndSetUserProfile() {
 			if (!this.isLoggedIn || !this.username) {
@@ -201,9 +201,11 @@ export default {
   },
 	mounted() {
 		if (this.isLoggedIn) {
-			this.fetchStaffStatus();
-			this.fetchFriendRequests();
-			this.fetchAndSetUserProfile();
+			Promise.all([
+				this.fetchStaffStatus(),
+				this.fetchFriendRequests(),
+				this.fetchAndSetUserProfile(),
+			]);
 		}
 		const dropdownElements = document.querySelectorAll('.dropdown-toggle');
 		dropdownElements.forEach(dropdown => {
