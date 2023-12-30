@@ -3,7 +3,13 @@ const baseUrl = `http://${window.location.hostname}:8000`;
 
 const fetchMoodChoices = async () => {
 	try {
-		const response = await fetch(`${baseUrl}/api/mood-choices/`);
+		const accessToken = getAccessToken();
+		const response = await fetch(`${baseUrl}/api/mood-choices/`, {
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${accessToken}`,
+			},
+		});
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
@@ -17,7 +23,13 @@ const fetchMoodChoices = async () => {
 
 const fetchMoodCauses = async () => {
 	try {
-		const response = await fetch(`${baseUrl}/api/get-mood-causes/`);
+		const accessToken = getAccessToken();
+		const response = await fetch(`${baseUrl}/api/get-mood-causes/`, {
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${accessToken}`,
+			},
+		});
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
@@ -32,9 +44,7 @@ const fetchMoodCauses = async () => {
 const postMood = async (moodData) => {
 	try {
 		const accessToken = getAccessToken();
-		console.log('Access Token:', accessToken)
-		const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
-		console.log('Token Payload:', tokenPayload);
+		JSON.parse(atob(accessToken.split('.')[1]));
 		const response = await fetch(`${baseUrl}/api/moods/`, {
 			method: 'POST',
 			headers: {

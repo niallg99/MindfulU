@@ -191,7 +191,7 @@ export default {
 			this.currentPage = page;
 		},
 		getProfilePicture(friend) {
-			return friend.friend.profile.picture ? `http://${window.location.hostname}:8000${friend.friend.profile.picture}` : 'src/images/person.svg';
+			return friend.friend.profile.picture || '/src/images/person.svg';
 		},
 		getMood(mostRecentMood) {
 			return mostRecentMood.split(' ')[0];

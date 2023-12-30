@@ -52,6 +52,7 @@
 <script>
 import { useRouter } from 'vue-router'; 
 import Spinner from './Spinner.vue';
+import { trackEvent } from '../api/mixpanel';
 
 export default {
 	name: 'MoodHistoryPanel',
@@ -59,6 +60,10 @@ export default {
 		const router = useRouter();
 		return {
 			navigateToMoodHistory() {
+				trackEvent('Navigate to Mood History Page', {
+					UserID: localStorage.getItem('userId'),
+					Username: localStorage.getItem('username'),
+				});
 				router.push('/mood-history');
 			},
 		};
@@ -116,7 +121,7 @@ export default {
 	}
 
 	.mood-carousel-container img {
-		max-width: 90%;
+		max-width: 80%;
 	}
 }
 </style>

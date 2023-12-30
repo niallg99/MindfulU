@@ -125,8 +125,7 @@ export default {
 	methods: {
 		async submitBroadcastMessage() {
 			try {
-				const response = await saveBroadcastMessage(this.broadcastMessage);
-				console.log(response.message);
+				await saveBroadcastMessage(this.broadcastMessage);
 			} catch (error) {
 				console.error('Error submitting broadcast message:', error);
 			}
@@ -145,7 +144,6 @@ export default {
 			}
 		},
 		openUserModal(user) {
-				console.log("Selected user:", user);
 				this.selectedUser = user;
 				this.resetModal();
 				this.fetchUserProfileData(user.username);
