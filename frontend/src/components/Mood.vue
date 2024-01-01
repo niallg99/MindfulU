@@ -28,8 +28,9 @@ computed: {
 		const imageUrl = `/src/images/${this.mood.toLowerCase()}.png`;
 		return {
 			backgroundImage: `url(${imageUrl})`,
-			backgroundSize: 'cover',
-			backgroundPosition: 'center'
+			backgroundSize: 'contain',
+			backgroundPosition: 'center',
+			backgroundRepeat: 'no-repeat'
 		};
 	},
 	shouldShowCauseInput() {

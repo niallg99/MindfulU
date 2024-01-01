@@ -1,5 +1,5 @@
 <template>
-	<navbar :isLoggedIn="true" :isStaff="isStaff" @update:isStaffLogin="isLoggedIn" @login-success="handleLoginSuccess" />
+	<navbar/>
 	<div class="main-container">
 		<div class="welcome-message padding-top-1 padding-bottom-1">
 			<div class="col-auto padding-top-1">
@@ -100,7 +100,8 @@ export default {
       events: [],
       supportSections: [],
       friendsList: [],
-      friendRequests: [],
+			friendRequests: [],
+			userProfile: {},
     };
   },
   methods: {
@@ -175,7 +176,7 @@ export default {
 				}
 			},
 			deep: true
-		}
+		},
 	}
 };
 </script>

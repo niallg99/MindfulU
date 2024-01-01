@@ -31,7 +31,6 @@ export default {
 				};
 				
 				const response = await registerUser(userData, csrfToken);
-				console.log(response);
 				if (response.success) {
 						this.$router.push("/login");
 				} else {

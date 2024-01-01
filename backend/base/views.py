@@ -4,17 +4,17 @@ from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
 from django.conf import settings
-from django.core.files.storage import default_storage
 from rest_framework import status
 from django.db.models import Count
+from django.http import Http404
 from django.utils import timezone
-from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAdminUser
+from mixpanel import Mixpanel
 from base.models import Event, ScrapedData, Mood, SupportLink, MoodCause, Friends, BroadcastMessage, UserProfile, UserProfile
 from base.serializers import (
 		EventSerializer,
@@ -29,6 +29,18 @@ from base.serializers import (
 
 #logging
 logger = logging.getLogger(__name__)
+
+mp = Mixpanel(settings.MIXPANEL_TOKEN)
+
+@api_view(['POST'])
+def track_event(request):
+		event_name = request.data.get('event_name')
+		data = request.data.get('data', {})
+
+		distinct_id = request.user.id
+
+		mp.track(distinct_id, event_name, data)
+		return Response(status=200)
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -143,22 +155,26 @@ def reset_password(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_events(request):
 		events = Event.objects.all()
 		serializer = EventSerializer(events, many=True)
 		return Response(serializer.data)
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_scraped_data(request):
 		scraped_data = ScrapedData.objects.all()
 		serializer = ScrapedDataSerializer(scraped_data, many=True)
 		return Response(serializer.data)
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_mood_choices(request):
 		return Response(Mood.MOOD_CHOICES)
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_support_links(request):
 		support_links = SupportLink.objects.all()
 		serializer = SupportLinkSerializer(support_links, many=True)
@@ -168,6 +184,7 @@ def get_support_links(request):
 		return response
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_support_links_view(request):
 		support_links = SupportLink.objects.all()
 		serializer = CustomSupportLinkSerializer(support_links, many=True)
@@ -233,6 +250,7 @@ def get_csrf_token(request):
 		return JsonResponse({'csrf_token': csrf_token})
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_mood_causes(request):
 		causes = [cause[0] for cause in MoodCause.CAUSE_CHOICES]
 		return JsonResponse(causes, safe=False)
@@ -274,14 +292,23 @@ def get_friends_list_view(request):
 		serializer = FriendSerializer(friends, many=True)
 		return Response(serializer.data)
 
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def send_friend_request(request, username):
-		friend_user = get_object_or_404(User, username__iexact=username)
-		if request.user == friend_user or Friends.objects.filter(user=request.user, friend=friend_user).exists():
-				return Response({"error": "Invalid friend request."}, status=status.HTTP_400_BAD_REQUEST)
+		try:
+				friend_user = get_object_or_404(User, username__iexact=username)
+		except Http404:
+				return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+		if request.user == friend_user:
+				return Response({"error": "You cannot send a friend request to yourself."}, status=status.HTTP_400_BAD_REQUEST)
+		if Friends.objects.filter(user=request.user, friend=friend_user).exists():
+				return Response({"error": "A friend request already exists."}, status=status.HTTP_400_BAD_REQUEST)
+		if Friends.objects.filter(user=request.user, friend=friend_user, friendship_status="Accepted").exists():
+				return Response({"error": "You are already friends."}, status=status.HTTP_400_BAD_REQUEST)
 		Friends.objects.create(user=request.user, friend=friend_user, friendship_status="Requested")
 		return Response({"success": True, "message": "Friend request sent."}, status=status.HTTP_200_OK)
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -322,6 +349,7 @@ def get_friend_requests(request):
 		return Response(serializer.data)
 
 @api_view(['GET'])
+@permission_classes([IsAdminUser])
 def mood_statistics(request):
 		mood_counts = Mood.objects.values('mood_type').annotate(count=Count('mood_type'))
 		return Response(mood_counts)
@@ -343,6 +371,7 @@ def get_latest_broadcast_message(request):
 		return Response({"message": ""})
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_users(request):
 		search = request.query_params.get('search')
 		users = User.objects.all()
@@ -368,42 +397,43 @@ def get_users(request):
 @permission_classes([IsAuthenticated])
 def update_user_profile(request):
 		user = request.user
-		profile_picture = request.FILES.get('profilePicture')
-		show_mood_str = request.data.get('showMood')
-
+		data = request.data
+		profile_picture_url = data.get('profilePictureUrl')
+		logger.debug(f"Profile picture URL: {profile_picture_url}")
 		user_profile, created = UserProfile.objects.get_or_create(user=user)
 
-		if profile_picture:
-				file_path = default_storage.save(f'profile_pictures/{user.username}/{profile_picture.name}', profile_picture)
-				user_profile.picture = file_path
-				user_profile.save()
-				new_profile_picture_url = f"{settings.MEDIA_URL}{file_path}"
-		else:
-				new_profile_picture_url = user_profile.picture.url if user_profile.picture else None
+		if profile_picture_url:
+				user_profile.picture = profile_picture_url
+				user_profile.save(update_fields=['picture'])
 
-		return Response({
-				"message": "Profile updated successfully", 
-				"newProfilePictureUrl": new_profile_picture_url,
-		}, status=status.HTTP_200_OK)
+		show_mood = data.get('showMood')
+		if show_mood is not None:
+				user_profile.show_mood = show_mood
+				user_profile.save(update_fields=['show_mood'])
+
+		response_data = {
+				"message": "Profile updated successfully",
+				"newProfilePictureUrl": user_profile.picture,
+				"showMood": user_profile.show_mood
+		}
+
+		return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_profile(request, username):
-			user = User.objects.get(username=username)
-			user_profile = UserProfile.objects.get(user=user)
-			serializer = UserProfileSerializer(user_profile)
-			return Response(serializer.data)
-
+		user = User.objects.get(username=username)
+		user_profile = UserProfile.objects.get(user=user)
+		serializer = UserProfileSerializer(user_profile)
+		return Response(serializer.data)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_show_mood_preference(request):
 		user = request.user
 		show_mood = request.data.get('showMood', False)
-
 		user_profile, created = UserProfile.objects.get_or_create(user=user)
-		user_profile.show_mood = show_mood
-		user_profile.save()
+		user_profile.set_show_mood(show_mood)
 
 		return Response({"message": "Preference updated successfully"}, status=status.HTTP_200_OK)

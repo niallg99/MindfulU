@@ -35,6 +35,7 @@
 <script>
 import { useRouter } from 'vue-router';
 import Spinner from './Spinner.vue';
+import { trackEvent } from '../api/mixpanel';
 
 export default {
 	name: 'EventPanel',
@@ -60,6 +61,10 @@ export default {
 	setup() {
 		const router = useRouter();
 		const navigateToEvents = () => {
+			trackEvent('Navigate to Events Page', {
+				UserID: localStorage.getItem('userId'),
+				Username: localStorage.getItem('username'),
+			});
 			router.push('/events');
 		};
 		return { navigateToEvents };

@@ -35,7 +35,7 @@ export default {
 
 <template>
   <div class="page-container">
-    <navbar :is-logged-in="isLoggedIn" />
+    <navbar />
     <div class="container mt-4">
       <div class="card shadow padding-1">
         <div class="card-title">

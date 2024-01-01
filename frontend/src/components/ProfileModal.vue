@@ -8,7 +8,7 @@
         </div>
         <div class="modal-body">
           <div class="text-center mb-3">
-            <img :src="computedUserProfilePicture" @error="imageLoadError" class="rounded-circle" alt="Profile Picture" style="width: 100px; height: 100px;">
+            <img :src="profilePicture" @error="imageLoadError" class="rounded-circle" alt="Profile Picture" style="width: 100px; height: 100px;">
           </div>
           <div class="mb-3">
             <label for="profilePicture" class="form-label">Update Profile Picture</label>
@@ -46,7 +46,7 @@ export default {
       default: true
     },
   },
-  data() {
+   data() {
     return {
       selectedFile: null,
       localShowMood: this.showMood,
@@ -67,22 +67,13 @@ export default {
       try {
         let formData = new FormData();
         if (this.selectedFile) {
-          formData.append('profilePicture', this.selectedFile);
+          formData.append('file', this.selectedFile);
         }
-        formData.append('showMood', this.localShowMood.toString());
-
         const response = await updateProfile(formData);
-
         if (response.newProfilePictureUrl) {
           this.localUserProfilePicture = response.newProfilePictureUrl;
           this.$emit('profile-updated', response.newProfilePictureUrl);
         }
-
-        if (response.data && response.data.showMood !== undefined) {
-          this.localShowMood = response.data.showMood;
-        }
-        localStorage.setItem('showMood', this.localShowMood);
-        this.$emit('showMood-updated', this.localShowMood);
       } catch (error) {
         console.error('Error updating profile:', error);
       }
@@ -134,13 +125,11 @@ export default {
     });
   },
   computed: {
-  computedUserProfilePicture() {
-    if (this.userProfilePicture && !this.userProfilePicture.startsWith('http')) {
-      return `http://localhost:8000${this.userProfilePicture}`;
+    profilePicture() {
+      return this.localUserProfilePicture ? this.localUserProfilePicture : '/src/images/person.svg';
     }
-    return this.userProfilePicture || '/src/images/person.svg';
-  }
-}
+},
+
 
 
 };

@@ -78,6 +78,7 @@ export default {
 			errorMessage: '',
 			showModal: false,
 			selectedMood: null,
+			handleSave: null,
 		};
 	},
 	computed: {

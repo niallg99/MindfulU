@@ -10,30 +10,31 @@
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" @click="toggleNavbarCollapse">
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<div v-if="isLoggedIn"
+				class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-					<li class="nav-item" v-if="isLoggedIn">
+					<li class="nav-item">
 						<router-link to="/dashboard" class="nav-link">Home</router-link>
 					</li>
-					<li class="nav-item" v-if="isLoggedIn">
+					<li class="nav-item">
 						<a class="nav-link" href="#" @click="openProfileModal">Profile</a>
 					</li>
-					<li class="nav-item" v-if="isLoggedIn">
+					<li class="nav-item">
 						<router-link to="/events" class="nav-link">Events</router-link>
 					</li>
-					<li class="nav-item" v-if="isLoggedIn">
+					<li class="nav-item">
 						<router-link to="/support" class="nav-link">Support</router-link>
 					</li>
-					<li class="nav-item" v-if="isLoggedIn">
+					<li class="nav-item">
 						<router-link to="/friends" class="nav-link">Friends</router-link>
 					</li>
-					<li class="nav-item" v-if="isLoggedIn">
+					<li class="nav-item">
 						<router-link to="/mood-history" class="nav-link">Mood History</router-link>
 					</li>
 					<li v-if="isLoggedIn && isStaff" class="nav-item">
 						<router-link to="/admin_dashboard" class="nav-link">Admin</router-link>
 					</li>
-					<li class="nav-item" v-if="isLoggedIn">
+					<li class="nav-item">
 						<router-link to="/login" class="nav-link">Logout</router-link>
 					</li>
 					<li v-if="!isLoggedIn" class="nav-item">
@@ -102,7 +103,7 @@ export default {
 			router: router,
 			isStaff: false,
 			showMood: localStorage.getItem('showMood') === 'true',
-      userProfilePicture: localStorage.getItem('userProfilePicture') || '/src/images/person.svg',
+			userProfilePicture: localStorage.getItem('userProfilePicture') || '/src/images/person.svg',
 		};
 	},
 	computed: {
@@ -163,7 +164,7 @@ export default {
 			const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
 				toggle: false
 			});
-			bsCollapse.toggle(); // This will automatically handle the show/hide
+			bsCollapse.toggle();
 		},
 		async fetchAndSetUserProfile() {
 			if (!this.isLoggedIn || !this.username) {
@@ -201,9 +202,11 @@ export default {
   },
 	mounted() {
 		if (this.isLoggedIn) {
-			this.fetchStaffStatus();
-			this.fetchFriendRequests();
-			this.fetchAndSetUserProfile();
+			Promise.all([
+				this.fetchStaffStatus(),
+				this.fetchFriendRequests(),
+				this.fetchAndSetUserProfile(),
+			]);
 		}
 		const dropdownElements = document.querySelectorAll('.dropdown-toggle');
 		dropdownElements.forEach(dropdown => {

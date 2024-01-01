@@ -1,6 +1,7 @@
 <script>
 import { useRouter } from 'vue-router';
 import Spinner from './Spinner.vue';
+import { trackEvent } from '../api/mixpanel';
 
 export default {
 	name: 'SupportPanel',
@@ -29,6 +30,10 @@ export default {
 	setup() {
 		const router = useRouter();
 		const navigateToSupportForYou = () => {
+			trackEvent('Navigate to Support Page', {
+				UserID: localStorage.getItem('userId'),
+				Username: localStorage.getItem('username'),
+			});
 			router.push('/support');
 		};
 		return { navigateToSupportForYou };

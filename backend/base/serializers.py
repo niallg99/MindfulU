@@ -59,9 +59,12 @@ class MoodCauseSerializer(serializers.ModelSerializer):
 				fields = "__all__"
 
 class UserProfileSerializer(serializers.ModelSerializer):
+		picture = serializers.ImageField(use_url=True)
+		
 		class Meta:
 				model = UserProfile
 				fields = ('user', 'phone', 'streak_count', 'picture')
+
 				
 class UserSerializer(serializers.ModelSerializer):
 		profile = UserProfileSerializer()  # Nested serializer for UserProfile
@@ -74,27 +77,27 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class FriendSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    friend = UserSerializer()
-    most_recent_mood = serializers.SerializerMethodField()
-    show_mood = serializers.SerializerMethodField()
+		user = UserSerializer()
+		friend = UserSerializer()
+		most_recent_mood = serializers.SerializerMethodField()
+		show_mood = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Friends
-        fields = ('id', 'user', 'friend', 'friendship_status', 'created_at', 'updated_at', 'most_recent_mood', 'show_mood')
+		class Meta:
+				model = Friends
+				fields = ('id', 'user', 'friend', 'friendship_status', 'created_at', 'updated_at', 'most_recent_mood', 'show_mood')
 
-    def get_most_recent_mood(self, obj):
-        last_mood = Mood.objects.filter(user=obj.friend).order_by('-mood_date').first()
-        if last_mood:
-            return f"{last_mood.mood_type} on {last_mood.mood_date.strftime('%Y-%m-%d')}"
-        return None
+		def get_most_recent_mood(self, obj):
+				last_mood = Mood.objects.filter(user=obj.friend).order_by('-mood_date').first()
+				if last_mood:
+						return f"{last_mood.mood_type} on {last_mood.mood_date.strftime('%Y-%m-%d')}"
+				return None
 
-    def get_show_mood(self, obj):
-        try:
-            user_profile = UserProfile.objects.get(user=obj.friend)
-            return user_profile.show_mood
-        except UserProfile.DoesNotExist:
-            return False
+		def get_show_mood(self, obj):
+				try:
+						user_profile = UserProfile.objects.get(user=obj.friend)
+						return user_profile.show_mood
+				except UserProfile.DoesNotExist:
+						return False
 
 
 
