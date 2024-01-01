@@ -74,7 +74,6 @@ export default {
 };
 </script>
 <template>
-	<navbar :is-logged-in="isLoggedIn"/>
 	<div class="full-page d-flex justify-content-center align-items-center">
 		<div class="card login-card shadow">
 			<div class="card-header text-center bg-transparent">
@@ -138,5 +137,4 @@ export default {
 			</div>
 		</div>
 	</div>
-	<custom-footer />
 </template>

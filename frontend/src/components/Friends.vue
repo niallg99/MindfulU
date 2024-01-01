@@ -1,6 +1,6 @@
 <template>
 	<div class="page-container">
-			<navbar :is-logged-in="isLoggedIn" />
+			<navbar />
 			<div class="container mt-4">
 			<div class="row">
 				<template v-if="friendsList && friendsList.length">
