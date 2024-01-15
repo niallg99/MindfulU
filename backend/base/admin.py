@@ -11,6 +11,7 @@ from .models import (
     SupportLink,
     SupportSection,
     UserProfile,
+    BroadcastMessage
 )
 
 # Register the MoodCause model
@@ -33,6 +34,9 @@ admin.site.register(SupportSection)
 
 # Register the UserProfile model
 admin.site.register(UserProfile)
+
+# Register the BroadcastMessage model
+admin.site.register(BroadcastMessage)
 
 class UserAdmin(BaseUserAdmin):
     list_display = ("id", "username", "email", "first_name", "last_name", "is_staff")

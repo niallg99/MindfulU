@@ -64,7 +64,7 @@ export default {
 </script>
 <template>
 	<div class="page-container">
-		<navbar :is-logged-in="true"/>
+		<navbar />
 		<div class="container mt-4">
 			<div class="d-flex justify-content-center align-items-center">
 				<div class="card shadow">

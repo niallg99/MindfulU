@@ -62,7 +62,12 @@ export default {
 			users: [],
 			userProfile: {},
 			selectedUser: null,
-			showUserModal: false
+			showUserModal: false,
+			phone: '',
+			currentPage: 1,
+			pageSize: 10,
+			sortAverageMood: null,
+			sortRiskLevel: null,
 		};
 	},
 	computed: {

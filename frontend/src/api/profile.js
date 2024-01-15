@@ -20,8 +20,6 @@ const updateProfile = async (formData) => {
 
 		const cloudinaryData = await cloudinaryResponse.json();
 		const profilePictureUrl = cloudinaryData.secure_url;
-		console.log('Cloudinary response:', cloudinaryData);
-		console.log('Profile picture URL:', profilePictureUrl);
 
 		const accessToken = getAccessToken();
 		const url = await fetch(`${baseUrl}/api/user/update-profile/`, {

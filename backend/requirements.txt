@@ -9,4 +9,5 @@ beautifulsoup4~=4.10.0
 pillow~=10.1.0
 cloudinary~=1.26.0
 mixpanel~=4.10.0
-
+twilio
+python-dotenv

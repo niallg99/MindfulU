@@ -15,6 +15,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAdminUser
 from mixpanel import Mixpanel
+from django.conf import settings
+from twilio.rest import Client
 from base.models import Event, ScrapedData, Mood, SupportLink, MoodCause, Friends, BroadcastMessage, UserProfile, UserProfile
 from base.serializers import (
 		EventSerializer,
@@ -31,6 +33,28 @@ from base.serializers import (
 logger = logging.getLogger(__name__)
 
 mp = Mixpanel(settings.MIXPANEL_TOKEN)
+
+@api_view(['POST'])
+def send_help_sms(request):
+		user = request.user
+		message_body = f"Help button clicked by {user.username} ({user.first_name} {user.last_name})!"
+		client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+
+		admin_profiles = UserProfile.objects.filter(user__is_staff=True, phone__isnull=False)
+
+		for profile in admin_profiles:
+				try:
+						message = client.messages.create(
+								body=message_body,
+								from_=settings.TWILIO_PHONE_NUMBER,
+								to=profile.phone
+						)
+						print(f"SMS sent successfully to {profile.phone}. SID: {message.sid}")
+				except Exception as e:
+						print(f"Error sending SMS to {profile.phone}: {e}")
+
+		return Response({"message": "Help SMS sent to admins"})
+
 
 @api_view(['POST'])
 def track_event(request):
