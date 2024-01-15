@@ -43,10 +43,11 @@ class ViewTestCase(APITestCase):
 				self.assertIn('access_token', response.data)
 
 		def test_get_user_profile_view(self):
-				url = reverse('get-user-profile', kwargs={'username': self.user.username})
-				response = self.client.get(url)
-				self.assertEqual(response.status_code, status.HTTP_200_OK)
-				self.assertEqual(response.data['phone'], self.user_profile.phone)
+			url = reverse('get-profile', kwargs={'username': self.user.username})
+			response = self.client.get(url)
+			self.assertEqual(response.status_code, status.HTTP_200_OK)
+			self.assertEqual(response.data['phone'], self.user_profile.phone)
+
 
 		def test_get_events_view(self):
 				url = reverse('get-events')
@@ -75,37 +76,44 @@ class UserViewTests(APITestCase):
 
 
 		def test_reset_password(self):
-			
 			url = reverse('reset-password')
-			data = {'email': self.user.email, 'new_password': 'newtestpassword'}
+			data = {
+					'email': self.user.email,
+					'new_password': 'newtestpassword123'
+			}
 			response = self.client.post(url, data)
 			self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+
 		def test_get_events(self):
-			url = reverse('get-events')  # Use hyphens instead of underscores
+			url = reverse('get-events')
 			response = self.client.get(url)
 			self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 		def test_get_scraped_data(self):
-				url = reverse('get-scraped-data')  # Use hyphens instead of underscores
+				url = reverse('get-scraped-data')
 				response = self.client.get(url)
 				self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 		def test_get_mood_choices(self):
-				url = reverse('mood-choices')  # Use hyphens instead of underscores
+				url = reverse('mood-choices')
 				response = self.client.get(url)
 				self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 		def test_get_support_links(self):
-				url = reverse('custom-support-links')  # Correct name from urlpatterns
+				url = reverse('custom-support-links')
 				response = self.client.get(url)
 				self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 		def test_post_mood(self):
-				url = reverse('post-mood')
-				data = {'mood_type': 'Happy', 'description': 'Feeling great!'}  # Ensure 'Happy' is a valid choice
-				response = self.client.post(url, data)
-				self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+			url = reverse('post-mood')
+			data = {
+					'mood_type': 'Meh',
+					'description': '',
+					'mood_cause': ''  # Assuming this is a valid input
+			}
+			response = self.client.post(url, data)
+			self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
 		def test_update_mood(self):

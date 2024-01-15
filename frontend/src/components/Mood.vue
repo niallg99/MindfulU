@@ -1,5 +1,7 @@
 <script>
 import { postMood, fetchMoodCauses, fetchMoodChoices } from '@/api/moods';
+import { sendHelpSMS } from '@/api/messages';
+import { trackEvent } from '../api/mixpanel';
 
 export default {
 	name: 'Mood',
@@ -53,12 +55,25 @@ computed: {
 				this.resetForm();
 				this.isModalVisible = false;
 			} catch (error) {
-				console.error('Error posting mood:', error);
+				this.errorMessage = error.message;
 			}
 		},
-	resetForm() {
-		this.selectedCause = '';
-		this.feedback = '';
+		async handleHelpClick() {
+			try {
+				await sendHelpSMS();
+				alert('Staff have been notified and will respond as soon as possible.');
+				trackEvent('Help Button Clicked', {
+					UserID: localStorage.getItem('userId'),
+					Username: localStorage.getItem('username'),
+				});
+				this.isModalVisible = false;
+			} catch (error) {
+					alert('Sorry, an issue occurred. Please try again.');
+			}
+		},
+		resetForm() {
+			this.selectedCause = '';
+			this.feedback = '';
 		},
 	},
 	async mounted() {
@@ -97,7 +112,8 @@ computed: {
 						<textarea id="feedback" class="form-control" v-model="feedback"></textarea>
 					</div>
 					<div class="padding-top-1">
-						<button type="submit" class="btn btn-success">Submit</button>
+						<button type="submit" class="btn btn-success margin-right-1">Submit</button>
+						<button v-if="shouldShowCauseInput" @click="handleHelpClick" type="button" class="btn btn-danger">I need help!</button>
 					</div>
 				</form>
 			</div>
