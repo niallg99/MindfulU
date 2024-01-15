@@ -32,15 +32,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-
 cloudinary.config(
   cloud_name = "dtvusggem",
   api_key = os.environ.get("CLOUDINARY_API_KEY"),
-  api_secret = os.environ.get("CLOUDINARY_API_SECRET")
 )
 
 MIXPANEL_TOKEN = os.environ.get("MIXPANEL_TOKEN")
 
+# Twilio settings
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
+
+print("TWILIO_ACCOUNT_SID:", TWILIO_ACCOUNT_SID)
+print("TWILIO_AUTH_TOKEN:", TWILIO_AUTH_TOKEN)
+print("TWILIO_PHONE_NUMsBER:", TWILIO_PHONE_NUMBER)
 
 # Application definition
 DJANGO_APPS = [
