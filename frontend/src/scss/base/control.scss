@@ -1,0 +1,17 @@
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:visited,
+.button.btn.btn-primary {
+    background-color: $color-dusty-rose !important;
+    border-color: $color-dusty-rose !important; // Sets border color
+}
+
+.btn-primary-border,
+.btn-primary-border:hover,
+.btn-primary-border:active,
+.btn-primary-border:visited {
+    background-color: transparent;
+    border: 1px solid $color-dusty-rose !important; // Sets border color
+    color: $color-dusty-rose; // Sets text color, adjust as needed
+}

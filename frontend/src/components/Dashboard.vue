@@ -142,7 +142,14 @@ export default {
       this.isError = true;
       this.errorMessage = message;
       this.isLoading = false;
-    }
+    },
+    async fetchUserProfileData() {
+      try {
+        this.userProfile = await fetchUserProfile(this.username);
+      } catch (error) {
+        this.handleError('Failed to load user profile.', error);
+      }
+    },
   },
   async mounted() {
     this.userId = localStorage.getItem('userId');
@@ -153,7 +160,7 @@ export default {
         this.fetchMoodData(),
         this.fetchFriendRequests(),
         this.fetchOtherData(),
-        fetchUserProfile(this.username),
+        this.fetchUserProfileData(),
     ]);
   } catch (error) {
     this.handleError('An error occurred while fetching data.', error);
