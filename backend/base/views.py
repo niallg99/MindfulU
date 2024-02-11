@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAdminUser
+from twilio.base.exceptions import TwilioRestException
 from mixpanel import Mixpanel
 from django.conf import settings
 from twilio.rest import Client
@@ -54,6 +55,21 @@ def send_help_sms(request):
 						print(f"Error sending SMS to {profile.phone}: {e}")
 
 		return Response({"message": "Help SMS sent to admins"})
+
+def verify_phone_number(request):
+		phone_number = request.GET.get('phoneNumber')
+		client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+		try:
+				response = client.lookups.phone_numbers(phone_number).fetch(type="carrier")
+				print(response)
+				return JsonResponse({'phone_number': response.phone_number})
+		except TwilioRestException as e:
+				if e.status == 404:
+						return JsonResponse({'error': 'Phone number not found'}, status=404)
+				else:
+						return JsonResponse({'error': 'An error occurred'}, status=e.status)
+		except Exception as e:
+				return JsonResponse({'error': str(e)}, status=500)
 
 
 @api_view(['POST'])

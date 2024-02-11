@@ -1,5 +1,6 @@
 <script>
 import { registerUser } from '@/api/registration';
+import { verifyPhoneNumber } from '@/api/messages.js';
 import loginApi from '@/api/login';
 
 export default {
@@ -20,6 +21,11 @@ export default {
 		async register() {
 		this.isRegistering = true;
 			try {
+				const verifiedPhoneNumber = await verifyPhoneNumber(this.phone);
+        if (!verifiedPhoneNumber) {
+						this.errorMessage = 'Phone number verification failed.';
+						return;
+				}
 				const csrfToken = await loginApi.getCSRFToken();
 				const userData = {
 					username: this.username,

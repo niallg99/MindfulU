@@ -35,5 +35,6 @@ urlpatterns = [
     path('api/user/update-preferences', views.update_show_mood_preference, name='update-show-mood-preference'),
     path('api/track-event/', views.track_event, name='track-event'),
     path('api/send-help-sms/', views.send_help_sms, name='send_help_sms'),
+    path('api/verify-phone-number/', views.verify_phone_number, name='verify-phone-number'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -44,10 +44,6 @@ TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
 
-print("TWILIO_ACCOUNT_SID:", TWILIO_ACCOUNT_SID)
-print("TWILIO_AUTH_TOKEN:", TWILIO_AUTH_TOKEN)
-print("TWILIO_PHONE_NUMsBER:", TWILIO_PHONE_NUMBER)
-
 # Application definition
 DJANGO_APPS = [
     "django.contrib.admin",

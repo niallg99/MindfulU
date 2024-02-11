@@ -24,13 +24,38 @@ const sendHelpSMS = async () => {
 			const errorBody = await response.json();
 			throw new Error(`HTTP error ${response.status}: ${errorBody.detail || 'Unknown error'}`);
 		}
-
-		const data = await response.json();
-		console.log(data);
+		 await response.json();
 	} catch (error) {
 		console.error('Error sending help SMS:', error);
 		throw error;
 	}
 };
 
-export { sendHelpSMS };
+const verifyPhoneNumber = async (phoneNumber) => {
+	try {
+		const formattedPhoneNumber = phoneNumber.startsWith('+44') ? phoneNumber : `+44${phoneNumber}`;
+
+		const response = await fetch(`${baseUrl}/api/verify-phone-number/?phoneNumber=${encodeURIComponent(formattedPhoneNumber)}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+
+		if (response.ok) {
+			const data = await response.json();
+			return data.phoneNumber || formattedPhoneNumber;
+		} else {
+			const errorBody = await response.json();
+			throw new Error(`HTTP error ${response.status}: ${errorBody.error || 'Unknown error'}`);
+		}
+	} catch (error) {
+		console.error('Error verifying phone number:', error);
+		throw error;
+	}
+};
+
+
+
+
+export { sendHelpSMS, verifyPhoneNumber };
